@@ -14,7 +14,7 @@ service RunnerService {
   rpc EnsureImage(EnsureImageRequest) returns (EnsureImageResponse);
 
   // Targets (containers today)
-  rpc StartTarget(StartTargetRequest) returns (StartTargetResponse);
+  rpc StartWorkload(StartWorkloadRequest) returns (StartWorkloadResponse);
   rpc StopTarget(StopTargetRequest) returns (StopTargetResponse);
   rpc RemoveTarget(RemoveTargetRequest) returns (RemoveTargetResponse);
 
@@ -81,7 +81,8 @@ message EnvVar {
   string value = 2;
 }
 
-message StartTargetRequest {
+// ContainerSpec describes a single container within a workload.
+message ContainerSpec {
   string image = 1;
   string name = 2;
   repeated string cmd = 3;
@@ -94,25 +95,46 @@ message StartTargetRequest {
 
   // Bind mounts in Docker form "hostPath:containerPath[:ro|rw]".
   repeated string binds = 8;
-  bool tty = 10;
 
-  map<string, string> labels = 11;
+  bool tty = 9;
 
-  Platform platform = 12;
+  map<string, string> labels = 10;
 
-  bool privileged = 13;
+  Platform platform = 11;
+
+  bool privileged = 12;
 
   // Anonymous volumes (container paths).
-  repeated string anonymous_volumes = 14;
+  repeated string anonymous_volumes = 13;
 
   // TTL hint for garbage collection.
-  uint32 ttl_seconds = 15;
+  uint32 ttl_seconds = 14;
 }
 
-message StartTargetResponse {
-  string target_id = 1;
-  string name = 2;
+// A workload is a main container plus optional sidecars.
+// Runner MUST ensure sidecars share the same network namespace as the main container.
+message StartWorkloadRequest {
+  ContainerSpec main = 1;
+  repeated ContainerSpec sidecars = 2;
+}
+
+message SidecarInstance {
+  string name = 1;
+  string id = 2;
   string status = 3;
+}
+
+message StartWorkloadResponse {
+  // Workload/group identifier.
+  string id = 1;
+
+  // Main container identifier.
+  string main_id = 2;
+
+  string name = 3;
+  string status = 4;
+
+  repeated SidecarInstance sidecars = 5;
 }
 
 message StopTargetRequest {
