@@ -128,13 +128,17 @@ message StartWorkloadResponse {
   // Workload/group identifier.
   string id = 1;
 
-  // Main container identifier.
-  string main_id = 2;
+  WorkloadContainers containers = 2;
 
   string name = 3;
   string status = 4;
+}
 
-  repeated SidecarInstance sidecars = 5;
+message WorkloadContainers {
+  // Main container identifier.
+  string main = 1;
+
+  repeated SidecarInstance sidecars = 2;
 }
 
 message StopTargetRequest {
