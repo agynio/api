@@ -1,9 +1,14 @@
 # agynio/api
 
-This repository contains Agyn API contracts (IDL), primarily **Protocol Buffers** definitions used for inter-service communication.
+Agyn API contracts (IDL) repository.
 
-## Layout
-- `proto/` — `.proto` sources
+## Protobuf layout
+Protobuf sources live under:
 
-## Tooling
-We use **Buf** for protobuf linting / breaking-change checks and for orchestrating code generation in consumer repositories.
+- `proto/<name>/<version>/*.proto`
+
+Example:
+- `proto/runner/v1/runner.proto`
+
+## Buf / BSR
+We use **Buf** for linting and codegen orchestration, and publish this module to **Buf Schema Registry (BSR)**.

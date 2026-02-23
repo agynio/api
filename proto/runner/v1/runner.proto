@@ -1,0 +1,140 @@
+syntax = "proto3";
+
+package agynio.api.runner.v1;
+
+service RunnerService {
+  // Start an execution and stream output/events.
+  // Client MUST send exactly one `start` message first, then may send stdin/resize.
+  // Server streams events until it emits a terminal `exit` event.
+  rpc Exec(stream ExecRequest) returns (stream ExecEvent);
+
+  // Best-effort cancellation of a running execution.
+  rpc CancelExecution(CancelExecutionRequest) returns (CancelExecutionResponse);
+}
+
+message ExecRequest {
+  oneof msg {
+    ExecStartRequest start = 1;
+    ExecStdin stdin = 2;
+    ExecResize resize = 3;
+  }
+}
+
+message ExecStartRequest {
+  // Caller-provided idempotency key for start.
+  string request_id = 1;
+
+  // Where to run the command.
+  TargetSelector target = 2;
+
+  // Exactly one must be set.
+  repeated string argv = 3;
+  string shell = 4;
+
+  string workdir = 5;
+  repeated EnvVar env = 6;
+
+  bool tty = 7;
+  bool separate_stderr = 8;
+
+  // Hard wall-clock timeout for the process. 0 = disabled (server may cap).
+  uint64 timeout_ms = 9;
+
+  // Idle timeout: no stdout/stderr observed. 0 = disabled.
+  uint64 idle_timeout_ms = 10;
+
+  // If true, when client cancels the Exec RPC, runner should attempt to terminate the process.
+  bool kill_on_cancel = 11;
+
+  // Bytes retained by server for tails included in Exit (streaming unaffected).
+  uint64 exit_tail_bytes = 12;
+
+  // Optional non-secret execution context (routing/policy/trace).
+  map<string, string> context = 13;
+}
+
+message TargetSelector {
+  // Backend implementation identifier (optional).
+  // Examples: "docker", "k8s", "ecs", "ssh".
+  string backend = 1;
+
+  // A stable target identity within the backend.
+  // Examples: docker container id, k8s pod uid/name, ecs task arn, vm instance id.
+  string target_id = 2;
+
+  // Optional backend-dependent scoping.
+  map<string, string> scope = 3;
+}
+
+message EnvVar {
+  string name = 1;
+  string value = 2;
+}
+
+message ExecStdin {
+  bytes data = 1;
+}
+
+message ExecResize {
+  uint32 cols = 1;
+  uint32 rows = 2;
+}
+
+message ExecEvent {
+  oneof event {
+    ExecStarted started = 1;
+    ExecOutput stdout = 2;
+    ExecOutput stderr = 3;
+    ExecExit exit = 4;
+    ExecError error = 5;
+  }
+}
+
+message ExecStarted {
+  string execution_id = 1;
+  uint64 started_at_ms = 2;
+}
+
+message ExecOutput {
+  uint64 seq = 1;
+  bytes data = 2;
+  uint64 ts_ms = 3;
+}
+
+message ExecExit {
+  string execution_id = 1;
+  int32 exit_code = 2;
+
+  bool killed = 3;
+  ExecExitReason reason = 4;
+
+  bytes stdout_tail = 5;
+  bytes stderr_tail = 6;
+
+  uint64 finished_at_ms = 7;
+}
+
+enum ExecExitReason {
+  EXEC_EXIT_REASON_UNSPECIFIED = 0;
+  EXEC_EXIT_REASON_COMPLETED = 1;
+  EXEC_EXIT_REASON_TIMEOUT = 2;
+  EXEC_EXIT_REASON_IDLE_TIMEOUT = 3;
+  EXEC_EXIT_REASON_CANCELLED = 4;
+  EXEC_EXIT_REASON_RUNNER_ERROR = 5;
+}
+
+message ExecError {
+  string code = 1;
+  string message = 2;
+  bool retryable = 3;
+}
+
+message CancelExecutionRequest {
+  string execution_id = 1;
+  // true => hard kill, false => graceful best-effort
+  bool force = 2;
+}
+
+message CancelExecutionResponse {
+  bool cancelled = 1;
+}
