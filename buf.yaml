@@ -1,8 +1,8 @@
 version: v2
-name: buf.build/agynio/api
 
 modules:
   - path: proto
+    name: buf.build/agynio/api
 
 lint:
   use:
