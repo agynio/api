@@ -94,10 +94,6 @@ message StartTargetRequest {
 
   // Bind mounts in Docker form "hostPath:containerPath[:ro|rw]".
   repeated string binds = 8;
-
-  // Network mode / network name.
-  string network_mode = 9;
-
   bool tty = 10;
 
   map<string, string> labels = 11;
