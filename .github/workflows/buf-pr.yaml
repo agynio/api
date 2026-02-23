@@ -1,4 +1,4 @@
-name: buf
+name: buf-pr
 
 on:
   pull_request:
