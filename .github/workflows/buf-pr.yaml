@@ -1,9 +1,7 @@
-name: buf
+name: buf-pr
 
 on:
   pull_request:
-  push:
-    branches: [ main ]
 
 jobs:
   buf:
@@ -14,4 +12,4 @@ jobs:
         with:
           input: .
           lint: true
-          breaking: false
+          breaking: true

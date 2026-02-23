@@ -13,7 +13,7 @@ jobs:
         with:
           input: .
           lint: true
-          breaking: false
+          breaking: true
           push: true
         env:
           BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
