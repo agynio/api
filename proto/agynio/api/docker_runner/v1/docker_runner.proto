@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package agynio.api.docker_runner.v1;
+
+// Placeholder proto to establish module/package structure.
+// The actual service definitions will be added as part of the platform gRPC migration.
+
+message Placeholder {
+  string note = 1;
+}

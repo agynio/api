@@ -1,0 +1,5 @@
+# Generated code should live in consumer repos, not here
+**/gen/
+**/*.pb.go
+**/*_pb2.py
+**/*.ts

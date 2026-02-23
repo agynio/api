@@ -1,0 +1,9 @@
+version: v2
+name: buf.build/agynio/api
+
+lint:
+  use:
+    - STANDARD
+breaking:
+  use:
+    - FILE
