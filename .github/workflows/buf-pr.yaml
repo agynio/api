@@ -12,4 +12,4 @@ jobs:
         with:
           input: .
           lint: true
-          breaking: false
+          breaking: true
