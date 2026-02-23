@@ -10,31 +10,27 @@ service RunnerService {
   // Health/readiness
   rpc Ready(ReadyRequest) returns (ReadyResponse);
 
-  // Images
-  rpc EnsureImage(EnsureImageRequest) returns (EnsureImageResponse);
-
   // Targets (containers today)
   rpc StartWorkload(StartWorkloadRequest) returns (StartWorkloadResponse);
-  rpc StopTarget(StopTargetRequest) returns (StopTargetResponse);
-  rpc RemoveTarget(RemoveTargetRequest) returns (RemoveTargetResponse);
+  rpc StopWorkload(StopWorkloadRequest) returns (StopWorkloadResponse);
+  rpc RemoveWorkload(RemoveWorkloadRequest) returns (RemoveWorkloadResponse);
 
   // Minimal inspect surface with EXACT fields required by platform today.
-  rpc InspectTarget(InspectTargetRequest) returns (InspectTargetResponse);
+  rpc InspectWorkload(InspectWorkloadRequest) returns (InspectWorkloadResponse);
 
-  rpc GetTargetLabels(GetTargetLabelsRequest) returns (GetTargetLabelsResponse);
-  rpc GetTargetNetworks(GetTargetNetworksRequest) returns (GetTargetNetworksResponse);
+  rpc GetWorkloadLabels(GetWorkloadLabelsRequest) returns (GetWorkloadLabelsResponse);
 
-  rpc FindTargetsByLabels(FindTargetsByLabelsRequest) returns (FindTargetsByLabelsResponse);
-  rpc ListTargetsByVolume(ListTargetsByVolumeRequest) returns (ListTargetsByVolumeResponse);
+  rpc FindWorkloadsByLabels(FindWorkloadsByLabelsRequest) returns (FindWorkloadsByLabelsResponse);
+  rpc ListWorkloadsByVolume(ListWorkloadsByVolumeRequest) returns (ListWorkloadsByVolumeResponse);
 
   rpc RemoveVolume(RemoveVolumeRequest) returns (RemoveVolumeResponse);
 
-  rpc TouchTarget(TouchTargetRequest) returns (TouchTargetResponse);
+  rpc TouchWorkload(TouchWorkloadRequest) returns (TouchWorkloadResponse);
 
   rpc PutArchive(PutArchiveRequest) returns (PutArchiveResponse);
 
   // Streaming logs/events (SSE equivalents)
-  rpc StreamTargetLogs(StreamTargetLogsRequest) returns (stream StreamTargetLogsResponse);
+  rpc StreamWorkloadLogs(StreamWorkloadLogsRequest) returns (stream StreamWorkloadLogsResponse);
   rpc StreamEvents(StreamEventsRequest) returns (stream StreamEventsResponse);
 
   // Exec (streaming-only; replaces /v1/exec/run and /v1/exec/interactive/ws)
@@ -59,26 +55,39 @@ message RunnerError {
   bool retryable = 4;
 }
 
-// -------------------- Images --------------------
-
-enum Platform {
-  PLATFORM_UNSPECIFIED = 0;
-  PLATFORM_LINUX_AMD64 = 1;
-  PLATFORM_LINUX_ARM64 = 2;
-}
-
-message EnsureImageRequest {
-  string image = 1;
-  Platform platform = 2; // PLATFORM_UNSPECIFIED means "backend default"
-}
-
-message EnsureImageResponse {}
-
 // -------------------- Target lifecycle --------------------
 
 message EnvVar {
   string name = 1;
   string value = 2;
+}
+
+// Volume specifications for a workload.
+message VolumeSpec {
+  // Logical name referenced by mounts.
+  string name = 1;
+
+  VolumeKind kind = 2;
+
+  // For named (persistent) volumes, the backend-level identifier.
+  // Docker example: "ha_ws_<threadId>".
+  string persistent_name = 3;
+
+  map<string, string> additional_properties = 100;
+}
+
+enum VolumeKind {
+  VOLUME_KIND_UNSPECIFIED = 0;
+  VOLUME_KIND_EPHEMERAL = 1;
+  VOLUME_KIND_NAMED = 2;
+}
+
+message VolumeMount {
+  // References VolumeSpec.name.
+  string volume = 1;
+
+  string mount_path = 2;
+  bool read_only = 3;
 }
 
 // ContainerSpec describes a single container within a workload.
@@ -91,24 +100,16 @@ message ContainerSpec {
   repeated EnvVar env = 5;
 
   string working_dir = 6;
-  bool auto_remove = 7;
 
-  // Bind mounts in Docker form "hostPath:containerPath[:ro|rw]".
-  repeated string binds = 8;
+  // Volume mounts inside this container.
+  repeated VolumeMount mounts = 7;
 
-  bool tty = 9;
+  // Required capabilities that the backend must satisfy for this container.
+  // Example values: "privileged", "dind".
+  repeated string required_capabilities = 8;
 
-  map<string, string> labels = 10;
-
-  Platform platform = 11;
-
-  bool privileged = 12;
-
-  // Anonymous volumes (container paths).
-  repeated string anonymous_volumes = 13;
-
-  // TTL hint for garbage collection.
-  uint32 ttl_seconds = 14;
+  // Backend-specific optional properties.
+  map<string, string> additional_properties = 100;
 }
 
 // A workload is a main container plus optional sidecars.
@@ -116,6 +117,10 @@ message ContainerSpec {
 message StartWorkloadRequest {
   ContainerSpec main = 1;
   repeated ContainerSpec sidecars = 2;
+
+  repeated VolumeSpec volumes = 3;
+
+  map<string, string> additional_properties = 100;
 }
 
 message SidecarInstance {
@@ -130,8 +135,10 @@ message StartWorkloadResponse {
 
   WorkloadContainers containers = 2;
 
-  string name = 3;
-  string status = 4;
+  WorkloadStatus status = 3;
+
+  // Present when status is FAILED.
+  WorkloadFailure failure = 4;
 }
 
 message WorkloadContainers {
@@ -141,28 +148,42 @@ message WorkloadContainers {
   repeated SidecarInstance sidecars = 2;
 }
 
-message StopTargetRequest {
-  string target_id = 1;
+enum WorkloadStatus {
+  WORKLOAD_STATUS_UNSPECIFIED = 0;
+  WORKLOAD_STATUS_RUNNING = 1;
+  WORKLOAD_STATUS_STARTING = 2;
+  WORKLOAD_STATUS_STOPPED = 3;
+  WORKLOAD_STATUS_FAILED = 4;
+}
+
+message WorkloadFailure {
+  string code = 1;
+  string message = 2;
+  map<string, string> details = 3;
+}
+
+message StopWorkloadRequest {
+  string workload_id = 1;
   uint32 timeout_sec = 2;
 }
 
-message StopTargetResponse {}
+message StopWorkloadResponse {}
 
-message RemoveTargetRequest {
-  string target_id = 1;
+message RemoveWorkloadRequest {
+  string workload_id = 1;
   bool force = 2;
   bool remove_volumes = 3;
 }
 
-message RemoveTargetResponse {}
+message RemoveWorkloadResponse {}
 
-message InspectTargetRequest {
-  string target_id = 1;
+message InspectWorkloadRequest {
+  string workload_id = 1;
 }
 
 // EXACT fields used today in platform:
 // id, name, image, config_image, config_labels, mounts, state_status, state_running
-message InspectTargetResponse {
+message InspectWorkloadResponse {
   string id = 1;
   string name = 2;
 
@@ -183,36 +204,28 @@ message TargetMount {
   bool read_only = 4;
 }
 
-message GetTargetLabelsRequest {
-  string target_id = 1;
+message GetWorkloadLabelsRequest {
+  string workload_id = 1;
 }
 
-message GetTargetLabelsResponse {
+message GetWorkloadLabelsResponse {
   map<string, string> labels = 1;
 }
 
-message GetTargetNetworksRequest {
-  string target_id = 1;
-}
-
-message GetTargetNetworksResponse {
-  repeated string networks = 1;
-}
-
-message FindTargetsByLabelsRequest {
+message FindWorkloadsByLabelsRequest {
   map<string, string> labels = 1;
   bool all = 2;
 }
 
-message FindTargetsByLabelsResponse {
+message FindWorkloadsByLabelsResponse {
   repeated string target_ids = 1;
 }
 
-message ListTargetsByVolumeRequest {
+message ListWorkloadsByVolumeRequest {
   string volume_name = 1;
 }
 
-message ListTargetsByVolumeResponse {
+message ListWorkloadsByVolumeResponse {
   repeated string target_ids = 1;
 }
 
@@ -223,14 +236,14 @@ message RemoveVolumeRequest {
 
 message RemoveVolumeResponse {}
 
-message TouchTargetRequest {
-  string target_id = 1;
+message TouchWorkloadRequest {
+  string workload_id = 1;
 }
 
-message TouchTargetResponse {}
+message TouchWorkloadResponse {}
 
 message PutArchiveRequest {
-  string target_id = 1;
+  string workload_id = 1;
   string path = 2;
   bytes tar_payload = 3;
 }
@@ -239,8 +252,8 @@ message PutArchiveResponse {}
 
 // -------------------- Logs streaming --------------------
 
-message StreamTargetLogsRequest {
-  string target_id = 1;
+message StreamWorkloadLogsRequest {
+  string workload_id = 1;
 
   bool follow = 2;
   int64 since = 3; // epoch seconds; 0 = unset
@@ -250,7 +263,7 @@ message StreamTargetLogsRequest {
   bool timestamps = 7;
 }
 
-message StreamTargetLogsResponse {
+message StreamWorkloadLogsResponse {
   oneof event {
     LogChunk chunk = 1;
     LogEnd end = 2;
