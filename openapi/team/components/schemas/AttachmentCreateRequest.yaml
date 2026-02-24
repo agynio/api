@@ -1,8 +1,9 @@
 type: object
+description: |
+  Create an attachment (relation) between two entities using a predefined `kind`.
+  Source/target types are implied by `kind` and validated by the backend; do not include them to avoid duplication.
 properties:
   kind: { $ref: './AttachmentKind.yaml' }
-  sourceType: { $ref: './EntityType.yaml' }
   sourceId: { type: string, format: uuid }
-  targetType: { $ref: './EntityType.yaml' }
   targetId: { type: string, format: uuid }
-required: [kind, sourceType, sourceId, targetType, targetId]
+required: [kind, sourceId, targetId]
