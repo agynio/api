@@ -1,0 +1,7 @@
+allOf:
+  - $ref: './EntityMeta.yaml'
+  - type: object
+    properties:
+      title: { type: string }
+      config: { $ref: './WorkspaceConfig.yaml' }
+    required: [config]

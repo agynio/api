@@ -1,0 +1,7 @@
+type: object
+properties:
+  title: { type: string }
+  name: { type: string }
+  role: { type: string }
+  config: { $ref: './AgentConfig.yaml' }
+required: [config]
