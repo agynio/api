@@ -1,0 +1,11 @@
+extends:
+  - spectral:oas
+rules:
+  operation-operationId:
+    severity: warn
+  operationId-unique:
+    severity: warn
+  info-description:
+    severity: warn
+  tag-description:
+    severity: warn
