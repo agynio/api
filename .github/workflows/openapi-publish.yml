@@ -1,0 +1,74 @@
+name: OpenAPI Lint & Publish
+
+on:
+  pull_request:
+    paths:
+      - 'openapi/**'
+  push:
+    branches: [ main ]
+    paths:
+      - 'openapi/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install CLI tools (Redocly, Spectral)
+        run: |
+          npm install -g @redocly/cli @stoplight/spectral-cli
+      - name: Bundle spec (team v1)
+        run: |
+          mkdir -p dist
+          redocly bundle openapi/team/v1/openapi.yaml -o dist/team-v1.yaml
+      - name: Lint bundled spec with Spectral
+        run: |
+          spectral lint dist/team-v1.yaml
+      - name: Upload bundled artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: team-v1-openapi
+          path: dist/team-v1.yaml
+
+  publish:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Redocly
+        run: |
+          npm install -g @redocly/cli
+      - name: Bundle spec (team v1)
+        run: |
+          mkdir -p dist
+          redocly bundle openapi/team/v1/openapi.yaml -o dist/team-v1.yaml
+      - name: Install ORAS
+        env:
+          ORAS_VERSION: '1.1.0'
+        run: |
+          curl -L -o oras.tar.gz "https://github.com/oras-project/oras/releases/download/v${ORAS_VERSION}/oras_${ORAS_VERSION}_linux_amd64.tar.gz"
+          tar -xzf oras.tar.gz
+          sudo mv oras /usr/local/bin/oras
+          oras version
+      - name: Login to GHCR
+        env:
+          CR_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$CR_PAT" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+      - name: Push OCI artifact to GHCR (major tag only)
+        run: |
+          oras push ghcr.io/agynio/openapi/team:1 \
+            dist/team-v1.yaml:application/vnd.oai.openapi+yaml
