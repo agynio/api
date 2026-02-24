@@ -11,7 +11,6 @@ properties:
   restrictOutput: { type: boolean, default: false }
   restrictionMessage: { type: string, default: "Do not produce a final answer directly. Before finishing, call a tool. If no tool is needed, call the 'finish' tool." }
   restrictionMaxInjections: { type: integer, minimum: 0, default: 0 }
-  title: { type: string }
   name: { type: string }
   role: { type: string }
 additionalProperties: false

@@ -3,6 +3,6 @@ allOf:
   - type: object
     properties:
       title: { type: string }
-      namespace: { type: string }
+      description: { type: string }
       config: { $ref: './McpServerConfig.yaml' }
     required: [config]
