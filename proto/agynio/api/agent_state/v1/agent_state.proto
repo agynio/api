@@ -4,8 +4,6 @@ package agynio.api.agent_state.v1;
 
 import "google/protobuf/timestamp.proto";
 
-option java_multiple_files = true;
-option java_outer_classname = "AgentStateServiceProto";
 option go_package = "github.com/agynio/api/gen/agynio/api/agent_state/v1;agentstatev1";
 
 // Agent Persistent State Service (APSS)
