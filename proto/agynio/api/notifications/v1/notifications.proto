@@ -37,7 +37,6 @@ message PublishRequest {
   repeated string rooms = 2;
   google.protobuf.Struct payload = 3;
   string source = 4;
-  string trace_id = 5;
   map<string, string> attributes = 6;
 }
 
