@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package agynio.api.notifications.v1;
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+// NotificationsService v1
+//
+// Internal notifications contract. Producers publish events; a future
+// gateway subscribes and bridges to external transports (e.g., sockets).
+service NotificationsService {
+  // Publish a single notification to rooms.
+  rpc Publish(PublishRequest) returns (PublishResponse);
+
+  // Publish a batch of notifications; each item returns success or error.
+  rpc PublishBatch(PublishBatchRequest) returns (PublishBatchResponse);
+
+  // Subscribe to envelopes filtered by rooms and/or events.
+  rpc Subscribe(SubscribeRequest) returns (stream SubscribeResponse);
+}
+
+// Envelope emitted to subscribers and used as the canonical notification.
+message NotificationEnvelope {
+  string id = 1; // server-generated UUID v4
+  google.protobuf.Timestamp ts = 2; // server-generated acceptance time
+  string source = 3; // optional origin (e.g., "platform-server")
+  string event = 4; // stable event name
+  repeated string rooms = 5; // non-empty list of target rooms
+  google.protobuf.Struct payload = 6; // JSON payload (event-specific schema)
+  string trace_id = 7; // optional trace identifier
+  map<string, string> attributes = 8; // optional opaque key/value pairs
+}
+
+message PublishRequest {
+  string event = 1;
+  repeated string rooms = 2;
+  google.protobuf.Struct payload = 3;
+  string source = 4;
+  string trace_id = 5;
+  map<string, string> attributes = 6;
+}
+
+message PublishResponse {
+  string id = 1;
+  google.protobuf.Timestamp ts = 2;
+}
+
+message PublishBatchRequest {
+  repeated PublishRequest items = 1;
+}
+
+message PublishBatchResponse {
+  repeated PublishResult results = 1;
+}
+
+message PublishResult {
+  oneof result {
+    string id = 1;
+    Error error = 2;
+  }
+  google.protobuf.Timestamp ts = 3; // present on success; optional on error
+}
+
+message SubscribeRequest {
+  repeated string rooms = 1; // must be non-empty
+  repeated string events = 2; // optional filter (empty = all)
+  string cursor = 3; // optional resume token
+}
+
+message SubscribeResponse {
+  NotificationEnvelope envelope = 1;
+}
+
+message Error {
+  enum Code {
+    CODE_UNSPECIFIED = 0;
+    CODE_INVALID_ARGUMENT = 1;
+    CODE_UNAVAILABLE = 2;
+    CODE_INTERNAL = 3;
+  }
+  Code code = 1;
+  string message = 2;
+  google.protobuf.Struct details = 3;
+}
+
+// Stability notes:
+// - Event names, room names, and payload shapes remain compatible with
+//   current consumers. Payload is Struct to preserve existing JSON.
+// - Producers set event/rooms/payload; server generates id/ts.
+// - Subscribe is for internal gateway usage; filtering may evolve while
+//   maintaining wire compatibility within v1.
