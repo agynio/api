@@ -33,7 +33,7 @@ service AgentStateService {
   // The client supplies the exact message IDs and call_id; APSS stores
   // a materialized copy of each message body in the provided order.
   // This guarantees reproducibility even after trims/edits.
-  rpc CreateSnapshotFromIds(CreateSnapshotFromIdsRequest) returns (CreateSnapshotFromIdsResponse);
+  rpc CreateSnapshot(CreateSnapshotRequest) returns (CreateSnapshotResponse);
 
 }
 
@@ -184,7 +184,6 @@ message GetConversationMetadataResponse { ConversationMetadata metadata = 1; }
 message ContextSnapshot {
   string snapshot_id = 1;                 // server-assigned UUID
   string conversation_id = 2;             // conversation this snapshot belongs to
-  string call_id = 3;                     // client-supplied identifier for the LLM call
   google.protobuf.Timestamp created_at = 4;
   int64 version_at_snapshot = 5;          // conversation version at snapshot time
   repeated SnapshotItem items = 6;        // ordered exactly as provided
@@ -200,13 +199,12 @@ message SnapshotItem {
   string body_sha256 = 6;                 // integrity hash of the serialized body
 }
 
-message CreateSnapshotFromIdsRequest {
+message CreateSnapshotRequest {
   string conversation_id = 1;
-  string call_id = 2;                     // correlation id for the LLM call
-  repeated string message_ids = 3;        // exact order to persist in the snapshot
-  int64 expect_version = 4;               // optional CAS to ensure snapshot matches intended state
+  repeated string message_ids = 2;        // exact order to persist in the snapshot
+  int64 expect_version = 3;               // optional CAS to ensure snapshot matches intended state
 }
 
-message CreateSnapshotFromIdsResponse {
+message CreateSnapshotResponse {
   ContextSnapshot snapshot = 1;
 }
