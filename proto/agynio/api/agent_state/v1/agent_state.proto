@@ -5,7 +5,7 @@ package agynio.api.agent_state.v1;
 import "google/protobuf/timestamp.proto";
 
 option java_multiple_files = true;
-option java_outer_classname = "AgentStateProto";
+option java_outer_classname = "AgentStateServiceProto";
 option go_package = "github.com/agynio/api/gen/agynio/api/agent_state/v1;agentstatev1";
 
 // Agent Persistent State Service (APSS)
@@ -15,7 +15,7 @@ option go_package = "github.com/agynio/api/gen/agynio/api/agent_state/v1;agentst
 // - message bodies are well-typed; text-only now, extensible via oneof
 // - no external type references
 
-service AgentState {
+service AgentStateService {
   // Append messages (batch). Server assigns seq; bumps conversation version.
   rpc AppendMessages(AppendMessagesRequest) returns (AppendMessagesResponse);
 
