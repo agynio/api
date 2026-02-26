@@ -185,8 +185,6 @@ message ContextSnapshot {
   string snapshot_id = 1;                 // server-assigned UUID
   string conversation_id = 2;             // conversation this snapshot belongs to
   google.protobuf.Timestamp created_at = 4;
-  int64 version_at_snapshot = 5;          // conversation version at snapshot time
-  repeated SnapshotItem items = 6;        // ordered exactly as provided
 }
 
 // Each snapshot item is a materialized message copy with integrity hash.
@@ -202,9 +200,46 @@ message SnapshotItem {
 message CreateSnapshotRequest {
   string conversation_id = 1;
   repeated string message_ids = 2;        // exact order to persist in the snapshot
-  int64 expect_version = 3;               // optional CAS to ensure snapshot matches intended state
 }
 
 message CreateSnapshotResponse {
   ContextSnapshot snapshot = 1;
+}
+
+// Snapshot listing RPCs
+message ListSnapshotMessagesRequest {
+  string snapshot_id = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListSnapshotMessagesResponse {
+  repeated Message messages = 1;
+  string next_page_token = 2;
+}
+
+message ListSnapshotMessageIdsRequest {
+  string snapshot_id = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListSnapshotMessageIdsResponse {
+  repeated string message_ids = 1;
+  string next_page_token = 2;
+}
+
+message ListConversationMessageIdsRequest {
+  string conversation_id = 1;
+  int64 seq_gte = 2;
+  int64 seq_lte = 3;
+  bool include_archived = 4;
+  int32 page_size = 5;
+  string page_token = 6;
+  bool descending = 7;
+}
+
+message ListConversationMessageIdsResponse {
+  repeated string message_ids = 1;
+  string next_page_token = 2;
 }
