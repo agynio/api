@@ -28,6 +28,12 @@ service AgentStateService {
 
   // Get conversation metadata (version, last_seq, message_count).
   rpc GetConversationMetadata(GetConversationMetadataRequest) returns (GetConversationMetadataResponse);
+
+  // Create a materialized context snapshot for a specific LLM call.
+  // The client supplies the exact message IDs and call_id; APSS stores
+  // a materialized copy of each message body in the provided order.
+  // This guarantees reproducibility even after trims/edits.
+  rpc CreateSnapshotFromIds(CreateSnapshotFromIdsRequest) returns (CreateSnapshotFromIdsResponse);
 }
 
 enum Role {
@@ -163,3 +169,44 @@ message TrimBySeqResponse {
 // Metadata
 message GetConversationMetadataRequest { string conversation_id = 1; }
 message GetConversationMetadataResponse { ConversationMetadata metadata = 1; }
+
+  // Create a materialized context snapshot for a specific LLM call.
+  // The client supplies the exact message IDs and call_id; APSS stores
+  // a materialized copy of each message body in the provided order.
+  // This guarantees reproducibility even after trims/edits.
+  rpc CreateSnapshotFromIds(CreateSnapshotFromIdsRequest) returns (CreateSnapshotFromIdsResponse);
+
+// --------------------------
+// Context Snapshots
+// --------------------------
+
+// A materialized snapshot of the exact context sent to an LLM call.
+message ContextSnapshot {
+  string snapshot_id = 1;                 // server-assigned UUID
+  string conversation_id = 2;             // conversation this snapshot belongs to
+  string call_id = 3;                     // client-supplied identifier for the LLM call
+  google.protobuf.Timestamp created_at = 4;
+  int64 version_at_snapshot = 5;          // conversation version at snapshot time
+  repeated SnapshotItem items = 6;        // ordered exactly as provided
+}
+
+// Each snapshot item is a materialized message copy with integrity hash.
+message SnapshotItem {
+  string message_id = 1;                  // original message id
+  int64 seq = 2;                          // original message seq
+  Role role = 3;                          // original role
+  string kind = 4;                        // original kind
+  MessageBody body = 5;                   // materialized body copy
+  string body_sha256 = 6;                 // integrity hash of the serialized body
+}
+
+message CreateSnapshotFromIdsRequest {
+  string conversation_id = 1;
+  string call_id = 2;                     // correlation id for the LLM call
+  repeated string message_ids = 3;        // exact order to persist in the snapshot
+  int64 expect_version = 4;               // optional CAS to ensure snapshot matches intended state
+}
+
+message CreateSnapshotFromIdsResponse {
+  ContextSnapshot snapshot = 1;
+}
