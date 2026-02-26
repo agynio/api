@@ -34,6 +34,7 @@ service AgentStateService {
   // a materialized copy of each message body in the provided order.
   // This guarantees reproducibility even after trims/edits.
   rpc CreateSnapshotFromIds(CreateSnapshotFromIdsRequest) returns (CreateSnapshotFromIdsResponse);
+
 }
 
 enum Role {
@@ -174,7 +175,6 @@ message GetConversationMetadataResponse { ConversationMetadata metadata = 1; }
   // The client supplies the exact message IDs and call_id; APSS stores
   // a materialized copy of each message body in the provided order.
   // This guarantees reproducibility even after trims/edits.
-  rpc CreateSnapshotFromIds(CreateSnapshotFromIdsRequest) returns (CreateSnapshotFromIdsResponse);
 
 // --------------------------
 // Context Snapshots
