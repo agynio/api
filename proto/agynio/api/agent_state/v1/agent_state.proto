@@ -20,23 +20,23 @@ service AgentStateService {
   // List messages with filtering & pagination.
   rpc ListConversationMessages(ListConversationMessagesRequest) returns (ListConversationMessagesResponse);
 
-  // Replace-by-kind: upsert latest active message per kind (e.g., system/summary/memory).
-  rpc ReplaceConversationMessagesByKind(ReplaceConversationMessagesByKindRequest) returns (ReplaceConversationMessagesByKindResponse);
+  // Delete messages by id.
+  rpc DeleteConversationMessages(DeleteConversationMessagesRequest) returns (DeleteConversationMessagesResponse);
 
-  // Trim messages by seq cutoff (archive/delete older messages).
-  rpc TrimConversationMessagesBySeq(TrimConversationMessagesBySeqRequest) returns (TrimConversationMessagesBySeqResponse);
+  // Insert messages relative to an anchor seq.
+  rpc InsertConversationMessages(InsertConversationMessagesRequest) returns (InsertConversationMessagesResponse);
 
   // Get conversation metadata (version, last_seq, message_count).
   rpc GetConversation(GetConversationRequest) returns (GetConversationResponse);
+
+  // List message IDs in a conversation (filtered, paginated).
+  rpc ListConversationMessageIds(ListConversationMessageIdsRequest) returns (ListConversationMessageIdsResponse);
 
   // List messages in a snapshot (exact stored order, paginated).
   rpc ListSnapshotMessages(ListSnapshotMessagesRequest) returns (ListSnapshotMessagesResponse);
 
   // List message IDs in a snapshot (exact stored order, paginated).
   rpc ListSnapshotMessageIds(ListSnapshotMessageIdsRequest) returns (ListSnapshotMessageIdsResponse);
-
-  // List message IDs in a conversation (filtered, paginated).
-  rpc ListConversationMessageIds(ListConversationMessageIdsRequest) returns (ListConversationMessageIdsResponse);
 
   // Create a materialized context snapshot for a specific LLM call.
   // The client supplies the exact message IDs; APSS stores
@@ -136,44 +136,37 @@ message ListConversationMessagesResponse {
   string next_page_token = 3;
 }
 
-// Replace-by-kind
-message ReplaceByKindInput {
-  string kind = 1;
-  Role role = 2;
-  MessageBody body = 3;
-  MemoryAttrs memory = 4;           // optional
-}
-
-message ReplaceConversationMessagesByKindRequest {
+// Delete
+message DeleteConversationMessagesRequest {
   string conversation_id = 1;
   int64 expect_version = 2;
   string idempotency_key = 3;
-  repeated ReplaceByKindInput replacements = 4;
-  bool archive_prior = 5;           // recommended true
+  repeated string message_ids = 4;
 }
 
-message ReplaceConversationMessagesByKindResponse {
+message DeleteConversationMessagesResponse {
   ConversationMetadata metadata = 1;
-  repeated Message replaced = 2;
-  repeated Message archived = 3;
+  repeated string deleted_message_ids = 2;
 }
 
-// Trim
-message TrimConversationMessagesBySeqRequest {
+// Insert
+message InsertConversationMessagesRequest {
+  enum Placement {
+    PLACEMENT_UNSPECIFIED = 0;
+    PLACEMENT_BEFORE = 1;
+    PLACEMENT_AFTER = 2;
+  }
   string conversation_id = 1;
   int64 expect_version = 2;
   string idempotency_key = 3;
-  int64 cutoff_seq = 4;             // inclusive
-  bool archive_only = 5;            // soft trim vs hard delete
-  bool keep_latest_special_kinds = 6;
-  repeated string special_kinds = 7; // e.g., system, summary, memory
+  int64 anchor_seq = 4;
+  Placement placement = 5;
+  repeated AppendMessageInput messages = 6;
 }
 
-message TrimConversationMessagesBySeqResponse {
+message InsertConversationMessagesResponse {
   ConversationMetadata metadata = 1;
-  int64 trimmed_count = 2;
-  int64 trimmed_through_seq = 3;
-  repeated Message kept_special = 4;
+  repeated Message inserted = 2;
 }
 
 // Metadata
