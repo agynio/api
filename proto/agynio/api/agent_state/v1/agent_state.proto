@@ -101,9 +101,8 @@ message ListConversationMessagesRequest {
   string conversation_id = 1;
   repeated Role roles = 2;          // filter roles (optional)
   repeated string kinds = 3;        // filter kinds (optional)
-  int64 seq_gte = 4;                // inclusive lower bound (optional)
-  int32 page_size = 5;              // server may cap
-  string page_token = 6;            // opaque cursor
+  int32 page_size = 4;              // server may cap
+  string page_token = 5;            // opaque cursor
 }
 
 message ListConversationMessagesResponse {
@@ -204,9 +203,8 @@ message ListSnapshotMessageIdsResponse {
 
 message ListConversationMessageIdsRequest {
   string conversation_id = 1;
-  int64 seq_gte = 2;
-  int32 page_size = 3;
-  string page_token = 4;
+  int32 page_size = 2;
+  string page_token = 3;
 }
 
 message ListConversationMessageIdsResponse {
