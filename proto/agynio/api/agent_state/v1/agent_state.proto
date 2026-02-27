@@ -53,16 +53,6 @@ enum Role {
   ROLE_TOOL = 3;
 }
 
-// Optional attributes for memory-like messages.
-message MemoryAttrs {
-  enum Place {
-    PLACE_UNSPECIFIED = 0;
-    PLACE_AFTER_SYSTEM = 1;
-    PLACE_LAST_MESSAGE = 2;
-  }
-  Place place = 1;
-}
-
 // Text payload for now. Future extensions can add more oneof variants.
 message TextBody { string text = 1; }
 
@@ -79,22 +69,17 @@ message MessageBody {
 message Message {
   string id = 1;                    // server-assigned UUID
   string conversation_id = 2;       // routing key
-  int64 seq = 3;                    // monotonic per conversation
-  Role role = 4;                    // user | assistant | tool
-  string kind = 5;                  // free-form tag (e.g., system, summary, memory, restriction, tool_output)
-  MessageBody body = 6;             // payload
-  MemoryAttrs memory = 7;           // optional placement attributes (for memory kinds)
-  google.protobuf.Timestamp created_at = 8;
-  bool archived = 9;                // soft delete / superseded flag
-  google.protobuf.Timestamp archived_at = 10;
+  Role role = 3;                    // user | assistant | tool
+  string kind = 4;                  // free-form tag (e.g., system, summary, memory, restriction, tool_output)
+  MessageBody body = 5;             // payload
+  google.protobuf.Timestamp created_at = 6;
 }
 
 message ConversationMetadata {
   string conversation_id = 1;
   int64 version = 2;                // CAS token (monotonic)
-  int64 last_seq = 3;               // highest seq among active messages
-  int64 message_count = 4;          // count of active messages
-  google.protobuf.Timestamp updated_at = 5;
+  int64 message_count = 3;          // count of active messages
+  google.protobuf.Timestamp updated_at = 4;
 }
 
 // Append
@@ -102,14 +87,12 @@ message AppendMessageInput {
   Role role = 1;
   string kind = 2;
   MessageBody body = 3;
-  MemoryAttrs memory = 4;           // optional, meaningful for memory kinds
 }
 
 message AppendConversationMessagesRequest {
   string conversation_id = 1;
   int64 expect_version = 2;         // optimistic concurrency; 0 to bypass on create
-  string idempotency_key = 3;       // dedupe retries
-  repeated AppendMessageInput messages = 4;
+  repeated AppendMessageInput messages = 3;
 }
 
 message AppendConversationMessagesResponse {
@@ -124,10 +107,8 @@ message ListConversationMessagesRequest {
   repeated string kinds = 3;        // filter kinds (optional)
   int64 seq_gte = 4;                // inclusive lower bound (optional)
   int64 seq_lte = 5;                // inclusive upper bound (optional)
-  bool include_archived = 6;        // default false
-  int32 page_size = 7;              // server may cap
-  string page_token = 8;            // opaque cursor
-  bool descending = 9;              // default ascending
+  int32 page_size = 6;              // server may cap
+  string page_token = 7;            // opaque cursor
 }
 
 message ListConversationMessagesResponse {
@@ -140,8 +121,7 @@ message ListConversationMessagesResponse {
 message DeleteConversationMessagesRequest {
   string conversation_id = 1;
   int64 expect_version = 2;
-  string idempotency_key = 3;
-  repeated string message_ids = 4;
+  repeated string message_ids = 3;
 }
 
 message DeleteConversationMessagesResponse {
@@ -158,10 +138,9 @@ message InsertConversationMessagesRequest {
   }
   string conversation_id = 1;
   int64 expect_version = 2;
-  string idempotency_key = 3;
-  int64 anchor_seq = 4;
-  Placement placement = 5;
-  repeated AppendMessageInput messages = 6;
+  int64 anchor_seq = 3;
+  Placement placement = 4;
+  repeated AppendMessageInput messages = 5;
 }
 
 message InsertConversationMessagesResponse {
@@ -192,11 +171,10 @@ message ContextSnapshot {
 // Each snapshot item is a materialized message copy with integrity hash.
 message SnapshotItem {
   string message_id = 1;                  // original message id
-  int64 seq = 2;                          // original message seq
-  Role role = 3;                          // original role
-  string kind = 4;                        // original kind
-  MessageBody body = 5;                   // materialized body copy
-  string body_sha256 = 6;                 // integrity hash of the serialized body
+  Role role = 2;                          // original role
+  string kind = 3;                        // original kind
+  MessageBody body = 4;                   // materialized body copy
+  string body_sha256 = 5;                 // integrity hash of the serialized body
 }
 
 message CreateSnapshotRequest {
@@ -235,10 +213,8 @@ message ListConversationMessageIdsRequest {
   string conversation_id = 1;
   int64 seq_gte = 2;
   int64 seq_lte = 3;
-  bool include_archived = 4;
-  int32 page_size = 5;
-  string page_token = 6;
-  bool descending = 7;
+  int32 page_size = 4;
+  string page_token = 5;
 }
 
 message ListConversationMessageIdsResponse {
