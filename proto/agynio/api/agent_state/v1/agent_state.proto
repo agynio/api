@@ -8,13 +8,11 @@ option go_package = "github.com/agynio/api/gen/agynio/api/agent_state/v1;agentst
 
 // Agent Persistent State Service (APSS)
 // - conversationId-only API (threadId/nodeId mapping handled outside)
-// - ordered messages via monotonic seq per conversation
-// - conversation-level version for optimistic concurrency (CAS/ETag)
 // - message bodies are well-typed; text-only now, extensible via oneof
 // - no external type references
 
 service AgentStateService {
-  // Append messages (batch). Server assigns seq; bumps conversation version.
+  // Append messages (batch).
   rpc AppendConversationMessages(AppendConversationMessagesRequest) returns (AppendConversationMessagesResponse);
 
   // List messages with filtering & pagination.
@@ -23,10 +21,10 @@ service AgentStateService {
   // Delete messages by id.
   rpc DeleteConversationMessages(DeleteConversationMessagesRequest) returns (DeleteConversationMessagesResponse);
 
-  // Insert messages relative to an anchor seq.
+  // Insert messages using placement hints.
   rpc InsertConversationMessages(InsertConversationMessagesRequest) returns (InsertConversationMessagesResponse);
 
-  // Get conversation metadata (version, last_seq, message_count).
+  // Get conversation metadata (message counts and timestamps).
   rpc GetConversation(GetConversationRequest) returns (GetConversationResponse);
 
   // List message IDs in a conversation (filtered, paginated).
@@ -77,9 +75,8 @@ message Message {
 
 message ConversationMetadata {
   string conversation_id = 1;
-  int64 version = 2;                // CAS token (monotonic)
-  int64 message_count = 3;          // count of active messages
-  google.protobuf.Timestamp updated_at = 4;
+  int64 message_count = 2;          // count of active messages
+  google.protobuf.Timestamp updated_at = 3;
 }
 
 // Append
@@ -91,8 +88,7 @@ message AppendMessageInput {
 
 message AppendConversationMessagesRequest {
   string conversation_id = 1;
-  int64 expect_version = 2;         // optimistic concurrency; 0 to bypass on create
-  repeated AppendMessageInput messages = 3;
+  repeated AppendMessageInput messages = 2;
 }
 
 message AppendConversationMessagesResponse {
@@ -106,9 +102,8 @@ message ListConversationMessagesRequest {
   repeated Role roles = 2;          // filter roles (optional)
   repeated string kinds = 3;        // filter kinds (optional)
   int64 seq_gte = 4;                // inclusive lower bound (optional)
-  int64 seq_lte = 5;                // inclusive upper bound (optional)
-  int32 page_size = 6;              // server may cap
-  string page_token = 7;            // opaque cursor
+  int32 page_size = 5;              // server may cap
+  string page_token = 6;            // opaque cursor
 }
 
 message ListConversationMessagesResponse {
@@ -120,8 +115,7 @@ message ListConversationMessagesResponse {
 // Delete
 message DeleteConversationMessagesRequest {
   string conversation_id = 1;
-  int64 expect_version = 2;
-  repeated string message_ids = 3;
+  repeated string message_ids = 2;
 }
 
 message DeleteConversationMessagesResponse {
@@ -138,9 +132,8 @@ message InsertConversationMessagesRequest {
   }
   string conversation_id = 1;
   int64 expect_version = 2;
-  int64 anchor_seq = 3;
-  Placement placement = 4;
-  repeated AppendMessageInput messages = 5;
+  Placement placement = 3;
+  repeated AppendMessageInput messages = 4;
 }
 
 message InsertConversationMessagesResponse {
@@ -212,9 +205,8 @@ message ListSnapshotMessageIdsResponse {
 message ListConversationMessageIdsRequest {
   string conversation_id = 1;
   int64 seq_gte = 2;
-  int64 seq_lte = 3;
-  int32 page_size = 4;
-  string page_token = 5;
+  int32 page_size = 3;
+  string page_token = 4;
 }
 
 message ListConversationMessageIdsResponse {
