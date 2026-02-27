@@ -29,6 +29,15 @@ service AgentStateService {
   // Get conversation metadata (version, last_seq, message_count).
   rpc GetConversationMetadata(GetConversationMetadataRequest) returns (GetConversationMetadataResponse);
 
+  // List messages in a snapshot (exact stored order, paginated).
+  rpc ListSnapshotMessages(ListSnapshotMessagesRequest) returns (ListSnapshotMessagesResponse);
+
+  // List message IDs in a snapshot (exact stored order, paginated).
+  rpc ListSnapshotMessageIds(ListSnapshotMessageIdsRequest) returns (ListSnapshotMessageIdsResponse);
+
+  // List message IDs in a conversation (filtered, paginated).
+  rpc ListConversationMessageIds(ListConversationMessageIdsRequest) returns (ListConversationMessageIdsResponse);
+
   // Create a materialized context snapshot for a specific LLM call.
   // The client supplies the exact message IDs and call_id; APSS stores
   // a materialized copy of each message body in the provided order.
