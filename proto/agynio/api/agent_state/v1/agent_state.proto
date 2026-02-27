@@ -15,19 +15,19 @@ option go_package = "github.com/agynio/api/gen/agynio/api/agent_state/v1;agentst
 
 service AgentStateService {
   // Append messages (batch). Server assigns seq; bumps conversation version.
-  rpc AppendMessages(AppendMessagesRequest) returns (AppendMessagesResponse);
+  rpc AppendConversationMessages(AppendConversationMessagesRequest) returns (AppendConversationMessagesResponse);
 
   // List messages with filtering & pagination.
-  rpc ListMessages(ListMessagesRequest) returns (ListMessagesResponse);
+  rpc ListConversationMessages(ListConversationMessagesRequest) returns (ListConversationMessagesResponse);
 
   // Replace-by-kind: upsert latest active message per kind (e.g., system/summary/memory).
-  rpc ReplaceByKind(ReplaceByKindRequest) returns (ReplaceByKindResponse);
+  rpc ReplaceConversationMessagesByKind(ReplaceConversationMessagesByKindRequest) returns (ReplaceConversationMessagesByKindResponse);
 
   // Trim messages by seq cutoff (archive/delete older messages).
-  rpc TrimBySeq(TrimBySeqRequest) returns (TrimBySeqResponse);
+  rpc TrimConversationMessagesBySeq(TrimConversationMessagesBySeqRequest) returns (TrimConversationMessagesBySeqResponse);
 
   // Get conversation metadata (version, last_seq, message_count).
-  rpc GetConversationMetadata(GetConversationMetadataRequest) returns (GetConversationMetadataResponse);
+  rpc GetConversation(GetConversationRequest) returns (GetConversationResponse);
 
   // List messages in a snapshot (exact stored order, paginated).
   rpc ListSnapshotMessages(ListSnapshotMessagesRequest) returns (ListSnapshotMessagesResponse);
@@ -39,7 +39,7 @@ service AgentStateService {
   rpc ListConversationMessageIds(ListConversationMessageIdsRequest) returns (ListConversationMessageIdsResponse);
 
   // Create a materialized context snapshot for a specific LLM call.
-  // The client supplies the exact message IDs and call_id; APSS stores
+  // The client supplies the exact message IDs; APSS stores
   // a materialized copy of each message body in the provided order.
   // This guarantees reproducibility even after trims/edits.
   rpc CreateSnapshot(CreateSnapshotRequest) returns (CreateSnapshotResponse);
@@ -105,20 +105,20 @@ message AppendMessageInput {
   MemoryAttrs memory = 4;           // optional, meaningful for memory kinds
 }
 
-message AppendMessagesRequest {
+message AppendConversationMessagesRequest {
   string conversation_id = 1;
   int64 expect_version = 2;         // optimistic concurrency; 0 to bypass on create
   string idempotency_key = 3;       // dedupe retries
   repeated AppendMessageInput messages = 4;
 }
 
-message AppendMessagesResponse {
+message AppendConversationMessagesResponse {
   ConversationMetadata metadata = 1;
   repeated Message appended = 2;
 }
 
 // List
-message ListMessagesRequest {
+message ListConversationMessagesRequest {
   string conversation_id = 1;
   repeated Role roles = 2;          // filter roles (optional)
   repeated string kinds = 3;        // filter kinds (optional)
@@ -130,7 +130,7 @@ message ListMessagesRequest {
   bool descending = 9;              // default ascending
 }
 
-message ListMessagesResponse {
+message ListConversationMessagesResponse {
   ConversationMetadata metadata = 1;
   repeated Message messages = 2;
   string next_page_token = 3;
@@ -144,7 +144,7 @@ message ReplaceByKindInput {
   MemoryAttrs memory = 4;           // optional
 }
 
-message ReplaceByKindRequest {
+message ReplaceConversationMessagesByKindRequest {
   string conversation_id = 1;
   int64 expect_version = 2;
   string idempotency_key = 3;
@@ -152,14 +152,14 @@ message ReplaceByKindRequest {
   bool archive_prior = 5;           // recommended true
 }
 
-message ReplaceByKindResponse {
+message ReplaceConversationMessagesByKindResponse {
   ConversationMetadata metadata = 1;
   repeated Message replaced = 2;
   repeated Message archived = 3;
 }
 
 // Trim
-message TrimBySeqRequest {
+message TrimConversationMessagesBySeqRequest {
   string conversation_id = 1;
   int64 expect_version = 2;
   string idempotency_key = 3;
@@ -169,7 +169,7 @@ message TrimBySeqRequest {
   repeated string special_kinds = 7; // e.g., system, summary, memory
 }
 
-message TrimBySeqResponse {
+message TrimConversationMessagesBySeqResponse {
   ConversationMetadata metadata = 1;
   int64 trimmed_count = 2;
   int64 trimmed_through_seq = 3;
@@ -177,13 +177,13 @@ message TrimBySeqResponse {
 }
 
 // Metadata
-message GetConversationMetadataRequest { string conversation_id = 1; }
-message GetConversationMetadataResponse { ConversationMetadata metadata = 1; }
+message GetConversationRequest { string conversation_id = 1; }
+message GetConversationResponse { ConversationMetadata metadata = 1; }
 
-  // Create a materialized context snapshot for a specific LLM call.
-  // The client supplies the exact message IDs and call_id; APSS stores
-  // a materialized copy of each message body in the provided order.
-  // This guarantees reproducibility even after trims/edits.
+// Create a materialized context snapshot for a specific LLM call.
+// The client supplies the exact message IDs; APSS stores
+// a materialized copy of each message body in the provided order.
+// This guarantees reproducibility even after trims/edits.
 
 // --------------------------
 // Context Snapshots
