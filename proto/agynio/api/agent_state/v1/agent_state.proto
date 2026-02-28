@@ -2,14 +2,13 @@ syntax = "proto3";
 
 package agynio.api.agent_state.v1;
 
-import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/agynio/api/gen/agynio/api/agent_state/v1;agentstatev1";
 
 // Agent Persistent State Service (APSS)
 // - conversationId-only API (threadId/nodeId mapping handled outside)
-// - message bodies are well-typed; text-only now, extensible via oneof
+// - message bodies are well-typed (text and tool outputs via oneof)
 // - no external type references
 
 service AgentStateService {
@@ -56,22 +55,46 @@ message TextBody {
   string text = 1;
 }
 
+message ToolTextOutput {
+  string text = 1;
+}
+
+enum ImageDetail {
+  IMAGE_DETAIL_UNSPECIFIED = 0;
+  IMAGE_DETAIL_AUTO = 1;
+  IMAGE_DETAIL_LOW = 2;
+  IMAGE_DETAIL_HIGH = 3;
+}
+
+message ToolImageOutput {
+  oneof source {
+    string openai_file_id = 1;
+    string blob_id = 2;
+    string external_url = 3;
+    string data_url = 4;
+    bytes data = 5;
+  }
+  string mime_type = 10;
+  ImageDetail detail = 11;
+  int32 width_px = 12;
+  int32 height_px = 13;
+  string sha256 = 14;
+}
+
 message ToolOutputBody {
   string tool_name = 1;
   string tool_call_id = 2;
-  oneof content {
-    TextBody output_text = 3;
-    google.protobuf.Struct output_json = 4;
+  oneof output {
+    ToolTextOutput text = 3;
+    ToolImageOutput image = 4;
   }
+  map<string, string> metadata = 10; // optional
 }
 
 message MessageBody {
   oneof body {
     TextBody text = 1;
     ToolOutputBody tool_output = 2;
-    // Reserved for future extensions:
-    // ImageBody image = 3;
-    // AudioBody audio = 4;
   }
 }
 
