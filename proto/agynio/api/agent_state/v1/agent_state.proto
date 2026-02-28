@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package agynio.api.agent_state.v1;
 
+import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/agynio/api/gen/agynio/api/agent_state/v1;agentstatev1";
@@ -15,19 +16,19 @@ service AgentStateService {
   // Append messages (batch).
   rpc AppendConversationMessages(AppendConversationMessagesRequest) returns (AppendConversationMessagesResponse);
 
-  // List messages with filtering & pagination.
+  // List messages with filtering & pagination (conversation order: oldest to newest).
   rpc ListConversationMessages(ListConversationMessagesRequest) returns (ListConversationMessagesResponse);
 
-  // Delete messages by id.
-  rpc DeleteConversationMessages(DeleteConversationMessagesRequest) returns (DeleteConversationMessagesResponse);
+  // Replace a message range with references to existing messages.
+  rpc ReplaceConversationMessagesRange(ReplaceConversationMessagesRangeRequest) returns (ReplaceConversationMessagesRangeResponse);
 
-  // Insert messages using placement hints.
-  rpc InsertConversationMessages(InsertConversationMessagesRequest) returns (InsertConversationMessagesResponse);
+  // Delete a contiguous range of messages by id.
+  rpc DeleteConversationMessagesRange(DeleteConversationMessagesRangeRequest) returns (DeleteConversationMessagesRangeResponse);
 
   // Get conversation metadata (message counts and timestamps).
   rpc GetConversation(GetConversationRequest) returns (GetConversationResponse);
 
-  // List message IDs in a conversation (filtered, paginated).
+  // List message IDs in a conversation (filtered, paginated; oldest to newest).
   rpc ListConversationMessageIds(ListConversationMessageIdsRequest) returns (ListConversationMessageIdsResponse);
 
   // List messages in a snapshot (exact stored order, paginated).
@@ -54,12 +55,22 @@ enum Role {
 // Text payload for now. Future extensions can add more oneof variants.
 message TextBody { string text = 1; }
 
+message ToolOutputBody {
+  string tool_name = 1;
+  string tool_call_id = 2;
+  oneof content {
+    TextBody output_text = 3;
+    google.protobuf.Struct output_json = 4;
+  }
+}
+
 message MessageBody {
   oneof body {
     TextBody text = 1;
+    ToolOutputBody tool_output = 2;
     // Reserved for future extensions:
-    // ImageBody image = 2;
-    // AudioBody audio = 3;
+    // ImageBody image = 3;
+    // AudioBody audio = 4;
   }
 }
 
@@ -96,7 +107,7 @@ message AppendConversationMessagesResponse {
   repeated Message appended = 2;
 }
 
-// List
+// List (results returned in conversation order: oldest to newest)
 message ListConversationMessagesRequest {
   string conversation_id = 1;
   repeated Role roles = 2;          // filter roles (optional)
@@ -111,33 +122,30 @@ message ListConversationMessagesResponse {
   string next_page_token = 3;
 }
 
-// Delete
-message DeleteConversationMessagesRequest {
+// Replace
+message ReplaceConversationMessagesRangeRequest {
   string conversation_id = 1;
-  repeated string message_ids = 2;
+  string from_message_id = 2;
+  string to_message_id = 3;
+  repeated string new_message_ids = 4;
 }
 
-message DeleteConversationMessagesResponse {
+message ReplaceConversationMessagesRangeResponse {
+  ConversationMetadata metadata = 1;
+  repeated string replaced_message_ids = 2;
+  repeated string inserted_message_ids = 3;
+}
+
+// Delete range
+message DeleteConversationMessagesRangeRequest {
+  string conversation_id = 1;
+  string from_message_id = 2;
+  string to_message_id = 3;
+}
+
+message DeleteConversationMessagesRangeResponse {
   ConversationMetadata metadata = 1;
   repeated string deleted_message_ids = 2;
-}
-
-// Insert
-message InsertConversationMessagesRequest {
-  enum Placement {
-    PLACEMENT_UNSPECIFIED = 0;
-    PLACEMENT_BEFORE = 1;
-    PLACEMENT_AFTER = 2;
-  }
-  string conversation_id = 1;
-  int64 expect_version = 2;
-  Placement placement = 3;
-  repeated AppendMessageInput messages = 4;
-}
-
-message InsertConversationMessagesResponse {
-  ConversationMetadata metadata = 1;
-  repeated Message inserted = 2;
 }
 
 // Metadata
@@ -201,6 +209,7 @@ message ListSnapshotMessageIdsResponse {
   string next_page_token = 2;
 }
 
+// List conversation message IDs (results returned in conversation order: oldest to newest)
 message ListConversationMessageIdsRequest {
   string conversation_id = 1;
   int32 page_size = 2;
