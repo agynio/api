@@ -124,6 +124,11 @@ message ListConversationMessagesResponse {
 
 // Replace
 message ReplaceConversationMessagesRangeRequest {
+  // Semantics:
+  // - from_message_id and to_message_id set: replace inclusive range [from..to] with new_message_ids.
+  // - only from_message_id set: insert new_message_ids immediately after from_message_id (no deletions).
+  // - only to_message_id set: insert new_message_ids immediately before to_message_id (no deletions).
+  // - neither set: invalid; clients must use AppendConversationMessages.
   string conversation_id = 1;
   string from_message_id = 2;
   string to_message_id = 3;
@@ -138,6 +143,11 @@ message ReplaceConversationMessagesRangeResponse {
 
 // Delete range
 message DeleteConversationMessagesRangeRequest {
+  // Semantics:
+  // - from_message_id and to_message_id set: delete inclusive range [from..to].
+  // - only from_message_id set: delete from from_message_id through tail.
+  // - only to_message_id set: delete from head through to_message_id.
+  // - neither set: invalid.
   string conversation_id = 1;
   string from_message_id = 2;
   string to_message_id = 3;
