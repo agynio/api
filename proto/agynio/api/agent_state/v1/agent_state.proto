@@ -67,13 +67,7 @@ enum ImageDetail {
 }
 
 message ToolImageOutput {
-  oneof source {
-    string openai_file_id = 1;
-    string blob_id = 2;
-    string external_url = 3;
-    string data_url = 4;
-    bytes data = 5;
-  }
+  string external_url = 1;
   string mime_type = 10;
   ImageDetail detail = 11;
   int32 width_px = 12;
