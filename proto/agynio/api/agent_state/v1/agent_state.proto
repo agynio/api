@@ -42,7 +42,6 @@ service AgentStateService {
   // a materialized copy of each message body in the provided order.
   // This guarantees reproducibility even after trims/edits.
   rpc CreateSnapshot(CreateSnapshotRequest) returns (CreateSnapshotResponse);
-
 }
 
 enum Role {
@@ -53,7 +52,9 @@ enum Role {
 }
 
 // Text payload for now. Future extensions can add more oneof variants.
-message TextBody { string text = 1; }
+message TextBody {
+  string text = 1;
+}
 
 message ToolOutputBody {
   string tool_name = 1;
@@ -76,17 +77,17 @@ message MessageBody {
 
 // Core message entity stored by APSS.
 message Message {
-  string id = 1;                    // server-assigned UUID
-  string conversation_id = 2;       // routing key
-  Role role = 3;                    // user | assistant | tool
-  string kind = 4;                  // free-form tag (e.g., system, summary, memory, restriction, tool_output)
-  MessageBody body = 5;             // payload
+  string id = 1; // server-assigned UUID
+  string conversation_id = 2; // routing key
+  Role role = 3; // user | assistant | tool
+  string kind = 4; // free-form tag (e.g., system, summary, memory, restriction, tool_output)
+  MessageBody body = 5; // payload
   google.protobuf.Timestamp created_at = 6;
 }
 
 message ConversationMetadata {
   string conversation_id = 1;
-  int64 message_count = 2;          // count of active messages
+  int64 message_count = 2; // count of active messages
   google.protobuf.Timestamp updated_at = 3;
 }
 
@@ -110,10 +111,10 @@ message AppendConversationMessagesResponse {
 // List (results returned in conversation order: oldest to newest)
 message ListConversationMessagesRequest {
   string conversation_id = 1;
-  repeated Role roles = 2;          // filter roles (optional)
-  repeated string kinds = 3;        // filter kinds (optional)
-  int32 page_size = 4;              // server may cap
-  string page_token = 5;            // opaque cursor
+  repeated Role roles = 2; // filter roles (optional)
+  repeated string kinds = 3; // filter kinds (optional)
+  int32 page_size = 4; // server may cap
+  string page_token = 5; // opaque cursor
 }
 
 message ListConversationMessagesResponse {
@@ -159,8 +160,12 @@ message DeleteConversationMessagesRangeResponse {
 }
 
 // Metadata
-message GetConversationRequest { string conversation_id = 1; }
-message GetConversationResponse { ConversationMetadata metadata = 1; }
+message GetConversationRequest {
+  string conversation_id = 1;
+}
+message GetConversationResponse {
+  ConversationMetadata metadata = 1;
+}
 
 // Create a materialized context snapshot for a specific LLM call.
 // The client supplies the exact message IDs; APSS stores
@@ -173,23 +178,23 @@ message GetConversationResponse { ConversationMetadata metadata = 1; }
 
 // A materialized snapshot of the exact context sent to an LLM call.
 message ContextSnapshot {
-  string snapshot_id = 1;                 // server-assigned UUID
-  string conversation_id = 2;             // conversation this snapshot belongs to
+  string snapshot_id = 1; // server-assigned UUID
+  string conversation_id = 2; // conversation this snapshot belongs to
   google.protobuf.Timestamp created_at = 4;
 }
 
 // Each snapshot item is a materialized message copy with integrity hash.
 message SnapshotItem {
-  string message_id = 1;                  // original message id
-  Role role = 2;                          // original role
-  string kind = 3;                        // original kind
-  MessageBody body = 4;                   // materialized body copy
-  string body_sha256 = 5;                 // integrity hash of the serialized body
+  string message_id = 1; // original message id
+  Role role = 2; // original role
+  string kind = 3; // original kind
+  MessageBody body = 4; // materialized body copy
+  string body_sha256 = 5; // integrity hash of the serialized body
 }
 
 message CreateSnapshotRequest {
   string conversation_id = 1;
-  repeated string message_ids = 2;        // exact order to persist in the snapshot
+  repeated string message_ids = 2; // exact order to persist in the snapshot
 }
 
 message CreateSnapshotResponse {
