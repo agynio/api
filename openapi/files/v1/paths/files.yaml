@@ -1,6 +1,8 @@
 post:
   tags: [Files]
   summary: Upload file
+  description: Upload a file using multipart form data.
+  operationId: uploadFile
   requestBody:
     required: true
     content:
