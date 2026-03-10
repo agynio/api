@@ -2,9 +2,6 @@ openapi: 3.0.3
 info:
   title: Files API
   version: 0.1.0
-  description: API for uploading files.
-  contact:
-    name: Agynio Support
 servers:
   - url: https://api.example.com
 tags:
