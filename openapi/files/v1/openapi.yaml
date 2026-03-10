@@ -1,0 +1,29 @@
+openapi: 3.0.3
+info:
+  title: Files API
+  version: 0.1.0
+servers:
+  - url: https://api.example.com
+tags:
+  - name: Files
+paths:
+  /files:
+    $ref: './paths/files.yaml'
+  /files/{fileId}:
+    $ref: './paths/file-by-id.yaml'
+  /files/{fileId}/url:
+    $ref: './paths/file-url.yaml'
+components:
+  parameters:
+    FileIdPath:
+      $ref: './components/parameters/FileIdPath.yaml'
+  responses:
+    ProblemResponse:
+      $ref: './components/responses/ProblemResponse.yaml'
+  schemas:
+    Problem:
+      $ref: './components/schemas/Problem.yaml'
+    File:
+      $ref: './components/schemas/File.yaml'
+    FileDownloadUrl:
+      $ref: './components/schemas/FileDownloadUrl.yaml'

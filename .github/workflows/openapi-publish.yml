@@ -26,14 +26,26 @@ jobs:
         run: |
           mkdir -p dist
           redocly bundle openapi/team/v1/openapi.yaml -o dist/team-v1.yaml
-      - name: Lint bundled spec with Spectral
+      - name: Bundle spec (files v1)
+        run: |
+          mkdir -p dist
+          redocly bundle openapi/files/v1/openapi.yaml -o dist/files-v1.yaml
+      - name: Lint bundled spec with Spectral (team v1)
         run: |
           spectral lint dist/team-v1.yaml
-      - name: Upload bundled artifact
+      - name: Lint bundled spec with Spectral (files v1)
+        run: |
+          spectral lint dist/files-v1.yaml
+      - name: Upload bundled artifact (team v1)
         uses: actions/upload-artifact@v4
         with:
           name: team-v1-openapi
           path: dist/team-v1.yaml
+      - name: Upload bundled artifact (files v1)
+        uses: actions/upload-artifact@v4
+        with:
+          name: files-v1-openapi
+          path: dist/files-v1.yaml
 
   publish:
     if: github.event_name == 'push'
@@ -55,6 +67,10 @@ jobs:
         run: |
           mkdir -p dist
           redocly bundle openapi/team/v1/openapi.yaml -o dist/team-v1.yaml
+      - name: Bundle spec (files v1)
+        run: |
+          mkdir -p dist
+          redocly bundle openapi/files/v1/openapi.yaml -o dist/files-v1.yaml
       - name: Install ORAS
         env:
           ORAS_VERSION: '1.1.0'
@@ -72,3 +88,7 @@ jobs:
         run: |
           oras push ghcr.io/agynio/openapi/team:1 \
             dist/team-v1.yaml:application/vnd.oai.openapi+yaml
+      - name: Push OCI artifact to GHCR (files v1)
+        run: |
+          oras push ghcr.io/agynio/openapi/files:1 \
+            dist/files-v1.yaml:application/vnd.oai.openapi+yaml
