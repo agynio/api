@@ -2,15 +2,18 @@ syntax = "proto3";
 
 package agynio.api.files.v1;
 
+import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/agynio/api/gen/agynio/api/files/v1;filesv1";
 
 service FilesService {
-  // Upload a file using client-side streaming.
-  // First message MUST contain metadata; subsequent messages carry content chunks.
   rpc UploadFile(stream UploadFileRequest) returns (UploadFileResponse);
+  rpc GetFileMetadata(GetFileMetadataRequest) returns (GetFileMetadataResponse);
+  rpc GetDownloadUrl(GetDownloadUrlRequest) returns (GetDownloadUrlResponse);
 }
+
+// -------------------- UploadFile --------------------
 
 message UploadFileRequest {
   oneof payload {
@@ -32,6 +35,30 @@ message UploadFileChunk {
 message UploadFileResponse {
   FileInfo file = 1;
 }
+
+// -------------------- GetFileMetadata --------------------
+
+message GetFileMetadataRequest {
+  string file_id = 1;
+}
+
+message GetFileMetadataResponse {
+  FileInfo file = 1;
+}
+
+// -------------------- GetDownloadUrl --------------------
+
+message GetDownloadUrlRequest {
+  string file_id = 1;
+  google.protobuf.Duration expiry = 2;
+}
+
+message GetDownloadUrlResponse {
+  string url = 1;
+  google.protobuf.Timestamp expires_at = 2;
+}
+
+// -------------------- Common --------------------
 
 message FileInfo {
   string id = 1;
