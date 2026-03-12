@@ -24,7 +24,7 @@ service ThreadsService {
   // a message.created notification to each recipient's room.
   rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
 
-  // List threads with pagination.
+  // List threads for a participant with pagination.
   rpc GetThreads(GetThreadsRequest) returns (GetThreadsResponse);
 
   // List messages in a thread with pagination.
@@ -78,7 +78,9 @@ message Message {
 }
 
 // Tracks acknowledgment state per participant per message.
-// Created by SendMessage — one row per recipient.
+// Created by SendMessage — one row per recipient (all thread participants
+// except the sender). Not exposed in RPCs; documented here as schema
+// reference for the underlying data model.
 message MessageRecipient {
   string message_id = 1; // UUID — FK to Message
   string thread_id = 2; // UUID — denormalized for query efficiency
@@ -131,8 +133,12 @@ message AddParticipantResponse {
 message SendMessageRequest {
   string thread_id = 1; // UUID
   string sender_id = 2; // UUID — must be a participant
-  string body = 3; // text content
-  repeated string file_ids = 4; // optional file references (UUIDs)
+  // Text content. May be empty when file_ids is non-empty.
+  // At least one of body or file_ids must be provided.
+  string body = 3;
+  // File references (UUIDs). May be empty when body is non-empty.
+  // At least one of body or file_ids must be provided.
+  repeated string file_ids = 4;
 }
 
 message SendMessageResponse {
@@ -144,8 +150,9 @@ message SendMessageResponse {
 // ===========================================================================
 
 message GetThreadsRequest {
-  int32 page_size = 1;
-  string page_token = 2;
+  string participant_id = 1; // UUID — return threads this participant belongs to
+  int32 page_size = 2;
+  string page_token = 3;
 }
 
 message GetThreadsResponse {
@@ -193,7 +200,8 @@ message AckMessagesRequest {
 }
 
 message AckMessagesResponse {
-  // Number of messages acknowledged (may be less than requested
-  // if some were already acknowledged or not found).
+  // Number of messages newly acknowledged. Already-acked and unknown IDs
+  // are silently ignored — this is intentional for idempotency so that
+  // retried ack requests do not fail.
   int32 acked_count = 1;
 }
