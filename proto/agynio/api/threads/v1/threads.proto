@@ -1,0 +1,199 @@
+syntax = "proto3";
+
+package agynio.api.threads.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/agynio/api/gen/agynio/api/threads/v1;threadsv1";
+
+// ThreadsService manages messaging threads between participants.
+// It stores messages, tracks participants, and provides message acknowledgment.
+// Participant-type-agnostic — identifies participants by UUID.
+service ThreadsService {
+  // Create a new thread with initial participants.
+  rpc CreateThread(CreateThreadRequest) returns (CreateThreadResponse);
+
+  // Archive a thread (soft-delete).
+  rpc ArchiveThread(ArchiveThreadRequest) returns (ArchiveThreadResponse);
+
+  // Add a participant to an existing thread.
+  rpc AddParticipant(AddParticipantRequest) returns (AddParticipantResponse);
+
+  // Send a message to a thread (text and/or file references).
+  // Creates a MessageRecipient row per recipient and publishes
+  // a message.created notification to each recipient's room.
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+
+  // List threads with pagination.
+  rpc GetThreads(GetThreadsRequest) returns (GetThreadsResponse);
+
+  // List messages in a thread with pagination.
+  // Read-only — does not change acknowledgment state.
+  rpc GetMessages(GetMessagesRequest) returns (GetMessagesResponse);
+
+  // List unacknowledged messages for a participant across all threads.
+  rpc GetUnackedMessages(GetUnackedMessagesRequest) returns (GetUnackedMessagesResponse);
+
+  // Acknowledge messages as processed by a participant.
+  rpc AckMessages(AckMessagesRequest) returns (AckMessagesResponse);
+}
+
+// ===========================================================================
+// Enums
+// ===========================================================================
+
+enum ThreadStatus {
+  THREAD_STATUS_UNSPECIFIED = 0;
+  THREAD_STATUS_ACTIVE = 1;
+  THREAD_STATUS_ARCHIVED = 2;
+}
+
+// ===========================================================================
+// Entities
+// ===========================================================================
+
+// A messaging thread between participants.
+message Thread {
+  string id = 1; // UUID
+  repeated Participant participants = 2;
+  ThreadStatus status = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+// A participant in a thread.
+message Participant {
+  string id = 1; // UUID
+  google.protobuf.Timestamp joined_at = 2;
+}
+
+// A message within a thread.
+message Message {
+  string id = 1; // UUID
+  string thread_id = 2; // UUID — parent thread
+  string sender_id = 3; // UUID — participant who sent the message
+  string body = 4; // text content
+  repeated string file_ids = 5; // referenced file UUIDs (may be empty)
+  google.protobuf.Timestamp created_at = 6;
+}
+
+// Tracks acknowledgment state per participant per message.
+// Created by SendMessage — one row per recipient.
+message MessageRecipient {
+  string message_id = 1; // UUID — FK to Message
+  string thread_id = 2; // UUID — denormalized for query efficiency
+  string participant_id = 3; // UUID — recipient
+  google.protobuf.Timestamp acked_at = 4; // absent = unacknowledged
+}
+
+// ===========================================================================
+// CreateThread
+// ===========================================================================
+
+message CreateThreadRequest {
+  // Initial participant UUIDs. At least one required.
+  repeated string participant_ids = 1;
+}
+
+message CreateThreadResponse {
+  Thread thread = 1;
+}
+
+// ===========================================================================
+// ArchiveThread
+// ===========================================================================
+
+message ArchiveThreadRequest {
+  string thread_id = 1; // UUID
+}
+
+message ArchiveThreadResponse {
+  Thread thread = 1;
+}
+
+// ===========================================================================
+// AddParticipant
+// ===========================================================================
+
+message AddParticipantRequest {
+  string thread_id = 1; // UUID
+  string participant_id = 2; // UUID
+}
+
+message AddParticipantResponse {
+  Thread thread = 1;
+}
+
+// ===========================================================================
+// SendMessage
+// ===========================================================================
+
+message SendMessageRequest {
+  string thread_id = 1; // UUID
+  string sender_id = 2; // UUID — must be a participant
+  string body = 3; // text content
+  repeated string file_ids = 4; // optional file references (UUIDs)
+}
+
+message SendMessageResponse {
+  Message message = 1;
+}
+
+// ===========================================================================
+// GetThreads
+// ===========================================================================
+
+message GetThreadsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message GetThreadsResponse {
+  repeated Thread threads = 1;
+  string next_page_token = 2;
+}
+
+// ===========================================================================
+// GetMessages
+// ===========================================================================
+
+message GetMessagesRequest {
+  string thread_id = 1; // UUID
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message GetMessagesResponse {
+  repeated Message messages = 1;
+  string next_page_token = 2;
+}
+
+// ===========================================================================
+// GetUnackedMessages
+// ===========================================================================
+
+message GetUnackedMessagesRequest {
+  string participant_id = 1; // UUID
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message GetUnackedMessagesResponse {
+  repeated Message messages = 1;
+  string next_page_token = 2;
+}
+
+// ===========================================================================
+// AckMessages
+// ===========================================================================
+
+message AckMessagesRequest {
+  string participant_id = 1; // UUID
+  repeated string message_ids = 2; // UUIDs of messages to acknowledge
+}
+
+message AckMessagesResponse {
+  // Number of messages acknowledged (may be less than requested
+  // if some were already acknowledged or not found).
+  int32 acked_count = 1;
+}
