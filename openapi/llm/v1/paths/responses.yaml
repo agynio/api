@@ -7,6 +7,9 @@ post:
       application/json:
         schema:
           type: object
+          properties:
+            model_id: { type: string, format: uuid }
+          required: [model_id]
           additionalProperties: true
   responses:
     '200':
