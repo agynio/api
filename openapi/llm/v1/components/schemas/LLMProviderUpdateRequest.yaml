@@ -1,0 +1,5 @@
+type: object
+properties:
+  endpoint: { type: string, format: uri }
+  authMethod: { $ref: './AuthMethod.yaml' }
+additionalProperties: false

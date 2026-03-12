@@ -1,0 +1,51 @@
+openapi: 3.0.3
+info:
+  title: LLM API
+  version: 0.1.0
+servers:
+  - url: https://api.example.com
+tags:
+  - name: LLM Providers
+  - name: LLM Models
+  - name: LLM Responses
+paths:
+  /providers:
+    $ref: './paths/providers.yaml'
+  /providers/{id}:
+    $ref: './paths/provider-by-id.yaml'
+  /models:
+    $ref: './paths/models.yaml'
+  /models/{id}:
+    $ref: './paths/model-by-id.yaml'
+  /responses:
+    $ref: './paths/responses.yaml'
+components:
+  parameters:
+    IdPath:
+      $ref: './components/parameters/IdPath.yaml'
+  responses:
+    ProblemResponse:
+      $ref: './components/responses/ProblemResponse.yaml'
+  schemas:
+    Problem:
+      $ref: './components/schemas/Problem.yaml'
+    EntityMeta:
+      $ref: './components/schemas/EntityMeta.yaml'
+    AuthMethod:
+      $ref: './components/schemas/AuthMethod.yaml'
+    LLMProvider:
+      $ref: './components/schemas/LLMProvider.yaml'
+    LLMProviderCreateRequest:
+      $ref: './components/schemas/LLMProviderCreateRequest.yaml'
+    LLMProviderUpdateRequest:
+      $ref: './components/schemas/LLMProviderUpdateRequest.yaml'
+    PaginatedLLMProviders:
+      $ref: './components/schemas/PaginatedLLMProviders.yaml'
+    Model:
+      $ref: './components/schemas/Model.yaml'
+    ModelCreateRequest:
+      $ref: './components/schemas/ModelCreateRequest.yaml'
+    ModelUpdateRequest:
+      $ref: './components/schemas/ModelUpdateRequest.yaml'
+    PaginatedModels:
+      $ref: './components/schemas/PaginatedModels.yaml'
