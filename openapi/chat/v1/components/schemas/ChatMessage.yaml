@@ -1,0 +1,11 @@
+type: object
+properties:
+  id: { type: string, format: uuid }
+  chatId: { type: string, format: uuid }
+  senderId: { type: string, format: uuid }
+  body: { type: string }
+  fileIds:
+    type: array
+    items: { type: string, format: uuid }
+  createdAt: { type: string, format: date-time }
+required: [id, chatId, senderId, body, fileIds, createdAt]

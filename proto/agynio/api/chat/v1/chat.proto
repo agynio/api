@@ -1,0 +1,147 @@
+syntax = "proto3";
+
+package agynio.api.chat.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/agynio/api/gen/agynio/api/chat/v1;chatv1";
+
+// ChatService implements the built-in web and mobile app chat experience
+// on top of Threads. It manages chat creation, message retrieval with
+// unread counts, sending messages, and read-receipt tracking.
+//
+// Identity is resolved from gRPC metadata (identity_id, identity_type,
+// tenant_id). Requests do not carry explicit user identifiers — the
+// server extracts the authenticated identity from context.
+service ChatService {
+  // Create a new chat thread between participants.
+  // The authenticated identity is automatically added as a participant.
+  // Delegates to Threads.CreateThread.
+  rpc CreateChat(CreateChatRequest) returns (CreateChatResponse);
+
+  // List chats for the authenticated user with pagination.
+  // Delegates to Threads.GetThreads using the authenticated identity_id.
+  rpc GetChats(GetChatsRequest) returns (GetChatsResponse);
+
+  // List messages in a chat with pagination.
+  // Returns an unread_count derived from Threads.GetUnackedMessages.
+  // Read-only — does not change acknowledgment state.
+  rpc GetMessages(GetMessagesRequest) returns (GetMessagesResponse);
+
+  // Send a message in a chat.
+  // The sender_id is the authenticated identity_id (set by the server).
+  // Delegates to Threads.SendMessage.
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+
+  // Mark messages as read for the authenticated user.
+  // Delegates to Threads.AckMessages using the authenticated identity_id.
+  rpc MarkAsRead(MarkAsReadRequest) returns (MarkAsReadResponse);
+}
+
+// ===========================================================================
+// Entities
+// ===========================================================================
+
+// A chat thread between participants.
+message Chat {
+  string id = 1; // UUID — maps to Threads thread_id
+  repeated ChatParticipant participants = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+// A participant in a chat.
+message ChatParticipant {
+  string id = 1; // UUID — identity_id of the participant
+  google.protobuf.Timestamp joined_at = 2;
+}
+
+// A message within a chat.
+message ChatMessage {
+  string id = 1; // UUID
+  string chat_id = 2; // UUID — parent chat
+  string sender_id = 3; // UUID — identity_id of the sender
+  string body = 4; // text content
+  repeated string file_ids = 5; // referenced file UUIDs (may be empty)
+  google.protobuf.Timestamp created_at = 6;
+}
+
+// ===========================================================================
+// CreateChat
+// ===========================================================================
+
+message CreateChatRequest {
+  // Identity IDs of other participants. The authenticated user is added
+  // automatically by the server. At least one participant is required.
+  repeated string participant_ids = 1;
+}
+
+message CreateChatResponse {
+  Chat chat = 1;
+}
+
+// ===========================================================================
+// GetChats
+// ===========================================================================
+
+message GetChatsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message GetChatsResponse {
+  repeated Chat chats = 1;
+  string next_page_token = 2;
+}
+
+// ===========================================================================
+// GetMessages
+// ===========================================================================
+
+message GetMessagesRequest {
+  string chat_id = 1; // UUID
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message GetMessagesResponse {
+  repeated ChatMessage messages = 1;
+  string next_page_token = 2;
+  // Number of unacknowledged messages for the authenticated user in this
+  // chat. Derived from Threads.GetUnackedMessages.
+  int32 unread_count = 3;
+}
+
+// ===========================================================================
+// SendMessage
+// ===========================================================================
+
+message SendMessageRequest {
+  string chat_id = 1; // UUID
+  // Text content. May be empty when file_ids is non-empty.
+  // At least one of body or file_ids must be provided.
+  string body = 2;
+  // File references (UUIDs). May be empty when body is non-empty.
+  // At least one of body or file_ids must be provided.
+  repeated string file_ids = 3;
+}
+
+message SendMessageResponse {
+  ChatMessage message = 1;
+}
+
+// ===========================================================================
+// MarkAsRead
+// ===========================================================================
+
+message MarkAsReadRequest {
+  string chat_id = 1; // UUID
+  // Message UUIDs to acknowledge as read. Must belong to the specified chat.
+  repeated string message_ids = 2;
+}
+
+message MarkAsReadResponse {
+  // Number of messages newly marked as read. Already-read and unknown
+  // IDs are silently ignored for idempotency.
+  int32 read_count = 1;
+}
