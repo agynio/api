@@ -1,0 +1,7 @@
+allOf:
+  - $ref: './EntityMeta.yaml'
+  - type: object
+    properties:
+      endpoint: { type: string, format: uri }
+      authMethod: { $ref: './AuthMethod.yaml' }
+    required: [endpoint, authMethod]

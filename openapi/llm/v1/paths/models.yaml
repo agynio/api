@@ -1,0 +1,50 @@
+get:
+  tags: [LLM Models]
+  summary: List LLM models
+  parameters:
+    - in: query
+      name: providerId
+      schema:
+        type: string
+        format: uuid
+      description: Filter by provider ID
+    - in: query
+      name: page
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    - in: query
+      name: perPage
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/PaginatedModels.yaml'
+    default:
+      $ref: '../components/responses/ProblemResponse.yaml'
+post:
+  tags: [LLM Models]
+  summary: Create LLM model
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../components/schemas/ModelCreateRequest.yaml'
+  responses:
+    '201':
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/Model.yaml'
+    default:
+      $ref: '../components/responses/ProblemResponse.yaml'
