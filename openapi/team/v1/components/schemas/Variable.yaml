@@ -1,7 +1,8 @@
-type: object
-properties:
-  meta: { $ref: './EntityMeta.yaml' }
-  key: { type: string }
-  value: { type: string }
-  description: { type: string }
-required: [meta, key, value]
+allOf:
+  - $ref: './EntityMeta.yaml'
+  - type: object
+    properties:
+      key: { type: string }
+      value: { type: string }
+      description: { type: string }
+    required: [key, value]
