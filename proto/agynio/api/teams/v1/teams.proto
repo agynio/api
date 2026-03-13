@@ -8,7 +8,7 @@ import "google/protobuf/timestamp.proto";
 option go_package = "github.com/agynio/api/gen/agynio/api/teams/v1;teamsv1";
 
 // TeamsService manages team resources: agents, tools, MCP servers,
-// workspace configurations, memory buckets, and attachments (relations).
+// workspace configurations, memory buckets, variables, and attachments (relations).
 //
 // This is a control-plane service. It stores desired state;
 // other services reconcile toward it.
@@ -47,6 +47,14 @@ service TeamsService {
   rpc UpdateMemoryBucket(UpdateMemoryBucketRequest) returns (UpdateMemoryBucketResponse);
   rpc DeleteMemoryBucket(DeleteMemoryBucketRequest) returns (DeleteMemoryBucketResponse);
   rpc ListMemoryBuckets(ListMemoryBucketsRequest) returns (ListMemoryBucketsResponse);
+
+  // --- Variables ---
+  rpc CreateVariable(CreateVariableRequest) returns (CreateVariableResponse);
+  rpc GetVariable(GetVariableRequest) returns (GetVariableResponse);
+  rpc UpdateVariable(UpdateVariableRequest) returns (UpdateVariableResponse);
+  rpc DeleteVariable(DeleteVariableRequest) returns (DeleteVariableResponse);
+  rpc ListVariables(ListVariablesRequest) returns (ListVariablesResponse);
+  rpc ResolveVariable(ResolveVariableRequest) returns (ResolveVariableResponse);
 
   // --- Attachments (no Update) ---
   rpc CreateAttachment(CreateAttachmentRequest) returns (CreateAttachmentResponse);
@@ -89,6 +97,7 @@ enum EntityType {
   ENTITY_TYPE_MCP_SERVER = 3;
   ENTITY_TYPE_WORKSPACE_CONFIGURATION = 4;
   ENTITY_TYPE_MEMORY_BUCKET = 5;
+  ENTITY_TYPE_VARIABLE = 6;
 }
 
 enum AttachmentKind {
@@ -123,6 +132,12 @@ enum AgentProcessBuffer {
   AGENT_PROCESS_BUFFER_UNSPECIFIED = 0;
   AGENT_PROCESS_BUFFER_ALL_TOGETHER = 1;
   AGENT_PROCESS_BUFFER_ONE_BY_ONE = 2;
+}
+
+enum McpToolFilterMode {
+  MCP_TOOL_FILTER_MODE_UNSPECIFIED = 0;
+  MCP_TOOL_FILTER_MODE_ALLOW = 1;
+  MCP_TOOL_FILTER_MODE_DENY = 2;
 }
 
 // ===========================================================================
@@ -266,6 +281,15 @@ message McpEnvItem {
   string value = 2;
 }
 
+message McpToolFilterRule {
+  string pattern = 1;
+}
+
+message McpToolFilter {
+  McpToolFilterMode mode = 1;
+  repeated McpToolFilterRule rules = 2;
+}
+
 message McpServerRestartConfig {
   int32 max_attempts = 1;
   int32 backoff_ms = 2;
@@ -281,6 +305,7 @@ message McpServerConfig {
   int32 heartbeat_interval_ms = 7;
   int32 stale_timeout_ms = 8;
   McpServerRestartConfig restart = 9;
+  McpToolFilter tool_filter = 10;
 }
 
 message McpServer {
@@ -473,6 +498,72 @@ message ListMemoryBucketsRequest {
 message ListMemoryBucketsResponse {
   repeated MemoryBucket memory_buckets = 1;
   string next_page_token = 2;
+}
+
+// ===========================================================================
+// Variable
+// ===========================================================================
+
+message Variable {
+  EntityMeta meta = 1;
+  string key = 2;
+  string value = 3;
+  string description = 4;
+}
+
+message CreateVariableRequest {
+  string key = 1;
+  string value = 2;
+  string description = 3;
+}
+
+message CreateVariableResponse {
+  Variable variable = 1;
+}
+
+message GetVariableRequest {
+  string id = 1;
+}
+
+message GetVariableResponse {
+  Variable variable = 1;
+}
+
+message UpdateVariableRequest {
+  string id = 1;
+  optional string key = 2;
+  optional string value = 3;
+  optional string description = 4;
+}
+
+message UpdateVariableResponse {
+  Variable variable = 1;
+}
+
+message DeleteVariableRequest {
+  string id = 1;
+}
+
+message DeleteVariableResponse {}
+
+message ListVariablesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string query = 3;
+}
+
+message ListVariablesResponse {
+  repeated Variable variables = 1;
+  string next_page_token = 2;
+}
+
+message ResolveVariableRequest {
+  string key = 1;
+}
+
+message ResolveVariableResponse {
+  string value = 1;
+  bool found = 2;
 }
 
 // ===========================================================================

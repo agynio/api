@@ -10,6 +10,7 @@ tags:
   - name: MCP Servers
   - name: WorkspaceConfigurations
   - name: MemoryBuckets
+  - name: Variables
   - name: Attachments
 paths:
   /agents:
@@ -32,6 +33,12 @@ paths:
     $ref: './paths/memory-buckets.yaml'
   /memory-buckets/{id}:
     $ref: './paths/memory-bucket-by-id.yaml'
+  /variables:
+    $ref: './paths/variables.yaml'
+  /variables/{id}:
+    $ref: './paths/variable-by-id.yaml'
+  /variables/resolve/{key}:
+    $ref: './paths/variable-resolve.yaml'
   /attachments:
     $ref: './paths/attachments.yaml'
   /attachments/{id}:
@@ -108,6 +115,14 @@ components:
       $ref: './components/schemas/MemoryBucketUpdateRequest.yaml'
     PaginatedMemoryBuckets:
       $ref: './components/schemas/PaginatedMemoryBuckets.yaml'
+    Variable:
+      $ref: './components/schemas/Variable.yaml'
+    VariableCreateRequest:
+      $ref: './components/schemas/VariableCreateRequest.yaml'
+    VariableUpdateRequest:
+      $ref: './components/schemas/VariableUpdateRequest.yaml'
+    PaginatedVariables:
+      $ref: './components/schemas/PaginatedVariables.yaml'
     EntityType:
       $ref: './components/schemas/EntityType.yaml'
     AttachmentKind:
