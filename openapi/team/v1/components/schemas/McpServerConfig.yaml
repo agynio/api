@@ -16,4 +16,19 @@ properties:
       maxAttempts: { type: integer, minimum: 1 }
       backoffMs: { type: integer, minimum: 1 }
     additionalProperties: false
+  toolFilter:
+    type: object
+    properties:
+      mode:
+        type: string
+        enum: [allow, deny]
+      rules:
+        type: array
+        items:
+          type: object
+          properties:
+            pattern: { type: string, minLength: 1 }
+          required: [pattern]
+          additionalProperties: false
+    additionalProperties: false
 additionalProperties: false

@@ -1,0 +1,23 @@
+get:
+  tags: [Variables]
+  summary: Resolve variable by key
+  parameters:
+    - in: path
+      name: key
+      required: true
+      schema:
+        type: string
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              value: { type: string }
+              found: { type: boolean }
+            required: [value, found]
+            additionalProperties: false
+    default:
+      $ref: '../components/responses/ProblemResponse.yaml'

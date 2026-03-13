@@ -1,0 +1,6 @@
+type: object
+properties:
+  key: { type: string, minLength: 1 }
+  value: { type: string }
+  description: { type: string }
+additionalProperties: false

@@ -1,0 +1,7 @@
+type: object
+properties:
+  meta: { $ref: './EntityMeta.yaml' }
+  key: { type: string }
+  value: { type: string }
+  description: { type: string }
+required: [meta, key, value]
