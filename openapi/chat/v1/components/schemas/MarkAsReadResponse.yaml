@@ -1,0 +1,9 @@
+type: object
+properties:
+  readCount:
+    type: integer
+    minimum: 0
+    description: >-
+      Number of messages newly marked as read. Already-read and unknown
+      IDs are silently ignored for idempotency.
+required: [readCount]

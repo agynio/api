@@ -1,0 +1,25 @@
+post:
+  operationId: markChatAsRead
+  tags: [Messages]
+  summary: Mark messages as read
+  description: >-
+    Mark messages as read for the authenticated user. Delegates to
+    Threads AckMessages. Already-read and unknown IDs are silently
+    ignored for idempotency.
+  parameters:
+    - $ref: '../components/parameters/ChatIdPath.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../components/schemas/MarkAsReadRequest.yaml'
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/MarkAsReadResponse.yaml'
+    default:
+      $ref: '../components/responses/ProblemResponse.yaml'
