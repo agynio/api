@@ -9,11 +9,19 @@ option go_package = "github.com/agynio/api/gen/agynio/api/authorization/v1;autho
 // AuthorizationService is a thin gRPC proxy to OpenFGA.
 // It mirrors the OpenFGA runtime API and injects store/model IDs.
 service AuthorizationService {
+  // Check tests whether a user has a specific relationship with an object.
   rpc Check(CheckRequest) returns (CheckResponse);
+  // BatchCheck evaluates multiple authorization checks in a single call.
+  // Each check includes a correlation_id for matching results.
   rpc BatchCheck(BatchCheckRequest) returns (BatchCheckResponse);
+  // Write creates or deletes relationship tuples in the store.
   rpc Write(WriteRequest) returns (WriteResponse);
+  // Read retrieves relationship tuples matching a partial tuple filter.
   rpc Read(ReadRequest) returns (ReadResponse);
+  // ListObjects returns all objects of a given type that a user has a
+  // specific relationship with.
   rpc ListObjects(ListObjectsRequest) returns (ListObjectsResponse);
+  // ListUsers returns all users that have a specific relationship with an object.
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
 }
 
