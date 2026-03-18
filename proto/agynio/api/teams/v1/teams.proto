@@ -32,7 +32,7 @@ service TeamsService {
   rpc DeleteVolumeAttachment(DeleteVolumeAttachmentRequest) returns (DeleteVolumeAttachmentResponse);
   rpc ListVolumeAttachments(ListVolumeAttachmentsRequest) returns (ListVolumeAttachmentsResponse);
 
-  // --- MCP Servers ---
+  // --- MCPs ---
   rpc CreateMcp(CreateMcpRequest) returns (CreateMcpResponse);
   rpc GetMcp(GetMcpRequest) returns (GetMcpResponse);
   rpc UpdateMcp(UpdateMcpRequest) returns (UpdateMcpResponse);
