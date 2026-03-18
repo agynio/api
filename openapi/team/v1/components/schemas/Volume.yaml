@@ -1,0 +1,11 @@
+allOf:
+  - $ref: './EntityMeta.yaml'
+  - type: object
+    properties:
+      persistent: { type: boolean }
+      mountPath: { type: string }
+      size:
+        type: string
+        description: Required when persistent is true.
+      description: { type: string }
+    required: [persistent, mountPath]

@@ -1,6 +1,6 @@
 get:
-  tags: [Agents]
-  summary: List agents
+  tags: [Init Scripts]
+  summary: List init scripts
   parameters:
     - in: query
       name: pageSize
@@ -19,24 +19,24 @@ get:
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/PaginatedAgents.yaml'
+            $ref: '../components/schemas/PaginatedInitScripts.yaml'
     default:
       $ref: '../components/responses/ProblemResponse.yaml'
 post:
-  tags: [Agents]
-  summary: Create agent
+  tags: [Init Scripts]
+  summary: Create init script
   requestBody:
     required: true
     content:
       application/json:
         schema:
-          $ref: '../components/schemas/AgentCreateRequest.yaml'
+          $ref: '../components/schemas/InitScriptCreateRequest.yaml'
   responses:
     '201':
       description: Created
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/Agent.yaml'
+            $ref: '../components/schemas/InitScript.yaml'
     default:
       $ref: '../components/responses/ProblemResponse.yaml'

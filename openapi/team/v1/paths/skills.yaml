@@ -1,6 +1,6 @@
 get:
-  tags: [Agents]
-  summary: List agents
+  tags: [Skills]
+  summary: List skills
   parameters:
     - in: query
       name: pageSize
@@ -19,24 +19,24 @@ get:
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/PaginatedAgents.yaml'
+            $ref: '../components/schemas/PaginatedSkills.yaml'
     default:
       $ref: '../components/responses/ProblemResponse.yaml'
 post:
-  tags: [Agents]
-  summary: Create agent
+  tags: [Skills]
+  summary: Create skill
   requestBody:
     required: true
     content:
       application/json:
         schema:
-          $ref: '../components/schemas/AgentCreateRequest.yaml'
+          $ref: '../components/schemas/SkillCreateRequest.yaml'
   responses:
     '201':
       description: Created
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/Agent.yaml'
+            $ref: '../components/schemas/Skill.yaml'
     default:
       $ref: '../components/responses/ProblemResponse.yaml'

@@ -1,0 +1,19 @@
+allOf:
+  - $ref: './EntityMeta.yaml'
+  - type: object
+    properties:
+      script: { type: string }
+      description: { type: string }
+      agentId:
+        type: string
+        format: uuid
+        description: Target agent. Mutually exclusive with mcpId and hookId.
+      mcpId:
+        type: string
+        format: uuid
+        description: Target MCP. Mutually exclusive with agentId and hookId.
+      hookId:
+        type: string
+        format: uuid
+        description: Target hook. Mutually exclusive with agentId and mcpId.
+    required: [script]

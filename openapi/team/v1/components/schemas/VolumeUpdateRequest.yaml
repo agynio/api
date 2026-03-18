@@ -1,0 +1,9 @@
+type: object
+properties:
+  persistent: { type: boolean }
+  mountPath: { type: string }
+  size:
+    type: string
+    description: Required when persistent is true.
+  description: { type: string }
+additionalProperties: false

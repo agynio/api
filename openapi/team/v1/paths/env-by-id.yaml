@@ -1,0 +1,44 @@
+get:
+  tags: [Envs]
+  summary: Get env by ID
+  parameters:
+    - $ref: '../components/parameters/IdPath.yaml'
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/Env.yaml'
+    default:
+      $ref: '../components/responses/ProblemResponse.yaml'
+patch:
+  tags: [Envs]
+  summary: Update env (partial)
+  parameters:
+    - $ref: '../components/parameters/IdPath.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../components/schemas/EnvUpdateRequest.yaml'
+  responses:
+    '200':
+      description: Updated
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/Env.yaml'
+    default:
+      $ref: '../components/responses/ProblemResponse.yaml'
+delete:
+  tags: [Envs]
+  summary: Delete env
+  parameters:
+    - $ref: '../components/parameters/IdPath.yaml'
+  responses:
+    '204':
+      description: No Content
+    default:
+      $ref: '../components/responses/ProblemResponse.yaml'

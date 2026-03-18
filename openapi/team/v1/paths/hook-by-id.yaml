@@ -1,0 +1,44 @@
+get:
+  tags: [Hooks]
+  summary: Get hook by ID
+  parameters:
+    - $ref: '../components/parameters/IdPath.yaml'
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/Hook.yaml'
+    default:
+      $ref: '../components/responses/ProblemResponse.yaml'
+patch:
+  tags: [Hooks]
+  summary: Update hook (partial)
+  parameters:
+    - $ref: '../components/parameters/IdPath.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../components/schemas/HookUpdateRequest.yaml'
+  responses:
+    '200':
+      description: Updated
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/Hook.yaml'
+    default:
+      $ref: '../components/responses/ProblemResponse.yaml'
+delete:
+  tags: [Hooks]
+  summary: Delete hook
+  parameters:
+    - $ref: '../components/parameters/IdPath.yaml'
+  responses:
+    '204':
+      description: No Content
+    default:
+      $ref: '../components/responses/ProblemResponse.yaml'

@@ -1,6 +1,6 @@
 get:
-  tags: [Agents]
-  summary: List agents
+  tags: [Volume Attachments]
+  summary: List volume attachments
   parameters:
     - in: query
       name: pageSize
@@ -19,24 +19,24 @@ get:
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/PaginatedAgents.yaml'
+            $ref: '../components/schemas/PaginatedVolumeAttachments.yaml'
     default:
       $ref: '../components/responses/ProblemResponse.yaml'
 post:
-  tags: [Agents]
-  summary: Create agent
+  tags: [Volume Attachments]
+  summary: Create volume attachment
   requestBody:
     required: true
     content:
       application/json:
         schema:
-          $ref: '../components/schemas/AgentCreateRequest.yaml'
+          $ref: '../components/schemas/VolumeAttachmentCreateRequest.yaml'
   responses:
     '201':
       description: Created
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/Agent.yaml'
+            $ref: '../components/schemas/VolumeAttachment.yaml'
     default:
       $ref: '../components/responses/ProblemResponse.yaml'
