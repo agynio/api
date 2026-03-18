@@ -1,6 +1,6 @@
 get:
-  tags: [Agents]
-  summary: List agents
+  tags: [Volumes]
+  summary: List volumes
   parameters:
     - in: query
       name: pageSize
@@ -19,24 +19,24 @@ get:
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/PaginatedAgents.yaml'
+            $ref: '../components/schemas/PaginatedVolumes.yaml'
     default:
       $ref: '../components/responses/ProblemResponse.yaml'
 post:
-  tags: [Agents]
-  summary: Create agent
+  tags: [Volumes]
+  summary: Create volume
   requestBody:
     required: true
     content:
       application/json:
         schema:
-          $ref: '../components/schemas/AgentCreateRequest.yaml'
+          $ref: '../components/schemas/VolumeCreateRequest.yaml'
   responses:
     '201':
       description: Created
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/Agent.yaml'
+            $ref: '../components/schemas/Volume.yaml'
     default:
       $ref: '../components/responses/ProblemResponse.yaml'

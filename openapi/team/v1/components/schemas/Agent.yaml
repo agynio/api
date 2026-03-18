@@ -2,7 +2,13 @@ allOf:
   - $ref: './EntityMeta.yaml'
   - type: object
     properties:
-      title: { type: string }
+      name: { type: string }
+      role: { type: string }
+      model: { type: string, format: uuid }
       description: { type: string }
-      config: { $ref: './AgentConfig.yaml' }
-    required: [config]
+      configuration:
+        type: string
+        description: JSON-encoded agent configuration payload.
+      image: { type: string }
+      resources: { $ref: './ComputeResources.yaml' }
+    required: [name, role, model, configuration, image]

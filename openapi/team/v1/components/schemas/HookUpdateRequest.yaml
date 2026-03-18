@@ -1,0 +1,8 @@
+type: object
+properties:
+  event: { type: string }
+  function: { type: string }
+  image: { type: string }
+  resources: { $ref: './ComputeResources.yaml' }
+  description: { type: string }
+additionalProperties: false

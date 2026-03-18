@@ -1,0 +1,8 @@
+type: object
+properties:
+  agentId: { type: string, format: uuid }
+  image: { type: string }
+  command: { type: string }
+  resources: { $ref: './ComputeResources.yaml' }
+  description: { type: string }
+required: [agentId, image, command]

@@ -1,6 +1,6 @@
 get:
-  tags: [Agents]
-  summary: List agents
+  tags: [Envs]
+  summary: List envs
   parameters:
     - in: query
       name: pageSize
@@ -13,30 +13,45 @@ get:
       name: pageToken
       schema:
         type: string
+    - in: query
+      name: agentId
+      schema:
+        type: string
+        format: uuid
+    - in: query
+      name: mcpId
+      schema:
+        type: string
+        format: uuid
+    - in: query
+      name: hookId
+      schema:
+        type: string
+        format: uuid
   responses:
     '200':
       description: OK
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/PaginatedAgents.yaml'
+            $ref: '../components/schemas/PaginatedEnvs.yaml'
     default:
       $ref: '../components/responses/ProblemResponse.yaml'
 post:
-  tags: [Agents]
-  summary: Create agent
+  tags: [Envs]
+  summary: Create env
   requestBody:
     required: true
     content:
       application/json:
         schema:
-          $ref: '../components/schemas/AgentCreateRequest.yaml'
+          $ref: '../components/schemas/EnvCreateRequest.yaml'
   responses:
     '201':
       description: Created
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/Agent.yaml'
+            $ref: '../components/schemas/Env.yaml'
     default:
       $ref: '../components/responses/ProblemResponse.yaml'

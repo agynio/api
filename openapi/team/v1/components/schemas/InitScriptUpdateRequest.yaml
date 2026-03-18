@@ -1,0 +1,5 @@
+type: object
+properties:
+  script: { type: string }
+  description: { type: string }
+additionalProperties: false

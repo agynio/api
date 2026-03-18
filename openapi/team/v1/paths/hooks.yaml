@@ -1,6 +1,6 @@
 get:
-  tags: [Agents]
-  summary: List agents
+  tags: [Hooks]
+  summary: List hooks
   parameters:
     - in: query
       name: pageSize
@@ -13,30 +13,35 @@ get:
       name: pageToken
       schema:
         type: string
+    - in: query
+      name: agentId
+      schema:
+        type: string
+        format: uuid
   responses:
     '200':
       description: OK
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/PaginatedAgents.yaml'
+            $ref: '../components/schemas/PaginatedHooks.yaml'
     default:
       $ref: '../components/responses/ProblemResponse.yaml'
 post:
-  tags: [Agents]
-  summary: Create agent
+  tags: [Hooks]
+  summary: Create hook
   requestBody:
     required: true
     content:
       application/json:
         schema:
-          $ref: '../components/schemas/AgentCreateRequest.yaml'
+          $ref: '../components/schemas/HookCreateRequest.yaml'
   responses:
     '201':
       description: Created
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/Agent.yaml'
+            $ref: '../components/schemas/Hook.yaml'
     default:
       $ref: '../components/responses/ProblemResponse.yaml'

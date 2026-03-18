@@ -1,6 +1,6 @@
 get:
-  tags: [Agents]
-  summary: List agents
+  tags: [MCPs]
+  summary: List MCPs
   parameters:
     - in: query
       name: pageSize
@@ -13,30 +13,35 @@ get:
       name: pageToken
       schema:
         type: string
+    - in: query
+      name: agentId
+      schema:
+        type: string
+        format: uuid
   responses:
     '200':
       description: OK
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/PaginatedAgents.yaml'
+            $ref: '../components/schemas/PaginatedMcps.yaml'
     default:
       $ref: '../components/responses/ProblemResponse.yaml'
 post:
-  tags: [Agents]
-  summary: Create agent
+  tags: [MCPs]
+  summary: Create MCP
   requestBody:
     required: true
     content:
       application/json:
         schema:
-          $ref: '../components/schemas/AgentCreateRequest.yaml'
+          $ref: '../components/schemas/McpCreateRequest.yaml'
   responses:
     '201':
       description: Created
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/Agent.yaml'
+            $ref: '../components/schemas/Mcp.yaml'
     default:
       $ref: '../components/responses/ProblemResponse.yaml'
