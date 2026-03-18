@@ -13,6 +13,21 @@ get:
       name: pageToken
       schema:
         type: string
+    - in: query
+      name: agentId
+      schema:
+        type: string
+        format: uuid
+    - in: query
+      name: mcpId
+      schema:
+        type: string
+        format: uuid
+    - in: query
+      name: hookId
+      schema:
+        type: string
+        format: uuid
   responses:
     '200':
       description: OK

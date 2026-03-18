@@ -258,6 +258,10 @@ message DeleteVolumeAttachmentResponse {}
 message ListVolumeAttachmentsRequest {
   int32 page_size = 1;
   string page_token = 2;
+  string volume_id = 3;
+  string agent_id = 4;
+  string mcp_id = 5;
+  string hook_id = 6;
 }
 
 message ListVolumeAttachmentsResponse {
@@ -319,6 +323,7 @@ message DeleteMcpResponse {}
 message ListMcpsRequest {
   int32 page_size = 1;
   string page_token = 2;
+  string agent_id = 3;
 }
 
 message ListMcpsResponse {
@@ -377,6 +382,7 @@ message DeleteSkillResponse {}
 message ListSkillsRequest {
   int32 page_size = 1;
   string page_token = 2;
+  string agent_id = 3;
 }
 
 message ListSkillsResponse {
@@ -441,6 +447,7 @@ message DeleteHookResponse {}
 message ListHooksRequest {
   int32 page_size = 1;
   string page_token = 2;
+  string agent_id = 3;
 }
 
 message ListHooksResponse {
@@ -514,6 +521,9 @@ message DeleteEnvResponse {}
 message ListEnvsRequest {
   int32 page_size = 1;
   string page_token = 2;
+  string agent_id = 3;
+  string mcp_id = 4;
+  string hook_id = 5;
 }
 
 message ListEnvsResponse {
@@ -577,6 +587,9 @@ message DeleteInitScriptResponse {}
 message ListInitScriptsRequest {
   int32 page_size = 1;
   string page_token = 2;
+  string agent_id = 3;
+  string mcp_id = 4;
+  string hook_id = 5;
 }
 
 message ListInitScriptsResponse {
