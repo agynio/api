@@ -24,14 +24,14 @@ message User {
   EntityMeta meta = 1;
   string oidc_subject = 2;
   string name = 3;
-  string nickname = 4;
+  string email = 4;
   string photo_url = 5;
 }
 
 message ResolveOrCreateUserRequest {
   string oidc_subject = 1;
   string name = 2;
-  string nickname = 3;
+  string email = 3;
   string photo_url = 4;
 }
 
@@ -67,7 +67,7 @@ message BatchGetUsersResponse {
 message UpdateUserRequest {
   string identity_id = 1;
   optional string name = 2;
-  optional string nickname = 3;
+  optional string email = 3;
   optional string photo_url = 4;
 }
 
