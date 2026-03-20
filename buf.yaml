@@ -7,6 +7,9 @@ modules:
 lint:
   use:
     - STANDARD
+  except:
+    - RPC_REQUEST_RESPONSE_UNIQUE
+    - SERVICE_SUFFIX
 breaking:
   use:
     - FILE

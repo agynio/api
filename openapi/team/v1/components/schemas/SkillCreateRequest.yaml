@@ -1,7 +1,0 @@
-type: object
-properties:
-  agentId: { type: string, format: uuid }
-  name: { type: string }
-  body: { type: string }
-  description: { type: string }
-required: [agentId, name, body]

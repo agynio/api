@@ -1,6 +1,0 @@
-type: object
-properties:
-  name: { type: string }
-  llmProviderId: { type: string, format: uuid }
-  remoteName: { type: string }
-additionalProperties: false

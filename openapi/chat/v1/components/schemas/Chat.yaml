@@ -1,9 +1,0 @@
-type: object
-properties:
-  id: { type: string, format: uuid }
-  participants:
-    type: array
-    items: { $ref: './ChatParticipant.yaml' }
-  createdAt: { type: string, format: date-time }
-  updatedAt: { type: string, format: date-time }
-required: [id, participants, createdAt]

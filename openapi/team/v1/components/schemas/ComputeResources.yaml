@@ -1,6 +1,0 @@
-type: object
-properties:
-  requestsCpu: { type: string }
-  requestsMemory: { type: string }
-  limitsCpu: { type: string }
-  limitsMemory: { type: string }

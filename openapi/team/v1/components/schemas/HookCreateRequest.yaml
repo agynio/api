@@ -1,9 +1,0 @@
-type: object
-properties:
-  agentId: { type: string, format: uuid }
-  event: { type: string }
-  function: { type: string }
-  image: { type: string }
-  resources: { $ref: './ComputeResources.yaml' }
-  description: { type: string }
-required: [agentId, event, function, image]
