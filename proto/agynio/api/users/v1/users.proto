@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package agynio.api.users.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/agynio/api/gen/agynio/api/users/v1;usersv1";
+
+service UsersService {
+  rpc ResolveOrCreateUser(ResolveOrCreateUserRequest) returns (ResolveOrCreateUserResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  rpc GetUserByOIDCSubject(GetUserByOIDCSubjectRequest) returns (GetUserByOIDCSubjectResponse);
+  rpc BatchGetUsers(BatchGetUsersRequest) returns (BatchGetUsersResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+}
+
+message EntityMeta {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+}
+
+message User {
+  EntityMeta meta = 1;
+  string oidc_subject = 2;
+  string name = 3;
+  string email = 4;
+  string photo_url = 5;
+}
+
+message ResolveOrCreateUserRequest {
+  string oidc_subject = 1;
+  string name = 2;
+  string email = 3;
+  string photo_url = 4;
+}
+
+message ResolveOrCreateUserResponse {
+  User user = 1;
+  bool created = 2;
+}
+
+message GetUserRequest {
+  string identity_id = 1;
+}
+
+message GetUserResponse {
+  User user = 1;
+}
+
+message GetUserByOIDCSubjectRequest {
+  string oidc_subject = 1;
+}
+
+message GetUserByOIDCSubjectResponse {
+  User user = 1;
+}
+
+message BatchGetUsersRequest {
+  repeated string identity_ids = 1;
+}
+
+message BatchGetUsersResponse {
+  repeated User users = 1;
+}
+
+message UpdateUserRequest {
+  string identity_id = 1;
+  optional string name = 2;
+  optional string email = 3;
+  optional string photo_url = 4;
+}
+
+message UpdateUserResponse {
+  User user = 1;
+}
