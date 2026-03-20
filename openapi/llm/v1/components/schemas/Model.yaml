@@ -1,8 +1,0 @@
-allOf:
-  - $ref: './EntityMeta.yaml'
-  - type: object
-    properties:
-      name: { type: string }
-      llmProviderId: { type: string, format: uuid }
-      remoteName: { type: string }
-    required: [name, llmProviderId, remoteName]

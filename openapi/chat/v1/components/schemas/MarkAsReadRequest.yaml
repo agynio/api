@@ -1,9 +1,0 @@
-type: object
-description: Mark messages as read for the authenticated user.
-properties:
-  messageIds:
-    type: array
-    items: { type: string, format: uuid }
-    minItems: 1
-    description: Message UUIDs to acknowledge as read. Must belong to the specified chat.
-required: [messageIds]
