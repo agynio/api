@@ -8,6 +8,5 @@ option go_package = "github.com/agynio/api/gen/agynio/api/gateway/v1;gatewayv1";
 
 service LLMGateway {
   rpc CreateResponse(agynio.api.llm.v1.CreateResponseRequest) returns (agynio.api.llm.v1.CreateResponseResponse);
-  rpc CreateResponseStream(agynio.api.llm.v1.CreateResponseStreamRequest)
-      returns (stream agynio.api.llm.v1.CreateResponseStreamResponse);
+  rpc CreateResponseStream(agynio.api.llm.v1.CreateResponseStreamRequest) returns (stream agynio.api.llm.v1.CreateResponseStreamResponse);
 }

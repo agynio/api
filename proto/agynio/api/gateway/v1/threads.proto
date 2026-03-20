@@ -13,7 +13,6 @@ service ThreadsGateway {
   rpc SendMessage(agynio.api.threads.v1.SendMessageRequest) returns (agynio.api.threads.v1.SendMessageResponse);
   rpc GetThreads(agynio.api.threads.v1.GetThreadsRequest) returns (agynio.api.threads.v1.GetThreadsResponse);
   rpc GetMessages(agynio.api.threads.v1.GetMessagesRequest) returns (agynio.api.threads.v1.GetMessagesResponse);
-  rpc GetUnackedMessages(agynio.api.threads.v1.GetUnackedMessagesRequest)
-      returns (agynio.api.threads.v1.GetUnackedMessagesResponse);
+  rpc GetUnackedMessages(agynio.api.threads.v1.GetUnackedMessagesRequest) returns (agynio.api.threads.v1.GetUnackedMessagesResponse);
   rpc AckMessages(agynio.api.threads.v1.AckMessagesRequest) returns (agynio.api.threads.v1.AckMessagesResponse);
 }

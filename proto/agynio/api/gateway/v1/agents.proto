@@ -22,14 +22,10 @@ service AgentsGateway {
   rpc ListVolumes(agynio.api.agents.v1.ListVolumesRequest) returns (agynio.api.agents.v1.ListVolumesResponse);
 
   // --- Volume Attachments (no Update) ---
-  rpc CreateVolumeAttachment(agynio.api.agents.v1.CreateVolumeAttachmentRequest)
-      returns (agynio.api.agents.v1.CreateVolumeAttachmentResponse);
-  rpc GetVolumeAttachment(agynio.api.agents.v1.GetVolumeAttachmentRequest)
-      returns (agynio.api.agents.v1.GetVolumeAttachmentResponse);
-  rpc DeleteVolumeAttachment(agynio.api.agents.v1.DeleteVolumeAttachmentRequest)
-      returns (agynio.api.agents.v1.DeleteVolumeAttachmentResponse);
-  rpc ListVolumeAttachments(agynio.api.agents.v1.ListVolumeAttachmentsRequest)
-      returns (agynio.api.agents.v1.ListVolumeAttachmentsResponse);
+  rpc CreateVolumeAttachment(agynio.api.agents.v1.CreateVolumeAttachmentRequest) returns (agynio.api.agents.v1.CreateVolumeAttachmentResponse);
+  rpc GetVolumeAttachment(agynio.api.agents.v1.GetVolumeAttachmentRequest) returns (agynio.api.agents.v1.GetVolumeAttachmentResponse);
+  rpc DeleteVolumeAttachment(agynio.api.agents.v1.DeleteVolumeAttachmentRequest) returns (agynio.api.agents.v1.DeleteVolumeAttachmentResponse);
+  rpc ListVolumeAttachments(agynio.api.agents.v1.ListVolumeAttachmentsRequest) returns (agynio.api.agents.v1.ListVolumeAttachmentsResponse);
 
   // --- MCPs ---
   rpc CreateMcp(agynio.api.agents.v1.CreateMcpRequest) returns (agynio.api.agents.v1.CreateMcpResponse);
@@ -60,12 +56,9 @@ service AgentsGateway {
   rpc ListEnvs(agynio.api.agents.v1.ListEnvsRequest) returns (agynio.api.agents.v1.ListEnvsResponse);
 
   // --- Init Scripts ---
-  rpc CreateInitScript(agynio.api.agents.v1.CreateInitScriptRequest)
-      returns (agynio.api.agents.v1.CreateInitScriptResponse);
+  rpc CreateInitScript(agynio.api.agents.v1.CreateInitScriptRequest) returns (agynio.api.agents.v1.CreateInitScriptResponse);
   rpc GetInitScript(agynio.api.agents.v1.GetInitScriptRequest) returns (agynio.api.agents.v1.GetInitScriptResponse);
-  rpc UpdateInitScript(agynio.api.agents.v1.UpdateInitScriptRequest)
-      returns (agynio.api.agents.v1.UpdateInitScriptResponse);
-  rpc DeleteInitScript(agynio.api.agents.v1.DeleteInitScriptRequest)
-      returns (agynio.api.agents.v1.DeleteInitScriptResponse);
+  rpc UpdateInitScript(agynio.api.agents.v1.UpdateInitScriptRequest) returns (agynio.api.agents.v1.UpdateInitScriptResponse);
+  rpc DeleteInitScript(agynio.api.agents.v1.DeleteInitScriptRequest) returns (agynio.api.agents.v1.DeleteInitScriptResponse);
   rpc ListInitScripts(agynio.api.agents.v1.ListInitScriptsRequest) returns (agynio.api.agents.v1.ListInitScriptsResponse);
 }
