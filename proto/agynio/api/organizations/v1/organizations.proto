@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package agynio.api.organizations.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/agynio/api/gen/agynio/api/organizations/v1;organizationsv1";
+
+// OrganizationsService manages organization definitions.
+//
+// This is a control-plane service. It stores desired state;
+// other services reconcile toward it.
+service OrganizationsService {
+  rpc CreateOrganization(CreateOrganizationRequest) returns (CreateOrganizationResponse);
+  rpc GetOrganization(GetOrganizationRequest) returns (GetOrganizationResponse);
+  rpc UpdateOrganization(UpdateOrganizationRequest) returns (UpdateOrganizationResponse);
+  rpc DeleteOrganization(DeleteOrganizationRequest) returns (DeleteOrganizationResponse);
+  rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse);
+  rpc ListAccessibleOrganizations(ListAccessibleOrganizationsRequest) returns (ListAccessibleOrganizationsResponse);
+}
+
+// ===========================================================================
+// Organization
+// ===========================================================================
+
+message Organization {
+  string id = 1; // UUID
+  string name = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+message CreateOrganizationRequest {
+  string name = 1;
+}
+
+message CreateOrganizationResponse {
+  Organization organization = 1;
+}
+
+message GetOrganizationRequest {
+  string id = 1; // UUID
+}
+
+message GetOrganizationResponse {
+  Organization organization = 1;
+}
+
+message UpdateOrganizationRequest {
+  string id = 1; // UUID
+  optional string name = 2;
+}
+
+message UpdateOrganizationResponse {
+  Organization organization = 1;
+}
+
+message DeleteOrganizationRequest {
+  string id = 1; // UUID
+}
+
+message DeleteOrganizationResponse {}
+
+message ListOrganizationsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message ListOrganizationsResponse {
+  repeated Organization organizations = 1;
+  string next_page_token = 2;
+}
+
+message ListAccessibleOrganizationsRequest {
+  string identity_id = 1; // UUID
+}
+
+message ListAccessibleOrganizationsResponse {
+  repeated Organization organizations = 1;
+}

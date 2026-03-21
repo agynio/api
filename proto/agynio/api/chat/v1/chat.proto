@@ -11,7 +11,7 @@ option go_package = "github.com/agynio/api/gen/agynio/api/chat/v1;chatv1";
 // unread counts, sending messages, and read-receipt tracking.
 //
 // Identity is resolved from gRPC metadata (identity_id, identity_type,
-// tenant_id). Requests do not carry explicit user identifiers — the
+// organization_id). Requests do not carry explicit user identifiers — the
 // server extracts the authenticated identity from context.
 service ChatService {
   // Create a new chat thread between participants.
