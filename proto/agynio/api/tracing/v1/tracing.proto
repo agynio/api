@@ -100,8 +100,8 @@ message Event {
 
 // A link to another span. Mirrors opentelemetry.proto.trace.v1.Span.Link.
 message Link {
-  bytes trace_id = 1;   // 16 bytes
-  bytes span_id = 2;    // 8 bytes
+  bytes trace_id = 1; // 16 bytes
+  bytes span_id = 2; // 8 bytes
   string trace_state = 3;
   repeated KeyValue attributes = 4;
   uint32 dropped_attributes_count = 5;
@@ -131,15 +131,15 @@ message InstrumentationScope {
 // A span represents a single operation within a trace.
 // Data model follows the OpenTelemetry Span specification.
 message Span {
-  bytes trace_id = 1;           // 16 bytes — trace identifier
-  bytes span_id = 2;            // 8 bytes — span identifier
-  string trace_state = 3;       // W3C trace-context trace state
-  bytes parent_span_id = 4;     // 8 bytes — parent span (empty for root)
-  uint32 flags = 5;             // W3C trace flags + OTel span flags
-  string name = 6;              // operation name
+  bytes trace_id = 1; // 16 bytes — trace identifier
+  bytes span_id = 2; // 8 bytes — span identifier
+  string trace_state = 3; // W3C trace-context trace state
+  bytes parent_span_id = 4; // 8 bytes — parent span (empty for root)
+  uint32 flags = 5; // W3C trace flags + OTel span flags
+  string name = 6; // operation name
   SpanKind kind = 7;
-  fixed64 start_time_unix_nano = 8;  // nanoseconds since epoch
-  fixed64 end_time_unix_nano = 9;    // 0 = in-progress
+  fixed64 start_time_unix_nano = 8; // nanoseconds since epoch
+  fixed64 end_time_unix_nano = 9; // 0 = in-progress
   repeated KeyValue attributes = 10;
   repeated Event events = 11;
   repeated Link links = 12;
@@ -157,20 +157,20 @@ message Span {
 
 // Filter criteria for ListSpans. All fields are optional and AND-combined.
 message SpanFilter {
-  bytes trace_id = 1;              // filter by trace
-  bytes parent_span_id = 2;        // filter by parent span
-  string name = 3;                 // filter by operation name (exact match)
-  SpanKind kind = 4;               // filter by span kind
-  fixed64 start_time_min = 5;      // start time lower bound (inclusive, nanos)
-  fixed64 start_time_max = 6;      // start time upper bound (inclusive, nanos)
-  optional bool in_progress = 7;   // true = only in-progress, false = only completed, unset = both
+  bytes trace_id = 1; // filter by trace
+  bytes parent_span_id = 2; // filter by parent span
+  string name = 3; // filter by operation name (exact match)
+  SpanKind kind = 4; // filter by span kind
+  fixed64 start_time_min = 5; // start time lower bound (inclusive, nanos)
+  fixed64 start_time_max = 6; // start time upper bound (inclusive, nanos)
+  optional bool in_progress = 7; // true = only in-progress, false = only completed, unset = both
 }
 
 message ListSpansRequest {
   SpanFilter filter = 1;
   int32 page_size = 2;
   string page_token = 3;
-  ListSpansOrderBy order_by = 4;   // default: START_TIME_DESC
+  ListSpansOrderBy order_by = 4; // default: START_TIME_DESC
 }
 
 message ListSpansResponse {
@@ -183,8 +183,8 @@ message ListSpansResponse {
 // ===========================================================================
 
 message GetSpanRequest {
-  bytes trace_id = 1;   // 16 bytes
-  bytes span_id = 2;    // 8 bytes
+  bytes trace_id = 1; // 16 bytes
+  bytes span_id = 2; // 8 bytes
 }
 
 message GetSpanResponse {
@@ -196,7 +196,7 @@ message GetSpanResponse {
 // ===========================================================================
 
 message GetTraceRequest {
-  bytes trace_id = 1;   // 16 bytes
+  bytes trace_id = 1; // 16 bytes
 }
 
 message GetTraceResponse {
