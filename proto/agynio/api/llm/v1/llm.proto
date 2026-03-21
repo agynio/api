@@ -60,6 +60,7 @@ message CreateLLMProviderRequest {
   string endpoint = 1;
   AuthMethod auth_method = 2;
   string token = 3;
+  string organization_id = 4;
 }
 
 message CreateLLMProviderResponse {
@@ -94,6 +95,7 @@ message DeleteLLMProviderResponse {}
 message ListLLMProvidersRequest {
   int32 page_size = 1;
   string page_token = 2;
+  string organization_id = 3;
 }
 
 message ListLLMProvidersResponse {
@@ -116,6 +118,7 @@ message CreateModelRequest {
   string name = 1;
   string llm_provider_id = 2; // UUID
   string remote_name = 3;
+  string organization_id = 4;
 }
 
 message CreateModelResponse {
@@ -151,6 +154,7 @@ message ListModelsRequest {
   int32 page_size = 1;
   string page_token = 2;
   string llm_provider_id = 3; // optional filter by provider
+  string organization_id = 4;
 }
 
 message ListModelsResponse {

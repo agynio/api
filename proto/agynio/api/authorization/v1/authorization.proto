@@ -32,7 +32,7 @@ service AuthorizationService {
 message TupleKey {
   string user = 1; // e.g. "identity:user_abc"
   string relation = 2; // e.g. "owner"
-  string object = 3; // e.g. "tenant:tenant_123"
+  string object = 3; // e.g. "organization:org_123"
 }
 
 message Tuple {
@@ -105,13 +105,13 @@ message ReadResponse {
 // ===========================================================================
 
 message ListObjectsRequest {
-  string type = 1; // e.g. "tenant"
+  string type = 1; // e.g. "organization"
   string relation = 2; // e.g. "member"
   string user = 3; // e.g. "identity:user_abc"
 }
 
 message ListObjectsResponse {
-  repeated string objects = 1; // e.g. ["tenant:tenant_123"]
+  repeated string objects = 1; // e.g. ["organization:org_123"]
 }
 
 // ===========================================================================
@@ -124,7 +124,7 @@ message UserTypeFilter {
 }
 
 message ListUsersRequest {
-  string object = 1; // e.g. "tenant:tenant_123"
+  string object = 1; // e.g. "organization:org_123"
   string relation = 2; // e.g. "member"
   repeated UserTypeFilter user_filters = 3; // at least one required
 }

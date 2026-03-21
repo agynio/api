@@ -31,13 +31,11 @@ message ManagedIdentity {
   string ziti_identity_id = 1;
   string identity_id = 2;
   IdentityType identity_type = 3;
-  string tenant_id = 4;
   google.protobuf.Timestamp created_at = 5;
 }
 
 message CreateAgentIdentityRequest {
   string agent_id = 1;
-  string tenant_id = 2;
 }
 
 message CreateAgentIdentityResponse {
@@ -53,7 +51,6 @@ message DeleteIdentityResponse {}
 
 message ListManagedIdentitiesRequest {
   IdentityType identity_type = 1;
-  string tenant_id = 2;
   int32 page_size = 3;
   string page_token = 4;
 }
@@ -70,5 +67,4 @@ message ResolveIdentityRequest {
 message ResolveIdentityResponse {
   string identity_id = 1;
   IdentityType identity_type = 2;
-  string tenant_id = 3;
 }
