@@ -16,5 +16,3 @@ breaking:
   ignore_only:
     FILE_NO_DELETE:
       - proto/agynio/api/tenants/v1/tenants.proto
-    FIELD_NO_DELETE:
-      - proto/agynio/api/ziti_management/v1/ziti_management.proto
