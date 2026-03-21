@@ -4,6 +4,9 @@ modules:
   - path: proto
     name: buf.build/agynio/api
 
+deps:
+  - buf.build/opentelemetry/opentelemetry
+
 lint:
   use:
     - STANDARD
