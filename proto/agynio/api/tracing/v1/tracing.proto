@@ -9,14 +9,23 @@ option go_package = "github.com/agynio/api/gen/agynio/api/tracing/v1;tracingv1";
 // TracingService provides query access to span data ingested via the standard
 // OTLP TraceService/Export endpoint. It supports paginated listing with
 // filters, single-span lookup, and full-trace retrieval.
+//
+// All query responses use the standard OTel envelope hierarchy
+// (ResourceSpans -> ScopeSpans -> Span) to preserve Resource and
+// InstrumentationScope context alongside each span. This follows the same
+// pattern used by Jaeger v3 QueryService.
 service TracingService {
   // List spans matching the provided filters with pagination.
+  // Each result span is wrapped in its ResourceSpans -> ScopeSpans envelope
+  // so that Resource and InstrumentationScope context is preserved.
   rpc ListSpans(ListSpansRequest) returns (ListSpansResponse);
 
-  // Get a single span by trace_id and span_id.
+  // Get a single span by trace_id and span_id, with its Resource and
+  // InstrumentationScope context.
   rpc GetSpan(GetSpanRequest) returns (GetSpanResponse);
 
-  // Get all spans belonging to a trace.
+  // Get all spans belonging to a trace, grouped by Resource and
+  // InstrumentationScope.
   rpc GetTrace(GetTraceRequest) returns (GetTraceResponse);
 }
 
@@ -54,7 +63,11 @@ message ListSpansRequest {
 }
 
 message ListSpansResponse {
-  repeated opentelemetry.proto.trace.v1.Span spans = 1;
+  // Matching spans in the standard OTel envelope hierarchy.
+  // Spans sharing a Resource and InstrumentationScope are grouped under the
+  // same ResourceSpans/ScopeSpans entry. The page_size limit applies to the
+  // total number of Span messages across all ResourceSpans/ScopeSpans.
+  repeated opentelemetry.proto.trace.v1.ResourceSpans resource_spans = 1;
   string next_page_token = 2;
 }
 
@@ -68,7 +81,9 @@ message GetSpanRequest {
 }
 
 message GetSpanResponse {
-  opentelemetry.proto.trace.v1.Span span = 1;
+  // The span wrapped in its ResourceSpans -> ScopeSpans envelope.
+  // Contains exactly one ResourceSpans with one ScopeSpans with one Span.
+  repeated opentelemetry.proto.trace.v1.ResourceSpans resource_spans = 1;
 }
 
 // ===========================================================================
@@ -80,5 +95,7 @@ message GetTraceRequest {
 }
 
 message GetTraceResponse {
-  repeated opentelemetry.proto.trace.v1.Span spans = 1;
+  // All spans in the trace, grouped by Resource and InstrumentationScope.
+  // A trace spanning multiple services will have multiple ResourceSpans entries.
+  repeated opentelemetry.proto.trace.v1.ResourceSpans resource_spans = 1;
 }
