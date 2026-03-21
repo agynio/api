@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package agynio.api.gateway.v1;
+
+import "agynio/api/users/v1/users.proto";
+
+option go_package = "github.com/agynio/api/gen/agynio/api/gateway/v1;gatewayv1";
+
+service UsersGateway {
+  // --- API Tokens ---
+  rpc CreateAPIToken(agynio.api.users.v1.CreateAPITokenRequest) returns (agynio.api.users.v1.CreateAPITokenResponse);
+  rpc ListAPITokens(agynio.api.users.v1.ListAPITokensRequest) returns (agynio.api.users.v1.ListAPITokensResponse);
+  rpc RevokeAPIToken(agynio.api.users.v1.RevokeAPITokenRequest) returns (agynio.api.users.v1.RevokeAPITokenResponse);
+}
