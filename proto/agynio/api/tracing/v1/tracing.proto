@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package agynio.api.tracing.v1;
 
-import "opentelemetry/proto/common/v1/common.proto";
-import "opentelemetry/proto/resource/v1/resource.proto";
 import "opentelemetry/proto/trace/v1/trace.proto";
 
 option go_package = "github.com/agynio/api/gen/agynio/api/tracing/v1;tracingv1";
@@ -34,20 +32,6 @@ enum ListSpansOrderBy {
 }
 
 // ===========================================================================
-// Query result wrapper
-// ===========================================================================
-
-// Span bundles an OTel Span with the Resource and InstrumentationScope
-// metadata from the OTLP envelope. In the OTLP wire format these live in
-// separate envelope layers (ResourceSpans -> ScopeSpans -> Span); the Tracing
-// service flattens them into a single message for query convenience.
-message Span {
-  opentelemetry.proto.trace.v1.Span otel_span = 1;
-  opentelemetry.proto.resource.v1.Resource resource = 2;
-  opentelemetry.proto.common.v1.InstrumentationScope instrumentation_scope = 3;
-}
-
-// ===========================================================================
 // ListSpans
 // ===========================================================================
 
@@ -70,7 +54,7 @@ message ListSpansRequest {
 }
 
 message ListSpansResponse {
-  repeated Span spans = 1;
+  repeated opentelemetry.proto.trace.v1.Span spans = 1;
   string next_page_token = 2;
 }
 
@@ -84,7 +68,7 @@ message GetSpanRequest {
 }
 
 message GetSpanResponse {
-  Span span = 1;
+  opentelemetry.proto.trace.v1.Span span = 1;
 }
 
 // ===========================================================================
@@ -96,5 +80,5 @@ message GetTraceRequest {
 }
 
 message GetTraceResponse {
-  repeated Span spans = 1;
+  repeated opentelemetry.proto.trace.v1.Span spans = 1;
 }
