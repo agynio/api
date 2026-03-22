@@ -18,6 +18,16 @@ service ZitiManagementService {
 
   // Gateway -> map OpenZiti identity ID to platform identity (hot path).
   rpc ResolveIdentity(ResolveIdentityRequest) returns (ResolveIdentityResponse);
+
+  // Infrastructure services (Gateway, Orchestrator, Runner) -> request an enrolled
+  // OpenZiti identity for the calling service. Ziti Management creates the identity
+  // on the Controller, enrolls it (generates key pair, submits CSR, receives cert),
+  // and returns the enrolled identity to the caller.
+  rpc RequestServiceIdentity(RequestServiceIdentityRequest) returns (RequestServiceIdentityResponse);
+
+  // Infrastructure services -> extend the lease on a service identity.
+  // Called periodically by the service to prevent GC from deleting the identity.
+  rpc ExtendIdentityLease(ExtendIdentityLeaseRequest) returns (ExtendIdentityLeaseResponse);
 }
 
 enum IdentityType {
@@ -25,6 +35,13 @@ enum IdentityType {
   IDENTITY_TYPE_AGENT = 1;
   IDENTITY_TYPE_RUNNER = 2;
   IDENTITY_TYPE_CHANNEL = 3;
+}
+
+enum ServiceType {
+  SERVICE_TYPE_UNSPECIFIED = 0;
+  SERVICE_TYPE_GATEWAY = 1;
+  SERVICE_TYPE_ORCHESTRATOR = 2;
+  SERVICE_TYPE_RUNNER = 3;
 }
 
 message ManagedIdentity {
@@ -68,3 +85,23 @@ message ResolveIdentityResponse {
   string identity_id = 1;
   IdentityType identity_type = 2;
 }
+
+message RequestServiceIdentityRequest {
+  // Which infrastructure service is requesting the identity.
+  ServiceType service_type = 1;
+}
+
+message RequestServiceIdentityResponse {
+  // The OpenZiti identity ID (for lease extension and cleanup).
+  string ziti_identity_id = 1;
+  // The full enrolled identity JSON (contains cert, key, CA, controller URL).
+  // The caller writes this to ephemeral disk and loads it via the OpenZiti SDK.
+  bytes identity_json = 2;
+}
+
+message ExtendIdentityLeaseRequest {
+  // The OpenZiti identity ID whose lease should be extended.
+  string ziti_identity_id = 1;
+}
+
+message ExtendIdentityLeaseResponse {}
