@@ -1,0 +1,101 @@
+syntax = "proto3";
+
+package agynio.api.tracing.v1;
+
+import "opentelemetry/proto/trace/v1/trace.proto";
+
+option go_package = "github.com/agynio/api/gen/agynio/api/tracing/v1;tracingv1";
+
+// TracingService provides query access to span data ingested via the standard
+// OTLP TraceService/Export endpoint. It supports paginated listing with
+// filters, single-span lookup, and full-trace retrieval.
+//
+// All query responses use the standard OTel envelope hierarchy
+// (ResourceSpans -> ScopeSpans -> Span) to preserve Resource and
+// InstrumentationScope context alongside each span. This follows the same
+// pattern used by Jaeger v3 QueryService.
+service TracingService {
+  // List spans matching the provided filters with pagination.
+  // Each result span is wrapped in its ResourceSpans -> ScopeSpans envelope
+  // so that Resource and InstrumentationScope context is preserved.
+  rpc ListSpans(ListSpansRequest) returns (ListSpansResponse);
+
+  // Get a single span by trace_id and span_id, with its Resource and
+  // InstrumentationScope context.
+  rpc GetSpan(GetSpanRequest) returns (GetSpanResponse);
+
+  // Get all spans belonging to a trace, grouped by Resource and
+  // InstrumentationScope.
+  rpc GetTrace(GetTraceRequest) returns (GetTraceResponse);
+}
+
+// ===========================================================================
+// Enums
+// ===========================================================================
+
+// Ordering for ListSpans results.
+enum ListSpansOrderBy {
+  LIST_SPANS_ORDER_BY_UNSPECIFIED = 0;
+  LIST_SPANS_ORDER_BY_START_TIME_DESC = 1;
+  LIST_SPANS_ORDER_BY_START_TIME_ASC = 2;
+}
+
+// ===========================================================================
+// ListSpans
+// ===========================================================================
+
+// Filter criteria for ListSpans. All fields are optional and AND-combined.
+message SpanFilter {
+  bytes trace_id = 1; // filter by trace (16 bytes)
+  bytes parent_span_id = 2; // filter by parent span (8 bytes)
+  string name = 3; // filter by operation name (exact match)
+  opentelemetry.proto.trace.v1.Span.SpanKind kind = 4; // filter by span kind
+  fixed64 start_time_min = 5; // start time lower bound (inclusive, nanos)
+  fixed64 start_time_max = 6; // start time upper bound (inclusive, nanos)
+  optional bool in_progress = 7; // true = only in-progress, false = only completed, unset = both
+}
+
+message ListSpansRequest {
+  SpanFilter filter = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+  ListSpansOrderBy order_by = 4; // default: START_TIME_DESC
+}
+
+message ListSpansResponse {
+  // Matching spans in the standard OTel envelope hierarchy.
+  // Spans sharing a Resource and InstrumentationScope are grouped under the
+  // same ResourceSpans/ScopeSpans entry. The page_size limit applies to the
+  // total number of Span messages across all ResourceSpans/ScopeSpans.
+  repeated opentelemetry.proto.trace.v1.ResourceSpans resource_spans = 1;
+  string next_page_token = 2;
+}
+
+// ===========================================================================
+// GetSpan
+// ===========================================================================
+
+message GetSpanRequest {
+  bytes trace_id = 1; // 16 bytes
+  bytes span_id = 2; // 8 bytes
+}
+
+message GetSpanResponse {
+  // The span wrapped in its ResourceSpans -> ScopeSpans envelope.
+  // Contains exactly one ResourceSpans with one ScopeSpans with one Span.
+  repeated opentelemetry.proto.trace.v1.ResourceSpans resource_spans = 1;
+}
+
+// ===========================================================================
+// GetTrace
+// ===========================================================================
+
+message GetTraceRequest {
+  bytes trace_id = 1; // 16 bytes
+}
+
+message GetTraceResponse {
+  // All spans in the trace, grouped by Resource and InstrumentationScope.
+  // A trace spanning multiple services will have multiple ResourceSpans entries.
+  repeated opentelemetry.proto.trace.v1.ResourceSpans resource_spans = 1;
+}
