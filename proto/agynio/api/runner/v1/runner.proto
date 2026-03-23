@@ -119,6 +119,7 @@ message StartWorkloadRequest {
   repeated ContainerSpec sidecars = 2;
 
   repeated VolumeSpec volumes = 3;
+  repeated ContainerSpec init_containers = 4;
 
   map<string, string> additional_properties = 100;
 }
