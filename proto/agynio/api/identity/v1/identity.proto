@@ -4,9 +4,16 @@ package agynio.api.identity.v1;
 
 option go_package = "github.com/agynio/api/gen/agynio/api/identity/v1;identityv1";
 
+// IdentityService provides the canonical registry of identity IDs and types.
 service IdentityService {
+  // RegisterIdentity stores a new identity ID and its type.
+  // Returns ALREADY_EXISTS if the identity_id is already registered.
   rpc RegisterIdentity(RegisterIdentityRequest) returns (RegisterIdentityResponse);
+  // GetIdentityType returns the type for a single identity ID.
+  // Returns NOT_FOUND if the identity_id is unknown.
   rpc GetIdentityType(GetIdentityTypeRequest) returns (GetIdentityTypeResponse);
+  // BatchGetIdentityTypes returns known identity types for the requested IDs.
+  // Unknown identity IDs are omitted from the response.
   rpc BatchGetIdentityTypes(BatchGetIdentityTypesRequest) returns (BatchGetIdentityTypesResponse);
 }
 
@@ -44,5 +51,5 @@ message IdentityTypeEntry {
 }
 
 message BatchGetIdentityTypesResponse {
-  repeated IdentityTypeEntry identity_types = 1;
+  repeated IdentityTypeEntry entries = 1;
 }
