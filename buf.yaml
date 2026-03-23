@@ -26,3 +26,7 @@ breaking:
       - proto/agynio/api/ziti_management/v1/ziti_management.proto
     FIELD_NO_DELETE_UNLESS_NAME_RESERVED:
       - proto/agynio/api/ziti_management/v1/ziti_management.proto
+    ENUM_NO_DELETE:
+      - proto/agynio/api/ziti_management/v1/ziti_management.proto
+    FIELD_SAME_TYPE:
+      - proto/agynio/api/ziti_management/v1/ziti_management.proto
