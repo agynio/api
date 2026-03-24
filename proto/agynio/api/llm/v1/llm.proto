@@ -22,9 +22,8 @@ service LLMService {
   rpc DeleteModel(DeleteModelRequest) returns (DeleteModelResponse);
   rpc ListModels(ListModelsRequest) returns (ListModelsResponse);
 
-  // --- Proxy ---
-  rpc CreateResponse(CreateResponseRequest) returns (CreateResponseResponse);
-  rpc CreateResponseStream(CreateResponseStreamRequest) returns (stream CreateResponseStreamResponse);
+  // --- Resolution ---
+  rpc ResolveModel(ResolveModelRequest) returns (ResolveModelResponse);
 }
 
 // ===========================================================================
@@ -54,6 +53,7 @@ message LLMProvider {
   EntityMeta meta = 1;
   string endpoint = 2;
   AuthMethod auth_method = 3;
+  string organization_id = 4; // UUID
 }
 
 message CreateLLMProviderRequest {
@@ -163,24 +163,16 @@ message ListModelsResponse {
 }
 
 // ===========================================================================
-// Proxy
+// Resolution
 // ===========================================================================
 
-message CreateResponseRequest {
+message ResolveModelRequest {
   string model_id = 1; // UUID
-  bytes body = 2;
 }
 
-message CreateResponseResponse {
-  bytes body = 1;
-}
-
-message CreateResponseStreamRequest {
-  string model_id = 1; // UUID
-  bytes body = 2;
-}
-
-message CreateResponseStreamResponse {
-  string event_type = 1;
-  bytes data = 2;
+message ResolveModelResponse {
+  string endpoint = 1;
+  string token = 2;
+  string remote_name = 3;
+  string organization_id = 4; // UUID
 }

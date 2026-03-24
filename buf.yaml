@@ -20,6 +20,11 @@ breaking:
     FILE_NO_DELETE:
       - proto/agynio/api/gateway/v1/tracing.proto
       - proto/agynio/api/tenants/v1/tenants.proto
+      - proto/agynio/api/gateway/v1/llm.proto
+    RPC_NO_DELETE:
+      - proto/agynio/api/llm/v1/llm.proto
+    MESSAGE_NO_DELETE:
+      - proto/agynio/api/llm/v1/llm.proto
     FIELD_NO_DELETE:
       - proto/agynio/api/ziti_management/v1/ziti_management.proto
     FIELD_NO_DELETE_UNLESS_NUMBER_RESERVED:
