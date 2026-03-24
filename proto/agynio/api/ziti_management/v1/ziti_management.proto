@@ -43,6 +43,7 @@ enum ServiceType {
   SERVICE_TYPE_GATEWAY = 1;
   SERVICE_TYPE_ORCHESTRATOR = 2;
   SERVICE_TYPE_RUNNER = 3;
+  SERVICE_TYPE_LLM_PROXY = 4;
 }
 
 message ManagedIdentity {
