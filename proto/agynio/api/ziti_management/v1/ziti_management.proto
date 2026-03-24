@@ -63,7 +63,7 @@ message CreateAgentIdentityResponse {
 
 // Request to create an OpenZiti identity and service for an app.
 message CreateAppIdentityRequest {
-  string app_id = 1;
+  string identity_id = 1;
   string slug = 2;
 }
 
