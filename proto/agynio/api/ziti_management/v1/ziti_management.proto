@@ -11,8 +11,16 @@ service ZitiManagementService {
   // Orchestrator -> create OpenZiti identity for an agent, return enrollment JWT.
   rpc CreateAgentIdentity(CreateAgentIdentityRequest) returns (CreateAgentIdentityResponse);
 
+  // Creates an OpenZiti identity and service for an app.
+  // The identity gets roleAttributes ["apps"], the service gets
+  // roleAttributes ["app-services"]. Returns enrolled credentials.
+  rpc CreateAppIdentity(CreateAppIdentityRequest) returns (CreateAppIdentityResponse);
+
   // Orchestrator -> delete OpenZiti identity and its platform mapping.
   rpc DeleteIdentity(DeleteIdentityRequest) returns (DeleteIdentityResponse);
+
+  // Deletes an app's OpenZiti identity and its associated service.
+  rpc DeleteAppIdentity(DeleteAppIdentityRequest) returns (DeleteAppIdentityResponse);
 
   // Orchestrator -> list all platform-managed identities (orphan reconciliation).
   rpc ListManagedIdentities(ListManagedIdentitiesRequest) returns (ListManagedIdentitiesResponse);
@@ -53,6 +61,27 @@ message CreateAgentIdentityResponse {
   string ziti_identity_id = 1;
   string enrollment_jwt = 2;
 }
+
+// Request to create an OpenZiti identity and service for an app.
+message CreateAppIdentityRequest {
+  string app_id = 1;
+  string slug = 2;
+}
+
+// Response with enrolled OpenZiti credentials for an app identity.
+message CreateAppIdentityResponse {
+  string ziti_identity_id = 1;
+  bytes identity_json = 2;
+  string ziti_service_id = 3;
+}
+
+// Request to delete an app's OpenZiti identity.
+message DeleteAppIdentityRequest {
+  string ziti_identity_id = 1;
+}
+
+// Response after deleting an app's OpenZiti identity.
+message DeleteAppIdentityResponse {}
 
 message DeleteIdentityRequest {
   string ziti_identity_id = 1;
