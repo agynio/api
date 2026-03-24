@@ -50,6 +50,7 @@ message ManagedIdentity {
   string ziti_identity_id = 1;
   string identity_id = 2;
   agynio.api.identity.v1.IdentityType identity_type = 3;
+  string ziti_service_id = 4;
   google.protobuf.Timestamp created_at = 5;
 }
 
