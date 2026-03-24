@@ -6,7 +6,7 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/agynio/api/gen/agynio/api/llm/v1;llmv1";
 
-// LLMService manages provider and model resources and proxies responses.
+// LLMService manages provider and model resources and resolves models.
 service LLMService {
   // --- Providers ---
   rpc CreateLLMProvider(CreateLLMProviderRequest) returns (CreateLLMProviderResponse);
