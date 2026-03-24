@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package agynio.api.apps.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/agynio/api/gen/agynio/api/apps/v1;appsv1";
+
+service AppsService {
+  rpc RegisterApp(RegisterAppRequest) returns (RegisterAppResponse);
+  rpc GetApp(GetAppRequest) returns (GetAppResponse);
+  rpc GetAppBySlug(GetAppBySlugRequest) returns (GetAppBySlugResponse);
+  rpc ListApps(ListAppsRequest) returns (ListAppsResponse);
+  rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse);
+  rpc GetAppProfile(GetAppProfileRequest) returns (GetAppProfileResponse);
+  rpc ValidateServiceToken(ValidateServiceTokenRequest) returns (ValidateServiceTokenResponse);
+}
+
+message App {
+  string id = 1;
+  string slug = 2;
+  string name = 3;
+  string description = 4;
+  string icon = 5;
+  string identity_id = 6;
+  string ziti_identity_id = 7;
+  string ziti_service_id = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+}
+
+message AppProfile {
+  string id = 1;
+  string slug = 2;
+  string name = 3;
+  string description = 4;
+  string icon = 5;
+}
+
+message RegisterAppRequest {
+  string slug = 1;
+  string name = 2;
+  string description = 3;
+  string icon = 4;
+}
+
+message RegisterAppResponse {
+  App app = 1;
+  string service_token = 2;
+}
+
+message GetAppRequest {
+  string id = 1;
+}
+
+message GetAppResponse {
+  App app = 1;
+}
+
+message GetAppBySlugRequest {
+  string slug = 1;
+}
+
+message GetAppBySlugResponse {
+  App app = 1;
+}
+
+message ListAppsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message ListAppsResponse {
+  repeated App apps = 1;
+  string next_page_token = 2;
+}
+
+message DeleteAppRequest {
+  string id = 1;
+}
+
+message DeleteAppResponse {}
+
+message GetAppProfileRequest {
+  string identity_id = 1;
+}
+
+message GetAppProfileResponse {
+  AppProfile profile = 1;
+}
+
+message ValidateServiceTokenRequest {
+  string token_hash = 1;
+}
+
+message ValidateServiceTokenResponse {
+  App app = 1;
+}
