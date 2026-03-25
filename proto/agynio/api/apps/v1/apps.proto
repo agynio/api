@@ -18,6 +18,10 @@ service AppsService {
   rpc GetAppProfile(GetAppProfileRequest) returns (GetAppProfileResponse);
   // Validate a service token hash and resolve its app.
   rpc ValidateServiceToken(ValidateServiceTokenRequest) returns (ValidateServiceTokenResponse);
+  // Self-enrollment: app calls at startup with its service_token.
+  // Creates (or re-creates) the OpenZiti identity + service for the app.
+  // Idempotent: cleans up old ziti resources and creates fresh ones on each call.
+  rpc EnrollApp(EnrollAppRequest) returns (EnrollAppResponse);
 }
 
 message EntityMeta {
@@ -103,4 +107,16 @@ message ValidateServiceTokenRequest {
 
 message ValidateServiceTokenResponse {
   App app = 1;
+}
+
+message EnrollAppRequest {
+  // The raw service token issued during RegisterApp.
+  string service_token = 1;
+}
+
+message EnrollAppResponse {
+  // The enrolled OpenZiti identity JSON (cert, key, CA, controller URL).
+  bytes identity_json = 1;
+  // The platform identity ID for this app.
+  string identity_id = 2;
 }
