@@ -195,7 +195,7 @@ message ListWorkloadsByThreadResponse {
 message ListWorkloadsRequest {
   int32 page_size = 1;
   string page_token = 2;
-  WorkloadStatus status = 3;
+  repeated WorkloadStatus statuses = 3;
 }
 
 message ListWorkloadsResponse {
