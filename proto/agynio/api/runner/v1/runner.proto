@@ -140,6 +140,8 @@ message StartWorkloadResponse {
 
   // Present when status is FAILED.
   WorkloadFailure failure = 4;
+
+  string runner_id = 5;
 }
 
 message WorkloadContainers {
