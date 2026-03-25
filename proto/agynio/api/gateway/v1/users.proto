@@ -11,4 +11,5 @@ service UsersGateway {
   rpc CreateAPIToken(agynio.api.users.v1.CreateAPITokenRequest) returns (agynio.api.users.v1.CreateAPITokenResponse);
   rpc ListAPITokens(agynio.api.users.v1.ListAPITokensRequest) returns (agynio.api.users.v1.ListAPITokensResponse);
   rpc RevokeAPIToken(agynio.api.users.v1.RevokeAPITokenRequest) returns (agynio.api.users.v1.RevokeAPITokenResponse);
+  rpc BatchGetUsers(agynio.api.users.v1.BatchGetUsersRequest) returns (agynio.api.users.v1.BatchGetUsersResponse);
 }
