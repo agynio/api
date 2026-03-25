@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package agynio.api.gateway.v1;
+
+import "agynio/api/organizations/v1/organizations.proto";
+
+option go_package = "github.com/agynio/api/gen/agynio/api/gateway/v1;gatewayv1";
+
+service OrganizationsGateway {
+  rpc ListAccessibleOrganizations(agynio.api.organizations.v1.ListAccessibleOrganizationsRequest) returns (agynio.api.organizations.v1.ListAccessibleOrganizationsResponse);
+  rpc CreateOrganization(agynio.api.organizations.v1.CreateOrganizationRequest) returns (agynio.api.organizations.v1.CreateOrganizationResponse);
+  rpc GetOrganization(agynio.api.organizations.v1.GetOrganizationRequest) returns (agynio.api.organizations.v1.GetOrganizationResponse);
+}
