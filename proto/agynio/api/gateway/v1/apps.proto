@@ -11,4 +11,5 @@ service AppsGateway {
   rpc GetApp(agynio.api.apps.v1.GetAppRequest) returns (agynio.api.apps.v1.GetAppResponse);
   rpc ListApps(agynio.api.apps.v1.ListAppsRequest) returns (agynio.api.apps.v1.ListAppsResponse);
   rpc DeleteApp(agynio.api.apps.v1.DeleteAppRequest) returns (agynio.api.apps.v1.DeleteAppResponse);
+  rpc EnrollApp(agynio.api.apps.v1.EnrollAppRequest) returns (agynio.api.apps.v1.EnrollAppResponse);
 }
