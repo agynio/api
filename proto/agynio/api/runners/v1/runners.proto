@@ -1,0 +1,204 @@
+syntax = "proto3";
+
+package agynio.api.runners.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/agynio/api/gen/agynio/api/runners/v1;runnersv1";
+
+// RunnersService manages runners and their workload state.
+service RunnersService {
+  // --- Runner management ---
+  rpc RegisterRunner(RegisterRunnerRequest) returns (RegisterRunnerResponse);
+  rpc GetRunner(GetRunnerRequest) returns (GetRunnerResponse);
+  rpc ListRunners(ListRunnersRequest) returns (ListRunnersResponse);
+  rpc DeleteRunner(DeleteRunnerRequest) returns (DeleteRunnerResponse);
+  rpc ValidateServiceToken(ValidateServiceTokenRequest) returns (ValidateServiceTokenResponse);
+
+  // --- Workload state ---
+  rpc CreateWorkload(CreateWorkloadRequest) returns (CreateWorkloadResponse);
+  rpc UpdateWorkloadStatus(UpdateWorkloadStatusRequest) returns (UpdateWorkloadStatusResponse);
+  rpc DeleteWorkload(DeleteWorkloadRequest) returns (DeleteWorkloadResponse);
+  rpc GetWorkload(GetWorkloadRequest) returns (GetWorkloadResponse);
+  rpc ListWorkloadsByThread(ListWorkloadsByThreadRequest) returns (ListWorkloadsByThreadResponse);
+  rpc ListWorkloads(ListWorkloadsRequest) returns (ListWorkloadsResponse);
+}
+
+// ===========================================================================
+// Common
+// ===========================================================================
+
+message EntityMeta {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+}
+
+// ===========================================================================
+// Runner
+// ===========================================================================
+
+enum RunnerStatus {
+  RUNNER_STATUS_UNSPECIFIED = 0;
+  RUNNER_STATUS_PENDING = 1;
+  RUNNER_STATUS_ENROLLED = 2;
+  RUNNER_STATUS_OFFLINE = 3;
+}
+
+message Runner {
+  EntityMeta meta = 1;
+  string name = 2;
+  optional string organization_id = 3;
+  string identity_id = 4;
+  RunnerStatus status = 5;
+}
+
+message RegisterRunnerRequest {
+  string name = 1;
+  optional string organization_id = 2;
+}
+
+message RegisterRunnerResponse {
+  Runner runner = 1;
+  string service_token = 2;
+}
+
+message GetRunnerRequest {
+  string id = 1;
+}
+
+message GetRunnerResponse {
+  Runner runner = 1;
+}
+
+message ListRunnersRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  optional string organization_id = 3;
+}
+
+message ListRunnersResponse {
+  repeated Runner runners = 1;
+  string next_page_token = 2;
+}
+
+message DeleteRunnerRequest {
+  string id = 1;
+}
+
+message DeleteRunnerResponse {}
+
+message ValidateServiceTokenRequest {
+  string token_hash = 1;
+}
+
+message ValidateServiceTokenResponse {
+  Runner runner = 1;
+}
+
+// ===========================================================================
+// Workload
+// ===========================================================================
+
+enum WorkloadStatus {
+  WORKLOAD_STATUS_UNSPECIFIED = 0;
+  WORKLOAD_STATUS_STARTING = 1;
+  WORKLOAD_STATUS_RUNNING = 2;
+  WORKLOAD_STATUS_STOPPING = 3;
+  WORKLOAD_STATUS_STOPPED = 4;
+  WORKLOAD_STATUS_FAILED = 5;
+}
+
+enum ContainerRole {
+  CONTAINER_ROLE_UNSPECIFIED = 0;
+  CONTAINER_ROLE_MAIN = 1;
+  CONTAINER_ROLE_SIDECAR = 2;
+  CONTAINER_ROLE_INIT = 3;
+}
+
+enum ContainerStatus {
+  CONTAINER_STATUS_UNSPECIFIED = 0;
+  CONTAINER_STATUS_RUNNING = 1;
+  CONTAINER_STATUS_TERMINATED = 2;
+  CONTAINER_STATUS_WAITING = 3;
+}
+
+message Container {
+  string container_id = 1;
+  string name = 2;
+  ContainerRole role = 3;
+  string image = 4;
+  ContainerStatus status = 5;
+}
+
+message Workload {
+  EntityMeta meta = 1;
+  string runner_id = 2;
+  string thread_id = 3;
+  string agent_id = 4;
+  string organization_id = 5;
+  WorkloadStatus status = 6;
+  repeated Container containers = 7;
+  string ziti_identity_id = 8;
+}
+
+message CreateWorkloadRequest {
+  string id = 1;
+  string runner_id = 2;
+  string thread_id = 3;
+  string agent_id = 4;
+  string organization_id = 5;
+  WorkloadStatus status = 6;
+  repeated Container containers = 7;
+  string ziti_identity_id = 8;
+}
+
+message CreateWorkloadResponse {
+  Workload workload = 1;
+}
+
+message UpdateWorkloadStatusRequest {
+  string id = 1;
+  WorkloadStatus status = 2;
+  repeated Container containers = 3;
+}
+
+message UpdateWorkloadStatusResponse {
+  Workload workload = 1;
+}
+
+message DeleteWorkloadRequest {
+  string id = 1;
+}
+
+message DeleteWorkloadResponse {}
+
+message GetWorkloadRequest {
+  string id = 1;
+}
+
+message GetWorkloadResponse {
+  Workload workload = 1;
+}
+
+message ListWorkloadsByThreadRequest {
+  string thread_id = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListWorkloadsByThreadResponse {
+  repeated Workload workloads = 1;
+  string next_page_token = 2;
+}
+
+message ListWorkloadsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  repeated WorkloadStatus statuses = 3;
+}
+
+message ListWorkloadsResponse {
+  repeated Workload workloads = 1;
+  string next_page_token = 2;
+}

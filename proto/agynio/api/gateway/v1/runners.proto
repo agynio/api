@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package agynio.api.gateway.v1;
+
+import "agynio/api/runners/v1/runners.proto";
+
+option go_package = "github.com/agynio/api/gen/agynio/api/gateway/v1;gatewayv1";
+
+service RunnersGateway {
+  // --- Workloads ---
+  rpc ListWorkloadsByThread(agynio.api.runners.v1.ListWorkloadsByThreadRequest) returns (agynio.api.runners.v1.ListWorkloadsByThreadResponse);
+  rpc GetWorkload(agynio.api.runners.v1.GetWorkloadRequest) returns (agynio.api.runners.v1.GetWorkloadResponse);
+}

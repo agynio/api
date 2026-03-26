@@ -101,6 +101,7 @@ message Agent {
   string image = 7;
   ComputeResources resources = 8;
   string init_image = 9;
+  string organization_id = 10;
 }
 
 message CreateAgentRequest {
