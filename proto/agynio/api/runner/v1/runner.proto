@@ -112,6 +112,15 @@ message ContainerSpec {
   map<string, string> additional_properties = 100;
 }
 
+// DNS configuration for the workload pod.
+message DnsConfig {
+  // DNS nameservers (e.g., ["127.0.0.1", "10.96.0.10"]).
+  repeated string nameservers = 1;
+
+  // DNS search domains (e.g., ["svc.cluster.local", "cluster.local"]).
+  repeated string searches = 2;
+}
+
 // A workload is a main container plus optional sidecars.
 // Runner MUST ensure sidecars share the same network namespace as the main container.
 message StartWorkloadRequest {
@@ -120,6 +129,11 @@ message StartWorkloadRequest {
 
   repeated VolumeSpec volumes = 3;
   repeated ContainerSpec init_containers = 4;
+
+  // DNS configuration for the workload pod. When set, the runner
+  // overrides the default DNS policy with the provided nameservers
+  // and search domains.
+  DnsConfig dns_config = 5;
 
   map<string, string> additional_properties = 100;
 }
