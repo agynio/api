@@ -10,9 +10,9 @@ option go_package = "github.com/agynio/api/gen/agynio/api/chat/v1;chatv1";
 // on top of Threads. It manages chat creation, message retrieval with
 // unread counts, sending messages, and read-receipt tracking.
 //
-// Identity is resolved from gRPC metadata (identity_id, identity_type,
-// organization_id). Requests do not carry explicit user identifiers — the
-// server extracts the authenticated identity from context.
+// Identity is resolved from gRPC metadata (identity_id, identity_type).
+// Requests do not carry explicit user identifiers — the server extracts the
+// authenticated identity from context.
 service ChatService {
   // Create a new chat thread between participants.
   // The authenticated identity is automatically added as a participant.
@@ -48,6 +48,7 @@ message Chat {
   repeated ChatParticipant participants = 2;
   google.protobuf.Timestamp created_at = 3;
   google.protobuf.Timestamp updated_at = 4;
+  string organization_id = 5; // UUID — owning organization
 }
 
 // A participant in a chat.
@@ -74,6 +75,7 @@ message CreateChatRequest {
   // Identity IDs of other participants. The authenticated user is added
   // automatically by the server. At least one participant is required.
   repeated string participant_ids = 1;
+  string organization_id = 2; // UUID — org to create the chat in
 }
 
 message CreateChatResponse {
@@ -87,6 +89,7 @@ message CreateChatResponse {
 message GetChatsRequest {
   int32 page_size = 1;
   string page_token = 2;
+  string organization_id = 3; // UUID — org filter
 }
 
 message GetChatsResponse {
