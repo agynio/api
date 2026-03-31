@@ -154,9 +154,6 @@ message StartWorkloadResponse {
 
   // Present when status is FAILED.
   WorkloadFailure failure = 4;
-
-  reserved 5;
-  reserved "runner_id";
 }
 
 message WorkloadContainers {
