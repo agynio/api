@@ -21,6 +21,9 @@ service ZitiManagementService {
   // Apps Service -> delete an app's OpenZiti identity and its associated service.
   rpc DeleteAppIdentity(DeleteAppIdentityRequest) returns (DeleteAppIdentityResponse);
 
+  rpc CreateRunnerIdentity(CreateRunnerIdentityRequest) returns (CreateRunnerIdentityResponse);
+  rpc DeleteRunnerIdentity(DeleteRunnerIdentityRequest) returns (DeleteRunnerIdentityResponse);
+
   // Orchestrator -> list all platform-managed identities (orphan reconciliation).
   rpc ListManagedIdentities(ListManagedIdentitiesRequest) returns (ListManagedIdentitiesResponse);
 
@@ -42,8 +45,9 @@ enum ServiceType {
   SERVICE_TYPE_UNSPECIFIED = 0;
   SERVICE_TYPE_GATEWAY = 1;
   SERVICE_TYPE_ORCHESTRATOR = 2;
-  SERVICE_TYPE_RUNNER = 3;
   SERVICE_TYPE_LLM_PROXY = 4;
+  reserved 3;
+  reserved "SERVICE_TYPE_RUNNER";
 }
 
 message ManagedIdentity {
@@ -84,6 +88,25 @@ message DeleteAppIdentityRequest {
 
 // Response after deleting an app's OpenZiti identity.
 message DeleteAppIdentityResponse {}
+
+message CreateRunnerIdentityRequest {
+  string runner_id = 1;
+  repeated string role_attributes = 2;
+}
+
+message CreateRunnerIdentityResponse {
+  string ziti_identity_id = 1;
+  bytes identity_json = 2;
+  string ziti_service_id = 3;
+  string openziti_service_name = 4;
+}
+
+message DeleteRunnerIdentityRequest {
+  string ziti_identity_id = 1;
+  string ziti_service_id = 2;
+}
+
+message DeleteRunnerIdentityResponse {}
 
 message DeleteIdentityRequest {
   string ziti_identity_id = 1;
