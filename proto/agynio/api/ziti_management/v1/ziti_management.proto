@@ -21,7 +21,9 @@ service ZitiManagementService {
   // Apps Service -> delete an app's OpenZiti identity and its associated service.
   rpc DeleteAppIdentity(DeleteAppIdentityRequest) returns (DeleteAppIdentityResponse);
 
+  // Runners Service -> create an OpenZiti identity and service for a runner.
   rpc CreateRunnerIdentity(CreateRunnerIdentityRequest) returns (CreateRunnerIdentityResponse);
+  // Runners Service -> delete a runner's OpenZiti identity and its associated service.
   rpc DeleteRunnerIdentity(DeleteRunnerIdentityRequest) returns (DeleteRunnerIdentityResponse);
 
   // Orchestrator -> list all platform-managed identities (orphan reconciliation).
