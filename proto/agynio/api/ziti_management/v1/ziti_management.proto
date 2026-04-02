@@ -100,7 +100,6 @@ message CreateRunnerIdentityResponse {
   string ziti_identity_id = 1;
   bytes identity_json = 2;
   string ziti_service_id = 3;
-  string openziti_service_name = 4;
 }
 
 message DeleteRunnerIdentityRequest {
