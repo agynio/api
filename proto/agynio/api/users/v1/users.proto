@@ -16,7 +16,26 @@ service UsersService {
   rpc ListAPITokens(ListAPITokensRequest) returns (ListAPITokensResponse);
   rpc RevokeAPIToken(RevokeAPITokenRequest) returns (RevokeAPITokenResponse);
   rpc ResolveAPIToken(ResolveAPITokenRequest) returns (ResolveAPITokenResponse);
+
+  // --- Admin User Management ---
+  rpc GetMe(GetMeRequest) returns (GetMeResponse);
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
 }
+
+// ===========================================================================
+// Enums
+// ===========================================================================
+
+enum ClusterRole {
+  CLUSTER_ROLE_UNSPECIFIED = 0;
+  CLUSTER_ROLE_ADMIN = 1;
+}
+
+// ===========================================================================
+// Common
+// ===========================================================================
 
 message EntityMeta {
   string id = 1;
@@ -30,7 +49,12 @@ message User {
   string name = 3;
   string email = 4;
   string photo_url = 5;
+  string nickname = 6;
 }
+
+// ===========================================================================
+// ResolveOrCreateUser
+// ===========================================================================
 
 message ResolveOrCreateUserRequest {
   string oidc_subject = 1;
@@ -44,13 +68,22 @@ message ResolveOrCreateUserResponse {
   bool created = 2;
 }
 
+// ===========================================================================
+// GetUser
+// ===========================================================================
+
 message GetUserRequest {
   string identity_id = 1;
 }
 
 message GetUserResponse {
   User user = 1;
+  ClusterRole cluster_role = 2;
 }
+
+// ===========================================================================
+// GetUserByOIDCSubject
+// ===========================================================================
 
 message GetUserByOIDCSubjectRequest {
   string oidc_subject = 1;
@@ -60,6 +93,10 @@ message GetUserByOIDCSubjectResponse {
   User user = 1;
 }
 
+// ===========================================================================
+// BatchGetUsers
+// ===========================================================================
+
 message BatchGetUsersRequest {
   repeated string identity_ids = 1;
 }
@@ -68,16 +105,77 @@ message BatchGetUsersResponse {
   repeated User users = 1;
 }
 
+// ===========================================================================
+// UpdateUser
+// ===========================================================================
+
 message UpdateUserRequest {
   string identity_id = 1;
   optional string name = 2;
   optional string email = 3;
   optional string photo_url = 4;
+  optional string nickname = 5;
+  optional ClusterRole cluster_role = 6;
 }
 
 message UpdateUserResponse {
   User user = 1;
 }
+
+// ===========================================================================
+// GetMe
+// ===========================================================================
+
+message GetMeRequest {}
+
+message GetMeResponse {
+  User user = 1;
+  ClusterRole cluster_role = 2;
+}
+
+// ===========================================================================
+// ListUsers
+// ===========================================================================
+
+message ListUsersRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message ListUsersResponse {
+  repeated User users = 1;
+  string next_page_token = 2;
+}
+
+// ===========================================================================
+// CreateUser
+// ===========================================================================
+
+message CreateUserRequest {
+  string oidc_subject = 1;
+  optional string name = 2;
+  optional string nickname = 3;
+  optional string photo_url = 4;
+  ClusterRole cluster_role = 5;
+}
+
+message CreateUserResponse {
+  User user = 1;
+}
+
+// ===========================================================================
+// DeleteUser
+// ===========================================================================
+
+message DeleteUserRequest {
+  string identity_id = 1;
+}
+
+message DeleteUserResponse {}
+
+// ===========================================================================
+// API Tokens
+// ===========================================================================
 
 message APIToken {
   string id = 1;

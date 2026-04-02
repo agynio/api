@@ -7,6 +7,16 @@ import "agynio/api/users/v1/users.proto";
 option go_package = "github.com/agynio/api/gen/agynio/api/gateway/v1;gatewayv1";
 
 service UsersGateway {
+  // --- Current User ---
+  rpc GetMe(agynio.api.users.v1.GetMeRequest) returns (agynio.api.users.v1.GetMeResponse);
+
+  // --- Admin User Management ---
+  rpc CreateUser(agynio.api.users.v1.CreateUserRequest) returns (agynio.api.users.v1.CreateUserResponse);
+  rpc GetUser(agynio.api.users.v1.GetUserRequest) returns (agynio.api.users.v1.GetUserResponse);
+  rpc ListUsers(agynio.api.users.v1.ListUsersRequest) returns (agynio.api.users.v1.ListUsersResponse);
+  rpc UpdateUser(agynio.api.users.v1.UpdateUserRequest) returns (agynio.api.users.v1.UpdateUserResponse);
+  rpc DeleteUser(agynio.api.users.v1.DeleteUserRequest) returns (agynio.api.users.v1.DeleteUserResponse);
+
   // --- API Tokens ---
   rpc CreateAPIToken(agynio.api.users.v1.CreateAPITokenRequest) returns (agynio.api.users.v1.CreateAPITokenResponse);
   rpc ListAPITokens(agynio.api.users.v1.ListAPITokensRequest) returns (agynio.api.users.v1.ListAPITokensResponse);

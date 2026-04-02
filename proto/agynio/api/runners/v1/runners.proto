@@ -12,6 +12,7 @@ service RunnersService {
   rpc RegisterRunner(RegisterRunnerRequest) returns (RegisterRunnerResponse);
   rpc GetRunner(GetRunnerRequest) returns (GetRunnerResponse);
   rpc ListRunners(ListRunnersRequest) returns (ListRunnersResponse);
+  rpc UpdateRunner(UpdateRunnerRequest) returns (UpdateRunnerResponse);
   rpc DeleteRunner(DeleteRunnerRequest) returns (DeleteRunnerResponse);
   rpc ValidateServiceToken(ValidateServiceTokenRequest) returns (ValidateServiceTokenResponse);
 
@@ -51,11 +52,13 @@ message Runner {
   optional string organization_id = 3;
   string identity_id = 4;
   RunnerStatus status = 5;
+  map<string, string> labels = 6;
 }
 
 message RegisterRunnerRequest {
   string name = 1;
   optional string organization_id = 2;
+  map<string, string> labels = 3;
 }
 
 message RegisterRunnerResponse {
@@ -80,6 +83,16 @@ message ListRunnersRequest {
 message ListRunnersResponse {
   repeated Runner runners = 1;
   string next_page_token = 2;
+}
+
+message UpdateRunnerRequest {
+  string id = 1;
+  optional string name = 2;
+  map<string, string> labels = 3;
+}
+
+message UpdateRunnerResponse {
+  Runner runner = 1;
 }
 
 message DeleteRunnerRequest {
