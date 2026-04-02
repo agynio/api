@@ -288,6 +288,7 @@ message Mcp {
   string command = 4;
   ComputeResources resources = 5;
   string description = 6;
+  string name = 7; // MCP server name, unique within agent
 }
 
 message CreateMcpRequest {
@@ -296,6 +297,7 @@ message CreateMcpRequest {
   string command = 3;
   ComputeResources resources = 4;
   string description = 5;
+  string name = 6; // MCP server name
 }
 
 message CreateMcpResponse {
