@@ -51,7 +51,6 @@ message Runner {
   optional string organization_id = 3;
   string identity_id = 4;
   RunnerStatus status = 5;
-  string openziti_service_name = 6;
 }
 
 message RegisterRunnerRequest {
