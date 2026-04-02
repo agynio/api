@@ -12,6 +12,7 @@ service OrganizationsGateway {
   rpc GetOrganization(agynio.api.organizations.v1.GetOrganizationRequest) returns (agynio.api.organizations.v1.GetOrganizationResponse);
   rpc UpdateOrganization(agynio.api.organizations.v1.UpdateOrganizationRequest) returns (agynio.api.organizations.v1.UpdateOrganizationResponse);
   rpc DeleteOrganization(agynio.api.organizations.v1.DeleteOrganizationRequest) returns (agynio.api.organizations.v1.DeleteOrganizationResponse);
+  rpc ListOrganizations(agynio.api.organizations.v1.ListOrganizationsRequest) returns (agynio.api.organizations.v1.ListOrganizationsResponse);
   rpc ListAccessibleOrganizations(agynio.api.organizations.v1.ListAccessibleOrganizationsRequest) returns (agynio.api.organizations.v1.ListAccessibleOrganizationsResponse);
 
   // --- Members Management ---

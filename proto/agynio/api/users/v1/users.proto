@@ -17,8 +17,10 @@ service UsersService {
   rpc RevokeAPIToken(RevokeAPITokenRequest) returns (RevokeAPITokenResponse);
   rpc ResolveAPIToken(ResolveAPITokenRequest) returns (ResolveAPITokenResponse);
 
-  // --- Admin User Management ---
+  // --- Current User ---
   rpc GetMe(GetMeRequest) returns (GetMeResponse);
+
+  // --- Admin User Management ---
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
