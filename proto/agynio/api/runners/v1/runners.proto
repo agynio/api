@@ -89,6 +89,7 @@ message UpdateRunnerRequest {
   string id = 1;
   optional string name = 2;
   map<string, string> labels = 3;
+  bool update_labels = 4;  // When true, replace labels with the labels map (even if empty)
 }
 
 message UpdateRunnerResponse {
