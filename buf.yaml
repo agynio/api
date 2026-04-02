@@ -34,5 +34,8 @@ breaking:
       - proto/agynio/api/ziti_management/v1/ziti_management.proto
     ENUM_NO_DELETE:
       - proto/agynio/api/ziti_management/v1/ziti_management.proto
+    ENUM_VALUE_NO_DELETE:
+      - proto/agynio/api/identity/v1/identity.proto
+      - proto/agynio/api/ziti_management/v1/ziti_management.proto
     FIELD_SAME_TYPE:
       - proto/agynio/api/ziti_management/v1/ziti_management.proto
