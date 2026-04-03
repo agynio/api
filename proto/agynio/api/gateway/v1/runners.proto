@@ -13,6 +13,7 @@ service RunnersGateway {
   rpc ListRunners(agynio.api.runners.v1.ListRunnersRequest) returns (agynio.api.runners.v1.ListRunnersResponse);
   rpc UpdateRunner(agynio.api.runners.v1.UpdateRunnerRequest) returns (agynio.api.runners.v1.UpdateRunnerResponse);
   rpc DeleteRunner(agynio.api.runners.v1.DeleteRunnerRequest) returns (agynio.api.runners.v1.DeleteRunnerResponse);
+  rpc EnrollRunner(agynio.api.runners.v1.EnrollRunnerRequest) returns (agynio.api.runners.v1.EnrollRunnerResponse);
 
   // --- Workloads ---
   rpc ListWorkloadsByThread(agynio.api.runners.v1.ListWorkloadsByThreadRequest) returns (agynio.api.runners.v1.ListWorkloadsByThreadResponse);

@@ -15,6 +15,7 @@ service RunnersService {
   rpc UpdateRunner(UpdateRunnerRequest) returns (UpdateRunnerResponse);
   rpc DeleteRunner(DeleteRunnerRequest) returns (DeleteRunnerResponse);
   rpc ValidateServiceToken(ValidateServiceTokenRequest) returns (ValidateServiceTokenResponse);
+  rpc EnrollRunner(EnrollRunnerRequest) returns (EnrollRunnerResponse);
 
   // --- Workload state ---
   rpc CreateWorkload(CreateWorkloadRequest) returns (CreateWorkloadResponse);
@@ -107,6 +108,16 @@ message ValidateServiceTokenRequest {
 
 message ValidateServiceTokenResponse {
   Runner runner = 1;
+}
+
+message EnrollRunnerRequest {
+  string service_token = 1;
+}
+
+message EnrollRunnerResponse {
+  bytes identity_json = 1;
+  string service_name = 2;
+  string identity_id = 3;
 }
 
 // ===========================================================================
