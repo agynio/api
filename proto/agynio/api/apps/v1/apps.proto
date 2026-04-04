@@ -7,7 +7,7 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/agynio/api/gen/agynio/api/apps/v1;appsv1";
 
-// AppsService manages app registrations and metadata.
+// AppsService manages apps, installations, and related metadata.
 service AppsService {
   rpc CreateApp(CreateAppRequest) returns (CreateAppResponse);
   rpc UpdateApp(UpdateAppRequest) returns (UpdateAppResponse);
@@ -24,12 +24,19 @@ service AppsService {
   // Creates (or re-creates) the OpenZiti identity + service for the app.
   // Idempotent: cleans up old ziti resources and creates fresh ones on each call.
   rpc EnrollApp(EnrollAppRequest) returns (EnrollAppResponse);
+  // Install an app for an organization.
   rpc InstallApp(InstallAppRequest) returns (InstallAppResponse);
+  // Fetch an installation by ID.
   rpc GetInstallation(GetInstallationRequest) returns (GetInstallationResponse);
+  // Resolve an installation by slug within an organization.
   rpc GetInstallationBySlug(GetInstallationBySlugRequest) returns (GetInstallationBySlugResponse);
+  // List installations with optional filters.
   rpc ListInstallations(ListInstallationsRequest) returns (ListInstallationsResponse);
+  // Update an installation's metadata.
   rpc UpdateInstallation(UpdateInstallationRequest) returns (UpdateInstallationResponse);
+  // Uninstall an app by installation ID.
   rpc UninstallApp(UninstallAppRequest) returns (UninstallAppResponse);
+  // Fetch only the installation configuration for scoped access.
   rpc GetInstallationConfiguration(GetInstallationConfigurationRequest)
       returns (GetInstallationConfigurationResponse);
 }
