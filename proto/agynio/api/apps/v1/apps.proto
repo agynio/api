@@ -2,13 +2,15 @@ syntax = "proto3";
 
 package agynio.api.apps.v1;
 
+import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/agynio/api/gen/agynio/api/apps/v1;appsv1";
 
 // AppsService manages app registrations and metadata.
 service AppsService {
-  rpc RegisterApp(RegisterAppRequest) returns (RegisterAppResponse);
+  rpc CreateApp(CreateAppRequest) returns (CreateAppResponse);
+  rpc UpdateApp(UpdateAppRequest) returns (UpdateAppResponse);
   rpc GetApp(GetAppRequest) returns (GetAppResponse);
   // Resolve an app by slug.
   rpc GetAppBySlug(GetAppBySlugRequest) returns (GetAppBySlugResponse);
@@ -22,12 +24,26 @@ service AppsService {
   // Creates (or re-creates) the OpenZiti identity + service for the app.
   // Idempotent: cleans up old ziti resources and creates fresh ones on each call.
   rpc EnrollApp(EnrollAppRequest) returns (EnrollAppResponse);
+  rpc InstallApp(InstallAppRequest) returns (InstallAppResponse);
+  rpc GetInstallation(GetInstallationRequest) returns (GetInstallationResponse);
+  rpc GetInstallationBySlug(GetInstallationBySlugRequest) returns (GetInstallationBySlugResponse);
+  rpc ListInstallations(ListInstallationsRequest) returns (ListInstallationsResponse);
+  rpc UpdateInstallation(UpdateInstallationRequest) returns (UpdateInstallationResponse);
+  rpc UninstallApp(UninstallAppRequest) returns (UninstallAppResponse);
+  rpc GetInstallationConfiguration(GetInstallationConfigurationRequest)
+      returns (GetInstallationConfigurationResponse);
 }
 
 message EntityMeta {
   string id = 1;
   google.protobuf.Timestamp created_at = 2;
   google.protobuf.Timestamp updated_at = 3;
+}
+
+enum AppVisibility {
+  APP_VISIBILITY_UNSPECIFIED = 0;
+  APP_VISIBILITY_PUBLIC = 1;
+  APP_VISIBILITY_INTERNAL = 2;
 }
 
 message App {
@@ -39,6 +55,9 @@ message App {
   string identity_id = 6;
   string ziti_identity_id = 7;
   string ziti_service_id = 8;
+  string organization_id = 9;
+  AppVisibility visibility = 10;
+  repeated string permissions = 11;
 }
 
 message AppProfile {
@@ -49,14 +68,25 @@ message AppProfile {
   string icon = 5;
 }
 
-message RegisterAppRequest {
-  string slug = 1;
-  string name = 2;
-  string description = 3;
-  string icon = 4;
+message Installation {
+  EntityMeta meta = 1;
+  string app_id = 2;
+  string organization_id = 3;
+  string slug = 4;
+  google.protobuf.Struct configuration = 5;
 }
 
-message RegisterAppResponse {
+message CreateAppRequest {
+  string organization_id = 1;
+  string slug = 2;
+  string name = 3;
+  string description = 4;
+  string icon = 5;
+  AppVisibility visibility = 6;
+  repeated string permissions = 7;
+}
+
+message CreateAppResponse {
   App app = 1;
   string service_token = 2;
 }
@@ -69,8 +99,21 @@ message GetAppResponse {
   App app = 1;
 }
 
+message UpdateAppRequest {
+  string id = 1;
+  optional string name = 2;
+  optional string description = 3;
+  optional string icon = 4;
+  optional AppVisibility visibility = 5;
+}
+
+message UpdateAppResponse {
+  App app = 1;
+}
+
 message GetAppBySlugRequest {
-  string slug = 1;
+  string organization_id = 1;
+  string slug = 2;
 }
 
 message GetAppBySlugResponse {
@@ -80,6 +123,8 @@ message GetAppBySlugResponse {
 message ListAppsRequest {
   int32 page_size = 1;
   string page_token = 2;
+  string organization_id = 3;
+  AppVisibility visibility = 4;
 }
 
 message ListAppsResponse {
@@ -110,7 +155,7 @@ message ValidateServiceTokenResponse {
 }
 
 message EnrollAppRequest {
-  // The raw service token issued during RegisterApp.
+  // The raw service token issued during CreateApp.
   string service_token = 1;
 }
 
@@ -119,4 +164,68 @@ message EnrollAppResponse {
   bytes identity_json = 1;
   // The platform identity ID for this app.
   string identity_id = 2;
+}
+
+message InstallAppRequest {
+  string app_id = 1;
+  string organization_id = 2;
+  string slug = 3;
+  google.protobuf.Struct configuration = 4;
+}
+
+message InstallAppResponse {
+  Installation installation = 1;
+}
+
+message GetInstallationRequest {
+  string id = 1;
+}
+
+message GetInstallationResponse {
+  Installation installation = 1;
+}
+
+message GetInstallationBySlugRequest {
+  string organization_id = 1;
+  string slug = 2;
+}
+
+message GetInstallationBySlugResponse {
+  Installation installation = 1;
+}
+
+message ListInstallationsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string organization_id = 3;
+  string app_id = 4;
+}
+
+message ListInstallationsResponse {
+  repeated Installation installations = 1;
+  string next_page_token = 2;
+}
+
+message UpdateInstallationRequest {
+  string id = 1;
+  optional string slug = 2;
+  optional google.protobuf.Struct configuration = 3;
+}
+
+message UpdateInstallationResponse {
+  Installation installation = 1;
+}
+
+message UninstallAppRequest {
+  string id = 1;
+}
+
+message UninstallAppResponse {}
+
+message GetInstallationConfigurationRequest {
+  string id = 1;
+}
+
+message GetInstallationConfigurationResponse {
+  google.protobuf.Struct configuration = 1;
 }
