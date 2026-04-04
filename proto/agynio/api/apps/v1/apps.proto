@@ -37,8 +37,7 @@ service AppsService {
   // Uninstall an app by installation ID.
   rpc UninstallApp(UninstallAppRequest) returns (UninstallAppResponse);
   // Fetch only the installation configuration for scoped access.
-  rpc GetInstallationConfiguration(GetInstallationConfigurationRequest)
-      returns (GetInstallationConfigurationResponse);
+  rpc GetInstallationConfiguration(GetInstallationConfigurationRequest) returns (GetInstallationConfigurationResponse);
 }
 
 message EntityMeta {
