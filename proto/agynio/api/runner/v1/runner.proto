@@ -121,6 +121,12 @@ message DnsConfig {
   repeated string searches = 2;
 }
 
+message ImagePullCredential {
+  string registry = 1;
+  string username = 2;
+  string password = 3;
+}
+
 // A workload is a main container plus optional sidecars.
 // Runner MUST ensure sidecars share the same network namespace as the main container.
 message StartWorkloadRequest {
@@ -134,6 +140,8 @@ message StartWorkloadRequest {
   // overrides the default DNS policy with the provided nameservers
   // and search domains.
   DnsConfig dns_config = 5;
+
+  repeated ImagePullCredential image_pull_credentials = 6;
 
   map<string, string> additional_properties = 100;
 }
