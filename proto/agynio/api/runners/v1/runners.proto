@@ -54,6 +54,8 @@ message Runner {
   string identity_id = 4;
   RunnerStatus status = 5;
   map<string, string> labels = 6;
+  // Per-runner OpenZiti service name (e.g. "runner-{id}")
+  string openziti_service_name = 7;
 }
 
 message RegisterRunnerRequest {

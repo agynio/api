@@ -11,19 +11,25 @@ service ZitiManagementService {
   // Orchestrator -> create OpenZiti identity for an agent, return enrollment JWT.
   rpc CreateAgentIdentity(CreateAgentIdentityRequest) returns (CreateAgentIdentityResponse);
 
-  // Apps Service -> create an OpenZiti identity and service for an app.
-  // Returns enrolled credentials and the service ID.
+  // Apps Service -> create and enroll an OpenZiti identity for an app. If a previous
+  // identity exists, deletes it first. Returns enrolled credentials.
   rpc CreateAppIdentity(CreateAppIdentityRequest) returns (CreateAppIdentityResponse);
+
+  // Runners Service, Apps Service -> create a per-runner or per-app OpenZiti service.
+  rpc CreateService(CreateServiceRequest) returns (CreateServiceResponse);
 
   // Orchestrator -> delete OpenZiti identity and its platform mapping.
   rpc DeleteIdentity(DeleteIdentityRequest) returns (DeleteIdentityResponse);
 
   // Apps Service -> delete an app's OpenZiti identity and its associated service.
+  // Looked up by platform identity_id.
   rpc DeleteAppIdentity(DeleteAppIdentityRequest) returns (DeleteAppIdentityResponse);
 
-  // Runners Service -> create an OpenZiti identity and service for a runner.
+  // Runners Service -> create and enroll an OpenZiti identity for a runner. If a previous
+  // identity exists, deletes it first. Returns enrolled credentials.
   rpc CreateRunnerIdentity(CreateRunnerIdentityRequest) returns (CreateRunnerIdentityResponse);
   // Runners Service -> delete a runner's OpenZiti identity and its associated service.
+  // Looked up by platform identity_id.
   rpc DeleteRunnerIdentity(DeleteRunnerIdentityRequest) returns (DeleteRunnerIdentityResponse);
 
   // Orchestrator -> list all platform-managed identities (orphan reconciliation).
@@ -69,7 +75,7 @@ message CreateAgentIdentityResponse {
   string enrollment_jwt = 2;
 }
 
-// Request to create an OpenZiti identity and service for an app.
+// Request to create and enroll an OpenZiti identity for an app.
 message CreateAppIdentityRequest {
   string identity_id = 1;
   string slug = 2;
@@ -79,12 +85,29 @@ message CreateAppIdentityRequest {
 message CreateAppIdentityResponse {
   string ziti_identity_id = 1;
   bytes identity_json = 2;
-  string ziti_service_id = 3;
+  reserved 3;
+  reserved "ziti_service_id";
 }
 
-// Request to delete an app's OpenZiti identity and service.
+message CreateServiceRequest {
+  // e.g. "runner-{runnerId}" or "app-{slug}"
+  string name = 1;
+  // e.g. ["runner-services"] or ["app-services"]
+  repeated string role_attributes = 2;
+}
+
+message CreateServiceResponse {
+  // The OpenZiti service ID
+  string ziti_service_id = 1;
+  // The service name (echoed back)
+  string ziti_service_name = 2;
+}
+
+// Request to delete an app's OpenZiti identity and service by platform identity_id.
 message DeleteAppIdentityRequest {
-  string ziti_identity_id = 1;
+  // Platform app identity UUID - for looking up managed identity
+  string identity_id = 1;
+  // OpenZiti service ID - for deleting the OpenZiti service
   string ziti_service_id = 2;
 }
 
@@ -99,12 +122,16 @@ message CreateRunnerIdentityRequest {
 message CreateRunnerIdentityResponse {
   string ziti_identity_id = 1;
   bytes identity_json = 2;
-  string ziti_service_id = 3;
-  string ziti_service_name = 4;
+  reserved 3;
+  reserved 4;
+  reserved "ziti_service_id";
+  reserved "ziti_service_name";
 }
 
 message DeleteRunnerIdentityRequest {
-  string ziti_identity_id = 1;
+  // Platform runner UUID - for looking up managed identity
+  string identity_id = 1;
+  // OpenZiti service ID - for deleting the OpenZiti service
   string ziti_service_id = 2;
 }
 
