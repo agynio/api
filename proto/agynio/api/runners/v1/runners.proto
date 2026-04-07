@@ -222,6 +222,8 @@ message ListWorkloadsRequest {
   int32 page_size = 1;
   string page_token = 2;
   repeated WorkloadStatus statuses = 3;
+  optional string organization_id = 4;
+  optional string runner_id = 5;
 }
 
 message ListWorkloadsResponse {
