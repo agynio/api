@@ -24,6 +24,11 @@ service UsersService {
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+
+  // --- Devices ---
+  rpc CreateDevice(CreateDeviceRequest) returns (CreateDeviceResponse);
+  rpc ListDevices(ListDevicesRequest) returns (ListDevicesResponse);
+  rpc DeleteDevice(DeleteDeviceRequest) returns (DeleteDeviceResponse);
 }
 
 // ===========================================================================
@@ -33,6 +38,12 @@ service UsersService {
 enum ClusterRole {
   CLUSTER_ROLE_UNSPECIFIED = 0;
   CLUSTER_ROLE_ADMIN = 1;
+}
+
+enum DeviceStatus {
+  DEVICE_STATUS_UNSPECIFIED = 0;
+  DEVICE_STATUS_PENDING = 1;
+  DEVICE_STATUS_ENROLLED = 2;
 }
 
 // ===========================================================================
@@ -52,6 +63,18 @@ message User {
   string email = 4;
   string photo_url = 5;
   string nickname = 6;
+}
+
+// ===========================================================================
+// Device
+// ===========================================================================
+
+message Device {
+  EntityMeta meta = 1;
+  string user_identity_id = 2;
+  string name = 3;
+  string openziti_identity_id = 4;
+  DeviceStatus status = 5;
 }
 
 // ===========================================================================
@@ -219,3 +242,41 @@ message ResolveAPITokenResponse {
   string identity_id = 1;
   APIToken token = 2;
 }
+
+// ===========================================================================
+// CreateDevice
+// ===========================================================================
+
+message CreateDeviceRequest {
+  string name = 1;
+}
+
+message CreateDeviceResponse {
+  Device device = 1;
+  // Enrollment JWT shown once to the user. Cannot be retrieved again.
+  string enrollment_jwt = 2;
+}
+
+// ===========================================================================
+// ListDevices
+// ===========================================================================
+
+message ListDevicesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message ListDevicesResponse {
+  repeated Device devices = 1;
+  string next_page_token = 2;
+}
+
+// ===========================================================================
+// DeleteDevice
+// ===========================================================================
+
+message DeleteDeviceRequest {
+  string id = 1;
+}
+
+message DeleteDeviceResponse {}
