@@ -23,6 +23,10 @@ service ChatService {
   // Delegates to Threads.GetThreads using the authenticated identity_id.
   rpc GetChats(GetChatsRequest) returns (GetChatsResponse);
 
+  // Update a chat's status or summary.
+  // Delegates to Threads.UpdateThread using the authenticated identity_id.
+  rpc UpdateChat(UpdateChatRequest) returns (UpdateChatResponse);
+
   // List messages in a chat with pagination.
   // Returns an unread_count derived from Threads.GetUnackedMessages.
   // Read-only — does not change acknowledgment state.
@@ -42,6 +46,12 @@ service ChatService {
 // Entities
 // ===========================================================================
 
+enum ChatStatus {
+  CHAT_STATUS_UNSPECIFIED = 0;
+  CHAT_STATUS_OPEN = 1;
+  CHAT_STATUS_CLOSED = 2;
+}
+
 // A chat thread between participants.
 message Chat {
   string id = 1; // UUID — maps to Threads thread_id
@@ -49,6 +59,8 @@ message Chat {
   google.protobuf.Timestamp created_at = 3;
   google.protobuf.Timestamp updated_at = 4;
   string organization_id = 5; // UUID — owning organization
+  ChatStatus status = 6;
+  optional string summary = 7;
 }
 
 // A participant in a chat.
@@ -90,11 +102,26 @@ message GetChatsRequest {
   int32 page_size = 1;
   string page_token = 2;
   string organization_id = 3; // UUID — org filter
+  ChatStatus status = 4; // UNSPECIFIED = no filter
 }
 
 message GetChatsResponse {
   repeated Chat chats = 1;
   string next_page_token = 2;
+}
+
+// ===========================================================================
+// UpdateChat
+// ===========================================================================
+
+message UpdateChatRequest {
+  string chat_id = 1; // UUID
+  ChatStatus status = 2; // UNSPECIFIED = don't change
+  optional string summary = 3; // absent = don't change; empty = clear
+}
+
+message UpdateChatResponse {
+  Chat chat = 1;
 }
 
 // ===========================================================================
