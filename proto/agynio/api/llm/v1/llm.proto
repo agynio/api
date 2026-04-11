@@ -43,6 +43,13 @@ message EntityMeta {
 enum AuthMethod {
   AUTH_METHOD_UNSPECIFIED = 0;
   AUTH_METHOD_BEARER = 1;
+  AUTH_METHOD_X_API_KEY = 2;
+}
+
+enum Protocol {
+  PROTOCOL_UNSPECIFIED = 0;
+  PROTOCOL_RESPONSES = 1;
+  PROTOCOL_ANTHROPIC_MESSAGES = 2;
 }
 
 // ===========================================================================
@@ -54,6 +61,7 @@ message LLMProvider {
   string endpoint = 2;
   AuthMethod auth_method = 3;
   string organization_id = 4; // UUID
+  Protocol protocol = 5;
 }
 
 message CreateLLMProviderRequest {
@@ -61,6 +69,7 @@ message CreateLLMProviderRequest {
   AuthMethod auth_method = 2;
   string token = 3;
   string organization_id = 4;
+  Protocol protocol = 5;
 }
 
 message CreateLLMProviderResponse {
@@ -80,6 +89,7 @@ message UpdateLLMProviderRequest {
   optional string endpoint = 2;
   optional AuthMethod auth_method = 3;
   optional string token = 4;
+  optional Protocol protocol = 5;
 }
 
 message UpdateLLMProviderResponse {
@@ -175,4 +185,6 @@ message ResolveModelResponse {
   string token = 2;
   string remote_name = 3;
   string organization_id = 4; // UUID
+  Protocol protocol = 5;
+  AuthMethod auth_method = 6;
 }
