@@ -19,11 +19,20 @@ service RunnersService {
 
   // --- Workload state ---
   rpc CreateWorkload(CreateWorkloadRequest) returns (CreateWorkloadResponse);
+  rpc UpdateWorkload(UpdateWorkloadRequest) returns (UpdateWorkloadResponse);
   rpc UpdateWorkloadStatus(UpdateWorkloadStatusRequest) returns (UpdateWorkloadStatusResponse);
+  rpc TouchWorkload(TouchWorkloadRequest) returns (TouchWorkloadResponse);
   rpc DeleteWorkload(DeleteWorkloadRequest) returns (DeleteWorkloadResponse);
   rpc GetWorkload(GetWorkloadRequest) returns (GetWorkloadResponse);
   rpc ListWorkloadsByThread(ListWorkloadsByThreadRequest) returns (ListWorkloadsByThreadResponse);
   rpc ListWorkloads(ListWorkloadsRequest) returns (ListWorkloadsResponse);
+
+  // --- Volume state ---
+  rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse);
+  rpc UpdateVolume(UpdateVolumeRequest) returns (UpdateVolumeResponse);
+  rpc GetVolume(GetVolumeRequest) returns (GetVolumeResponse);
+  rpc ListVolumes(ListVolumesRequest) returns (ListVolumesResponse);
+  rpc ListVolumesByThread(ListVolumesByThreadRequest) returns (ListVolumesByThreadResponse);
 }
 
 // ===========================================================================
@@ -91,6 +100,7 @@ message ListRunnersResponse {
 message UpdateRunnerRequest {
   string id = 1;
   optional string name = 2;
+  // Labels replace the existing map; omitted keys are removed.
   map<string, string> labels = 3;
 }
 
@@ -166,6 +176,10 @@ message Workload {
   WorkloadStatus status = 6;
   repeated Container containers = 7;
   string ziti_identity_id = 8;
+  optional string instance_id = 9;
+  google.protobuf.Timestamp last_activity_at = 10;
+  optional google.protobuf.Timestamp last_metering_sampled_at = 11;
+  optional google.protobuf.Timestamp removed_at = 12;
 }
 
 message CreateWorkloadRequest {
@@ -183,6 +197,19 @@ message CreateWorkloadResponse {
   Workload workload = 1;
 }
 
+message UpdateWorkloadRequest {
+  string id = 1;
+  optional WorkloadStatus status = 2;
+  repeated Container containers = 3;
+  optional string instance_id = 4;
+  optional google.protobuf.Timestamp removed_at = 5;
+  optional google.protobuf.Timestamp last_metering_sampled_at = 6;
+}
+
+message UpdateWorkloadResponse {
+  Workload workload = 1;
+}
+
 message UpdateWorkloadStatusRequest {
   string id = 1;
   WorkloadStatus status = 2;
@@ -192,6 +219,12 @@ message UpdateWorkloadStatusRequest {
 message UpdateWorkloadStatusResponse {
   Workload workload = 1;
 }
+
+message TouchWorkloadRequest {
+  string id = 1;
+}
+
+message TouchWorkloadResponse {}
 
 message DeleteWorkloadRequest {
   string id = 1;
@@ -224,9 +257,97 @@ message ListWorkloadsRequest {
   repeated WorkloadStatus statuses = 3;
   optional string organization_id = 4;
   optional string runner_id = 5;
+  optional bool pending_sample = 6;
 }
 
 message ListWorkloadsResponse {
   repeated Workload workloads = 1;
+  string next_page_token = 2;
+}
+
+// ===========================================================================
+// Volume
+// ===========================================================================
+
+enum VolumeStatus {
+  VOLUME_STATUS_UNSPECIFIED = 0;
+  VOLUME_STATUS_PROVISIONING = 1;
+  VOLUME_STATUS_ACTIVE = 2;
+  VOLUME_STATUS_DEPROVISIONING = 3;
+  VOLUME_STATUS_DELETED = 4;
+  VOLUME_STATUS_FAILED = 5;
+}
+
+message Volume {
+  EntityMeta meta = 1;
+  optional string instance_id = 2;
+  string volume_id = 3;
+  string thread_id = 4;
+  string runner_id = 5;
+  string agent_id = 6;
+  string organization_id = 7;
+  string size_gb = 8;
+  VolumeStatus status = 9;
+  optional google.protobuf.Timestamp removed_at = 10;
+  optional google.protobuf.Timestamp last_metering_sampled_at = 11;
+}
+
+message CreateVolumeRequest {
+  string id = 1;
+  string volume_id = 2;
+  string thread_id = 3;
+  string runner_id = 4;
+  string agent_id = 5;
+  string organization_id = 6;
+  string size_gb = 7;
+  VolumeStatus status = 8;
+}
+
+message CreateVolumeResponse {
+  Volume volume = 1;
+}
+
+message UpdateVolumeRequest {
+  string id = 1;
+  optional VolumeStatus status = 2;
+  optional string instance_id = 3;
+  optional google.protobuf.Timestamp removed_at = 4;
+  optional google.protobuf.Timestamp last_metering_sampled_at = 5;
+}
+
+message UpdateVolumeResponse {
+  Volume volume = 1;
+}
+
+message GetVolumeRequest {
+  string id = 1;
+}
+
+message GetVolumeResponse {
+  Volume volume = 1;
+}
+
+message ListVolumesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  repeated VolumeStatus statuses = 3;
+  optional string organization_id = 4;
+  optional string runner_id = 5;
+  optional bool pending_sample = 6;
+}
+
+message ListVolumesResponse {
+  repeated Volume volumes = 1;
+  string next_page_token = 2;
+}
+
+message ListVolumesByThreadRequest {
+  string thread_id = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListVolumesByThreadResponse {
+  repeated Volume volumes = 1;
   string next_page_token = 2;
 }

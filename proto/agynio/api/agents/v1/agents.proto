@@ -177,6 +177,7 @@ message Volume {
   string mount_path = 3;
   string size = 4;
   string description = 5;
+  optional string ttl = 6;
 }
 
 message CreateVolumeRequest {
@@ -185,6 +186,7 @@ message CreateVolumeRequest {
   string size = 3;
   string description = 4;
   string organization_id = 5;
+  optional string ttl = 6;
 }
 
 message CreateVolumeResponse {
@@ -205,6 +207,7 @@ message UpdateVolumeRequest {
   optional string mount_path = 3;
   optional string size = 4;
   optional string description = 5;
+  optional string ttl = 6;
 }
 
 message UpdateVolumeResponse {
