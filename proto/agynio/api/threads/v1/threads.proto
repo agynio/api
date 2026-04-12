@@ -65,6 +65,8 @@ message Thread {
 message Participant {
   string id = 1; // UUID
   google.protobuf.Timestamp joined_at = 2;
+  // When true, the participant receives messages but does not trigger workload starts.
+  bool passive = 3;
 }
 
 // A message within a thread.
@@ -120,6 +122,12 @@ message ArchiveThreadResponse {
 message AddParticipantRequest {
   string thread_id = 1; // UUID
   string participant_id = 2; // UUID
+  // @nickname to resolve within organization_id. Mutually exclusive with participant_id.
+  string participant_nickname = 3;
+  // Organization scope for nickname resolution. Required with participant_nickname.
+  string organization_id = 4; // UUID
+  // Passive participants receive messages but do not trigger workload starts.
+  bool passive = 5;
 }
 
 message AddParticipantResponse {
@@ -183,6 +191,8 @@ message GetUnackedMessagesRequest {
   string participant_id = 1; // UUID
   int32 page_size = 2;
   string page_token = 3;
+  // Optional thread filter.
+  optional string thread_id = 4; // UUID
 }
 
 message GetUnackedMessagesResponse {
