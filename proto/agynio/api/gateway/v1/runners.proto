@@ -19,4 +19,5 @@ service RunnersGateway {
   rpc ListWorkloads(agynio.api.runners.v1.ListWorkloadsRequest) returns (agynio.api.runners.v1.ListWorkloadsResponse);
   rpc ListWorkloadsByThread(agynio.api.runners.v1.ListWorkloadsByThreadRequest) returns (agynio.api.runners.v1.ListWorkloadsByThreadResponse);
   rpc GetWorkload(agynio.api.runners.v1.GetWorkloadRequest) returns (agynio.api.runners.v1.GetWorkloadResponse);
+  rpc TouchWorkload(agynio.api.runners.v1.TouchWorkloadRequest) returns (agynio.api.runners.v1.TouchWorkloadResponse);
 }

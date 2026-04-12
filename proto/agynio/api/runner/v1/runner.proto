@@ -20,8 +20,12 @@ service RunnerService {
 
   rpc GetWorkloadLabels(GetWorkloadLabelsRequest) returns (GetWorkloadLabelsResponse);
 
+  rpc ListWorkloads(ListWorkloadsRequest) returns (ListWorkloadsResponse);
+
   rpc FindWorkloadsByLabels(FindWorkloadsByLabelsRequest) returns (FindWorkloadsByLabelsResponse);
   rpc ListWorkloadsByVolume(ListWorkloadsByVolumeRequest) returns (ListWorkloadsByVolumeResponse);
+
+  rpc ListVolumes(ListVolumesRequest) returns (ListVolumesResponse);
 
   rpc RemoveVolume(RemoveVolumeRequest) returns (RemoveVolumeResponse);
 
@@ -72,6 +76,9 @@ message VolumeSpec {
   // For named (persistent) volumes, the backend-level identifier.
   // Docker example: "ha_ws_<threadId>".
   string persistent_name = 3;
+
+  // Labels applied to the persistent volume claim.
+  map<string, string> labels = 4;
 
   map<string, string> additional_properties = 100;
 }
@@ -143,6 +150,9 @@ message StartWorkloadRequest {
 
   repeated ImagePullCredential image_pull_credentials = 6;
 
+  // Labels applied to the workload pod.
+  map<string, string> labels = 7;
+
   map<string, string> additional_properties = 100;
 }
 
@@ -162,6 +172,9 @@ message StartWorkloadResponse {
 
   // Present when status is FAILED.
   WorkloadFailure failure = 4;
+
+  reserved 5;
+  reserved "runner_id";
 }
 
 message WorkloadContainers {
@@ -235,6 +248,17 @@ message GetWorkloadLabelsResponse {
   map<string, string> labels = 1;
 }
 
+message ListWorkloadsRequest {}
+
+message WorkloadListItem {
+  string instance_id = 1;
+  string workload_key = 2;
+}
+
+message ListWorkloadsResponse {
+  repeated WorkloadListItem workloads = 1;
+}
+
 message FindWorkloadsByLabelsRequest {
   map<string, string> labels = 1;
   bool all = 2;
@@ -250,6 +274,17 @@ message ListWorkloadsByVolumeRequest {
 
 message ListWorkloadsByVolumeResponse {
   repeated string target_ids = 1;
+}
+
+message ListVolumesRequest {}
+
+message VolumeListItem {
+  string instance_id = 1;
+  string volume_key = 2;
+}
+
+message ListVolumesResponse {
+  repeated VolumeListItem volumes = 1;
 }
 
 message RemoveVolumeRequest {
