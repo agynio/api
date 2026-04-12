@@ -182,7 +182,6 @@ message TestModelRequest {
 
 message TestModelResponse {
   string output_text = 1;
-  string error_message = 2;
 }
 
 // ===========================================================================
