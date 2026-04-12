@@ -109,7 +109,7 @@ message Agent {
   string init_image = 9;
   string organization_id = 10;
   string nickname = 11;
-  string idle_timeout = 12; // Go duration string (e.g., "30s", "5m", "1h").
+  optional string idle_timeout = 12; // Go duration string (e.g., "30s", "5m", "1h").
 }
 
 message CreateAgentRequest {
