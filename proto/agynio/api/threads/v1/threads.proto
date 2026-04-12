@@ -124,8 +124,7 @@ message AddParticipantRequest {
   string thread_id = 1; // UUID
   // Deprecated: use participant instead.
   string participant_id = 2 [deprecated = true]; // UUID
-  // Deprecated: use participant instead.
-  string participant_nickname = 3 [deprecated = true];
+  reserved 3;
   // Organization scope for nickname resolution. Required with participant_nickname.
   optional string organization_id = 4; // UUID
   // Passive participants receive messages but do not trigger workload starts.
