@@ -108,6 +108,7 @@ message Agent {
   ComputeResources resources = 8;
   string init_image = 9;
   string organization_id = 10;
+  string nickname = 11;
 }
 
 message CreateAgentRequest {
@@ -120,6 +121,7 @@ message CreateAgentRequest {
   ComputeResources resources = 7;
   string organization_id = 8;
   string init_image = 9;
+  string nickname = 10;
 }
 
 message CreateAgentResponse {
@@ -144,6 +146,7 @@ message UpdateAgentRequest {
   optional string image = 7;
   optional ComputeResources resources = 8;
   optional string init_image = 9;
+  optional string nickname = 10;
 }
 
 message UpdateAgentResponse {

@@ -15,6 +15,13 @@ service IdentityService {
   // BatchGetIdentityTypes returns known identity types for the requested IDs.
   // Unknown identity IDs are omitted from the response.
   rpc BatchGetIdentityTypes(BatchGetIdentityTypesRequest) returns (BatchGetIdentityTypesResponse);
+  // SetNickname sets or updates the nickname for an identity within an org.
+  // Returns ALREADY_EXISTS if the nickname is already taken in the org.
+  rpc SetNickname(SetNicknameRequest) returns (SetNicknameResponse);
+  // RemoveNickname deletes the nickname entry for an identity within an org.
+  rpc RemoveNickname(RemoveNicknameRequest) returns (RemoveNicknameResponse);
+  // ResolveNickname resolves an @nickname within an org to its identity.
+  rpc ResolveNickname(ResolveNicknameRequest) returns (ResolveNicknameResponse);
 }
 
 enum IdentityType {
@@ -53,4 +60,34 @@ message IdentityTypeEntry {
 
 message BatchGetIdentityTypesResponse {
   repeated IdentityTypeEntry entries = 1;
+}
+
+message SetNicknameRequest {
+  string organization_id = 1;
+  string identity_id = 2;
+  string nickname = 3;
+  // Optional app installation ID; required for app installation nicknames.
+  optional string installation_id = 4;
+}
+
+message SetNicknameResponse {}
+
+message RemoveNicknameRequest {
+  string organization_id = 1;
+  string identity_id = 2;
+  // Optional app installation ID; required for app installation nicknames.
+  optional string installation_id = 3;
+}
+
+message RemoveNicknameResponse {}
+
+message ResolveNicknameRequest {
+  string organization_id = 1;
+  string nickname = 2;
+}
+
+message ResolveNicknameResponse {
+  string identity_id = 1;
+  IdentityType identity_type = 2;
+  optional string installation_id = 3;
 }
