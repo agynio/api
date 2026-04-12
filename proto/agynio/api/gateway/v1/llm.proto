@@ -20,4 +20,7 @@ service LLMGateway {
   rpc UpdateModel(agynio.api.llm.v1.UpdateModelRequest) returns (agynio.api.llm.v1.UpdateModelResponse);
   rpc DeleteModel(agynio.api.llm.v1.DeleteModelRequest) returns (agynio.api.llm.v1.DeleteModelResponse);
   rpc ListModels(agynio.api.llm.v1.ListModelsRequest) returns (agynio.api.llm.v1.ListModelsResponse);
+
+  // --- Test ---
+  rpc TestModel(agynio.api.llm.v1.TestModelRequest) returns (agynio.api.llm.v1.TestModelResponse);
 }
