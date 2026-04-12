@@ -214,6 +214,7 @@ message ResolveIdentityRequest {
 message ResolveIdentityResponse {
   string identity_id = 1;
   agynio.api.identity.v1.IdentityType identity_type = 2;
+  optional string workload_id = 3;
 }
 
 message RequestServiceIdentityRequest {
