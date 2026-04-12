@@ -96,6 +96,7 @@ message MessageRecipient {
 
 message CreateThreadRequest {
   // Initial participant UUIDs. At least one required.
+  // Passive participants must be added with AddParticipant.
   repeated string participant_ids = 1;
 }
 
@@ -121,13 +122,23 @@ message ArchiveThreadResponse {
 
 message AddParticipantRequest {
   string thread_id = 1; // UUID
-  string participant_id = 2; // UUID
-  // @nickname to resolve within organization_id. Mutually exclusive with participant_id.
-  string participant_nickname = 3;
+  // Deprecated: use participant instead.
+  string participant_id = 2 [deprecated = true]; // UUID
+  // Deprecated: use participant instead.
+  string participant_nickname = 3 [deprecated = true];
   // Organization scope for nickname resolution. Required with participant_nickname.
-  string organization_id = 4; // UUID
+  optional string organization_id = 4; // UUID
   // Passive participants receive messages but do not trigger workload starts.
   bool passive = 5;
+  ParticipantIdentifier participant = 6;
+}
+
+message ParticipantIdentifier {
+  oneof identifier {
+    string participant_id = 1; // UUID
+    // @nickname to resolve within organization_id.
+    string participant_nickname = 2;
+  }
 }
 
 message AddParticipantResponse {
