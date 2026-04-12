@@ -94,6 +94,7 @@ message ManagedIdentity {
 
 message CreateAgentIdentityRequest {
   string agent_id = 1;
+  string workload_id = 2;
 }
 
 message CreateAgentIdentityResponse {
