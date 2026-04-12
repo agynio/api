@@ -26,6 +26,7 @@ service RunnersService {
   rpc GetWorkload(GetWorkloadRequest) returns (GetWorkloadResponse);
   rpc ListWorkloadsByThread(ListWorkloadsByThreadRequest) returns (ListWorkloadsByThreadResponse);
   rpc ListWorkloads(ListWorkloadsRequest) returns (ListWorkloadsResponse);
+  rpc BatchUpdateWorkloadSampledAt(BatchUpdateWorkloadSampledAtRequest) returns (BatchUpdateWorkloadSampledAtResponse);
 
   // --- Volume state ---
   rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse);
@@ -33,6 +34,7 @@ service RunnersService {
   rpc GetVolume(GetVolumeRequest) returns (GetVolumeResponse);
   rpc ListVolumes(ListVolumesRequest) returns (ListVolumesResponse);
   rpc ListVolumesByThread(ListVolumesByThreadRequest) returns (ListVolumesByThreadResponse);
+  rpc BatchUpdateVolumeSampledAt(BatchUpdateVolumeSampledAtRequest) returns (BatchUpdateVolumeSampledAtResponse);
 }
 
 // ===========================================================================
@@ -43,6 +45,11 @@ message EntityMeta {
   string id = 1;
   google.protobuf.Timestamp created_at = 2;
   google.protobuf.Timestamp updated_at = 3;
+}
+
+message SampledAtEntry {
+  string id = 1;
+  google.protobuf.Timestamp sampled_at = 2;
 }
 
 // ===========================================================================
@@ -265,6 +272,12 @@ message ListWorkloadsResponse {
   string next_page_token = 2;
 }
 
+message BatchUpdateWorkloadSampledAtRequest {
+  repeated SampledAtEntry entries = 1;
+}
+
+message BatchUpdateWorkloadSampledAtResponse {}
+
 // ===========================================================================
 // Volume
 // ===========================================================================
@@ -351,3 +364,9 @@ message ListVolumesByThreadResponse {
   repeated Volume volumes = 1;
   string next_page_token = 2;
 }
+
+message BatchUpdateVolumeSampledAtRequest {
+  repeated SampledAtEntry entries = 1;
+}
+
+message BatchUpdateVolumeSampledAtResponse {}
