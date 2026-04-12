@@ -153,6 +153,9 @@ message StartWorkloadRequest {
   // Labels applied to the workload pod.
   map<string, string> labels = 7;
 
+  // Optional workload id to use for the runner instance.
+  string workload_id = 8;
+
   map<string, string> additional_properties = 100;
 }
 
