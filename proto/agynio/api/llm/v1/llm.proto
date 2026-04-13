@@ -22,6 +22,9 @@ service LLMService {
   rpc DeleteModel(DeleteModelRequest) returns (DeleteModelResponse);
   rpc ListModels(ListModelsRequest) returns (ListModelsResponse);
 
+  // --- Test ---
+  rpc TestModel(TestModelRequest) returns (TestModelResponse);
+
   // --- Resolution ---
   rpc ResolveModel(ResolveModelRequest) returns (ResolveModelResponse);
 }
