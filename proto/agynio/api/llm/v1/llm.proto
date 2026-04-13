@@ -24,6 +24,9 @@ service LLMService {
 
   // --- Resolution ---
   rpc ResolveModel(ResolveModelRequest) returns (ResolveModelResponse);
+
+  // --- Test ---
+  rpc TestModel(TestModelRequest) returns (TestModelResponse);
 }
 
 // ===========================================================================
