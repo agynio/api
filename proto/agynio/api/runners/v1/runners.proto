@@ -187,6 +187,8 @@ message Workload {
   google.protobuf.Timestamp last_activity_at = 10;
   optional google.protobuf.Timestamp last_metering_sampled_at = 11;
   optional google.protobuf.Timestamp removed_at = 12;
+  int32 allocated_cpu_millicores = 13;
+  int64 allocated_ram_bytes = 14;
 }
 
 message CreateWorkloadRequest {
@@ -198,6 +200,8 @@ message CreateWorkloadRequest {
   WorkloadStatus status = 6;
   repeated Container containers = 7;
   string ziti_identity_id = 8;
+  int32 allocated_cpu_millicores = 9;
+  int64 allocated_ram_bytes = 10;
 }
 
 message CreateWorkloadResponse {
