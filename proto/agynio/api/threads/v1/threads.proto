@@ -122,20 +122,25 @@ message ArchiveThreadResponse {
 
 message AddParticipantRequest {
   string thread_id = 1; // UUID
-  // Deprecated: use participant instead.
+  // Deprecated: use participant_identifier instead.
   string participant_id = 2 [deprecated = true]; // UUID
   reserved 3;
-  // Organization scope for nickname resolution. Required with participant_nickname.
+  // Organization scope for nickname resolution. Required when participant_identifier
+  // is an @nickname and caller context lacks an organization id.
   optional string organization_id = 4; // UUID
   // Passive participants receive messages but do not trigger workload starts.
   bool passive = 5;
-  ParticipantIdentifier participant = 6;
+  // Deprecated: use participant_identifier instead.
+  ParticipantIdentifier participant = 6 [deprecated = true];
+  // Participant identifier (UUID or @nickname).
+  string participant_identifier = 7;
 }
 
+// Deprecated: use AddParticipantRequest.participant_identifier.
 message ParticipantIdentifier {
   oneof identifier {
     string participant_id = 1; // UUID
-    // @nickname to resolve within organization_id.
+    // Nickname to resolve within organization_id.
     string participant_nickname = 2;
   }
 }
