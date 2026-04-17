@@ -72,6 +72,7 @@ message Runner {
   map<string, string> labels = 6;
   // Per-runner OpenZiti service name (e.g. "runner-{id}")
   string openziti_service_name = 7;
+  // Capabilities supported by this runner. Free-form strings (e.g., "privileged", "dind").
   repeated string capabilities = 8;
 }
 
@@ -79,6 +80,7 @@ message RegisterRunnerRequest {
   string name = 1;
   optional string organization_id = 2;
   map<string, string> labels = 3;
+  // Capabilities supported by this runner. Free-form strings (e.g., "privileged", "dind").
   repeated string capabilities = 4;
 }
 
@@ -111,6 +113,7 @@ message UpdateRunnerRequest {
   optional string name = 2;
   // Labels replace the existing map; omitted keys are removed.
   map<string, string> labels = 3;
+  // Capabilities replace the existing list; an empty list clears all capabilities.
   repeated string capabilities = 4;
 }
 

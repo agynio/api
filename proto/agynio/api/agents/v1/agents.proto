@@ -110,6 +110,7 @@ message Agent {
   string organization_id = 10;
   string nickname = 11;
   optional string idle_timeout = 12; // Go duration string (e.g., "30s", "5m", "1h").
+  // Capabilities supported by this agent. Free-form strings (e.g., "privileged", "dind").
   repeated string capabilities = 13;
 }
 
@@ -125,6 +126,7 @@ message CreateAgentRequest {
   string init_image = 9;
   string nickname = 10;
   optional string idle_timeout = 11; // Go duration string (e.g., "30s", "5m", "1h").
+  // Capabilities supported by this agent. Free-form strings (e.g., "privileged", "dind").
   repeated string capabilities = 12;
 }
 
@@ -152,6 +154,7 @@ message UpdateAgentRequest {
   optional string init_image = 9;
   optional string nickname = 10;
   optional string idle_timeout = 11; // Go duration string (e.g., "30s", "5m", "1h").
+  // Capabilities replace the existing list; an empty list clears all capabilities.
   repeated string capabilities = 12;
 }
 
