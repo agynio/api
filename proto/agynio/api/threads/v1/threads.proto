@@ -97,7 +97,11 @@ message MessageRecipient {
 message CreateThreadRequest {
   // Initial participant UUIDs. At least one required.
   // Passive participants must be added with AddParticipant.
-  repeated string participant_ids = 1;
+  repeated string participant_ids = 1 [deprecated = true];
+  // Initial participants by UUID or nickname.
+  repeated ParticipantIdentifier participants = 2;
+  // Organization scope for nickname resolution. Required with participant_nickname.
+  optional string organization_id = 3; // UUID
 }
 
 message CreateThreadResponse {
