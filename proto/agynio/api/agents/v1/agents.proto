@@ -110,6 +110,7 @@ message Agent {
   string organization_id = 10;
   string nickname = 11;
   optional string idle_timeout = 12; // Go duration string (e.g., "30s", "5m", "1h").
+  repeated string capabilities = 13;
 }
 
 message CreateAgentRequest {
@@ -124,6 +125,7 @@ message CreateAgentRequest {
   string init_image = 9;
   string nickname = 10;
   optional string idle_timeout = 11; // Go duration string (e.g., "30s", "5m", "1h").
+  repeated string capabilities = 12;
 }
 
 message CreateAgentResponse {
@@ -150,6 +152,7 @@ message UpdateAgentRequest {
   optional string init_image = 9;
   optional string nickname = 10;
   optional string idle_timeout = 11; // Go duration string (e.g., "30s", "5m", "1h").
+  repeated string capabilities = 12;
 }
 
 message UpdateAgentResponse {

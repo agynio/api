@@ -156,6 +156,9 @@ message StartWorkloadRequest {
   // Optional workload id to use for the runner instance.
   string workload_id = 8;
 
+  // Runner-level capabilities required by the workload.
+  repeated string capabilities = 9;
+
   map<string, string> additional_properties = 100;
 }
 
