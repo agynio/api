@@ -104,7 +104,8 @@ message CreateThreadRequest {
   // Initial participants by UUID or nickname.
   // At least one required unless initiator metadata supplies the only participant.
   repeated ParticipantIdentifier participants = 2;
-  // Organization scope for nickname resolution. Required with participant_nickname.
+  // Organization that owns the thread; required for user callers and may be
+  // derived for agent callers when omitted.
   optional string organization_id = 3; // UUID
 }
 
