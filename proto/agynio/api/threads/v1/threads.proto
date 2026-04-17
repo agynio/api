@@ -104,8 +104,8 @@ message CreateThreadRequest {
   // Initial participants by UUID or nickname.
   // At least one required unless initiator metadata supplies the only participant.
   repeated ParticipantIdentifier participants = 2;
-  // Organization that owns the thread; required for user callers and may be
-  // derived for agent callers when omitted.
+  // Organization context for thread creation; may be derived from the caller
+  // identity when omitted and used as the nickname resolution scope.
   optional string organization_id = 3; // UUID
 }
 
@@ -134,7 +134,8 @@ message AddParticipantRequest {
   // Deprecated: use participant instead.
   string participant_id = 2 [deprecated = true]; // UUID
   reserved 3;
-  // Organization scope for nickname resolution. Required with participant_nickname.
+  // Organization context for the thread; may be derived from the caller
+  // identity when omitted and used as the nickname resolution scope.
   optional string organization_id = 4; // UUID
   // Passive participants receive messages but do not trigger workload starts.
   bool passive = 5;
