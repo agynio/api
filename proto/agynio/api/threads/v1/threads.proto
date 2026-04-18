@@ -27,8 +27,8 @@ service ThreadsService {
   // List threads for a participant with pagination.
   rpc GetThreads(GetThreadsRequest) returns (GetThreadsResponse);
 
-  // List threads for an organization with pagination.
-  rpc ListOrganizationThreads(ListOrganizationThreadsRequest) returns (ListOrganizationThreadsResponse);
+  // Get threads for an organization with pagination.
+  rpc GetOrganizationThreads(GetOrganizationThreadsRequest) returns (GetOrganizationThreadsResponse);
 
   // Get a thread by ID.
   rpc GetThread(GetThreadRequest) returns (GetThreadResponse);
@@ -71,7 +71,10 @@ message Thread {
   ThreadStatus status = 3;
   google.protobuf.Timestamp created_at = 4;
   google.protobuf.Timestamp updated_at = 5;
-  string organization_id = 6; // UUID
+  // Owning organization UUID. May be empty for legacy threads created
+  // before organization linkage was recorded.
+  string organization_id = 6;
+  // Count of messages in the thread, updated on send.
   int32 message_count = 7;
 }
 
@@ -203,17 +206,18 @@ message GetThreadsResponse {
 }
 
 // ===========================================================================
-// ListOrganizationThreads
+// GetOrganizationThreads
 // ===========================================================================
 
-message ListOrganizationThreadsRequest {
+message GetOrganizationThreadsRequest {
   string organization_id = 1; // UUID
   int32 page_size = 2;
   string page_token = 3;
-  optional ThreadStatus status = 4;
+  // Filter by status. THREAD_STATUS_UNSPECIFIED means no filter.
+  ThreadStatus status = 4;
 }
 
-message ListOrganizationThreadsResponse {
+message GetOrganizationThreadsResponse {
   repeated Thread threads = 1;
   string next_page_token = 2;
 }
@@ -238,6 +242,8 @@ message GetMessagesRequest {
   string thread_id = 1; // UUID
   int32 page_size = 2;
   string page_token = 3;
+  // Message ordering for pagination. Defaults to MESSAGE_ORDER_OLDEST_FIRST.
+  // page_token values are order-sensitive; reuse only with the same order.
   MessageOrder order = 4;
 }
 
