@@ -19,7 +19,6 @@ breaking:
   ignore_only:
     FILE_NO_DELETE:
       - proto/agynio/api/gateway/v1/tracing.proto
-      - proto/agynio/api/tenants/v1/tenants.proto
       - proto/agynio/api/gateway/v1/llm.proto
     RPC_NO_DELETE:
       - proto/agynio/api/llm/v1/llm.proto
