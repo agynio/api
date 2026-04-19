@@ -27,6 +27,12 @@ service ThreadsService {
   // List threads for a participant with pagination.
   rpc GetThreads(GetThreadsRequest) returns (GetThreadsResponse);
 
+  // Get threads for an organization with pagination.
+  rpc GetOrganizationThreads(GetOrganizationThreadsRequest) returns (GetOrganizationThreadsResponse);
+
+  // Get a thread by ID.
+  rpc GetThread(GetThreadRequest) returns (GetThreadResponse);
+
   // List messages in a thread with pagination.
   // Read-only — does not change acknowledgment state.
   rpc GetMessages(GetMessagesRequest) returns (GetMessagesResponse);
@@ -48,6 +54,12 @@ enum ThreadStatus {
   THREAD_STATUS_ARCHIVED = 2;
 }
 
+enum MessageOrder {
+  MESSAGE_ORDER_UNSPECIFIED = 0;
+  MESSAGE_ORDER_OLDEST_FIRST = 1;
+  MESSAGE_ORDER_NEWEST_FIRST = 2;
+}
+
 // ===========================================================================
 // Entities
 // ===========================================================================
@@ -59,6 +71,11 @@ message Thread {
   ThreadStatus status = 3;
   google.protobuf.Timestamp created_at = 4;
   google.protobuf.Timestamp updated_at = 5;
+  // Owning organization UUID. May be empty for legacy threads created
+  // before organization linkage was recorded.
+  string organization_id = 6;
+  // Count of messages in the thread, updated on send.
+  int32 message_count = 7;
 }
 
 // A participant in a thread.
@@ -189,6 +206,35 @@ message GetThreadsResponse {
 }
 
 // ===========================================================================
+// GetOrganizationThreads
+// ===========================================================================
+
+message GetOrganizationThreadsRequest {
+  string organization_id = 1; // UUID
+  int32 page_size = 2;
+  string page_token = 3;
+  // Filter by status. THREAD_STATUS_UNSPECIFIED means no filter.
+  ThreadStatus status = 4;
+}
+
+message GetOrganizationThreadsResponse {
+  repeated Thread threads = 1;
+  string next_page_token = 2;
+}
+
+// ===========================================================================
+// GetThread
+// ===========================================================================
+
+message GetThreadRequest {
+  string thread_id = 1; // UUID
+}
+
+message GetThreadResponse {
+  Thread thread = 1;
+}
+
+// ===========================================================================
 // GetMessages
 // ===========================================================================
 
@@ -196,6 +242,9 @@ message GetMessagesRequest {
   string thread_id = 1; // UUID
   int32 page_size = 2;
   string page_token = 3;
+  // Message ordering for pagination. Defaults to MESSAGE_ORDER_OLDEST_FIRST.
+  // page_token values are order-sensitive; reuse only with the same order.
+  MessageOrder order = 4;
 }
 
 message GetMessagesResponse {
