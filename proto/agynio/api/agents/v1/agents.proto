@@ -15,6 +15,8 @@ service AgentsService {
   // --- Agents ---
   rpc CreateAgent(CreateAgentRequest) returns (CreateAgentResponse);
   rpc GetAgent(GetAgentRequest) returns (GetAgentResponse);
+  // Resolve an agent and organization by identity ID.
+  rpc ResolveAgentIdentity(ResolveAgentIdentityRequest) returns (ResolveAgentIdentityResponse);
   rpc UpdateAgent(UpdateAgentRequest) returns (UpdateAgentResponse);
   rpc DeleteAgent(DeleteAgentRequest) returns (DeleteAgentResponse);
   rpc ListAgents(ListAgentsRequest) returns (ListAgentsResponse);
@@ -140,6 +142,15 @@ message GetAgentRequest {
 
 message GetAgentResponse {
   Agent agent = 1;
+}
+
+message ResolveAgentIdentityRequest {
+  string identity_id = 1;
+}
+
+message ResolveAgentIdentityResponse {
+  string agent_id = 1;
+  string organization_id = 2;
 }
 
 message UpdateAgentRequest {

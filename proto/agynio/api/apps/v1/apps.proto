@@ -30,6 +30,8 @@ service AppsService {
   rpc GetInstallation(GetInstallationRequest) returns (GetInstallationResponse);
   // Resolve an installation by slug within an organization.
   rpc GetInstallationBySlug(GetInstallationBySlugRequest) returns (GetInstallationBySlugResponse);
+  // Resolve an installation by identity ID within an organization.
+  rpc GetInstallationByIdentityId(GetInstallationByIdentityIdRequest) returns (GetInstallationByIdentityIdResponse);
   // List installations with optional filters.
   rpc ListInstallations(ListInstallationsRequest) returns (ListInstallationsResponse);
   // Update an installation's metadata.
@@ -197,6 +199,15 @@ message GetInstallationBySlugRequest {
 }
 
 message GetInstallationBySlugResponse {
+  Installation installation = 1;
+}
+
+message GetInstallationByIdentityIdRequest {
+  string organization_id = 1;
+  string identity_id = 2;
+}
+
+message GetInstallationByIdentityIdResponse {
   Installation installation = 1;
 }
 

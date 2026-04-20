@@ -35,7 +35,9 @@ message PublishResponse {
   google.protobuf.Timestamp ts = 2;
 }
 
-message SubscribeRequest {}
+message SubscribeRequest {
+  repeated string rooms = 1;
+}
 
 message SubscribeResponse {
   NotificationEnvelope envelope = 1;
