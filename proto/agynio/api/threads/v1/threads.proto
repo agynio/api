@@ -16,6 +16,9 @@ service ThreadsService {
   // Archive a thread (soft-delete).
   rpc ArchiveThread(ArchiveThreadRequest) returns (ArchiveThreadResponse);
 
+  // Degrade a thread (mark as degraded).
+  rpc DegradeThread(DegradeThreadRequest) returns (DegradeThreadResponse);
+
   // Add a participant to an existing thread.
   rpc AddParticipant(AddParticipantRequest) returns (AddParticipantResponse);
 
@@ -52,6 +55,7 @@ enum ThreadStatus {
   THREAD_STATUS_UNSPECIFIED = 0;
   THREAD_STATUS_ACTIVE = 1;
   THREAD_STATUS_ARCHIVED = 2;
+  THREAD_STATUS_DEGRADED = 3;
 }
 
 enum MessageOrder {
@@ -139,6 +143,20 @@ message ArchiveThreadRequest {
 }
 
 message ArchiveThreadResponse {
+  Thread thread = 1;
+}
+
+// ===========================================================================
+// DegradeThread
+// ===========================================================================
+
+message DegradeThreadRequest {
+  string thread_id = 1; // UUID
+  // Reason for degrading the thread.
+  string reason = 2;
+}
+
+message DegradeThreadResponse {
   Thread thread = 1;
 }
 
