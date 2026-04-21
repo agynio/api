@@ -40,6 +40,12 @@ service AppsService {
   rpc UninstallApp(UninstallAppRequest) returns (UninstallAppResponse);
   // Fetch only the installation configuration for scoped access.
   rpc GetInstallationConfiguration(GetInstallationConfigurationRequest) returns (GetInstallationConfigurationResponse);
+  // Report status for an installation.
+  rpc ReportInstallationStatus(ReportInstallationStatusRequest) returns (ReportInstallationStatusResponse);
+  // Append an audit log entry for an installation.
+  rpc AppendInstallationAuditLogEntry(AppendInstallationAuditLogEntryRequest) returns (AppendInstallationAuditLogEntryResponse);
+  // List audit log entries for an installation.
+  rpc ListInstallationAuditLogEntries(ListInstallationAuditLogEntriesRequest) returns (ListInstallationAuditLogEntriesResponse);
 }
 
 message EntityMeta {
@@ -82,6 +88,23 @@ message Installation {
   string organization_id = 3;
   string slug = 4;
   google.protobuf.Struct configuration = 5;
+  optional string status = 6;
+}
+
+enum InstallationAuditLogLevel {
+  INSTALLATION_AUDIT_LOG_LEVEL_UNSPECIFIED = 0;
+  INSTALLATION_AUDIT_LOG_LEVEL_INFO = 1;
+  INSTALLATION_AUDIT_LOG_LEVEL_WARNING = 2;
+  INSTALLATION_AUDIT_LOG_LEVEL_ERROR = 3;
+}
+
+message InstallationAuditLogEntry {
+  string id = 1;
+  string installation_id = 2;
+  string message = 3;
+  InstallationAuditLogLevel level = 4;
+  optional string idempotency_key = 5;
+  google.protobuf.Timestamp created_at = 6;
 }
 
 message CreateAppRequest {
@@ -245,4 +268,35 @@ message GetInstallationConfigurationRequest {
 
 message GetInstallationConfigurationResponse {
   google.protobuf.Struct configuration = 1;
+}
+
+message ReportInstallationStatusRequest {
+  string installation_id = 1;
+  string status = 2;
+}
+
+message ReportInstallationStatusResponse {
+  Installation installation = 1;
+}
+
+message AppendInstallationAuditLogEntryRequest {
+  string installation_id = 1;
+  string message = 2;
+  InstallationAuditLogLevel level = 3;
+  optional string idempotency_key = 4;
+}
+
+message AppendInstallationAuditLogEntryResponse {
+  InstallationAuditLogEntry entry = 1;
+}
+
+message ListInstallationAuditLogEntriesRequest {
+  string installation_id = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListInstallationAuditLogEntriesResponse {
+  repeated InstallationAuditLogEntry entries = 1;
+  string next_page_token = 2;
 }

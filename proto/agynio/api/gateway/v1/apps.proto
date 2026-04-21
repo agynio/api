@@ -21,4 +21,7 @@ service AppsGateway {
   rpc ListInstallations(agynio.api.apps.v1.ListInstallationsRequest) returns (agynio.api.apps.v1.ListInstallationsResponse);
   rpc UpdateInstallation(agynio.api.apps.v1.UpdateInstallationRequest) returns (agynio.api.apps.v1.UpdateInstallationResponse);
   rpc UninstallApp(agynio.api.apps.v1.UninstallAppRequest) returns (agynio.api.apps.v1.UninstallAppResponse);
+  rpc ReportInstallationStatus(agynio.api.apps.v1.ReportInstallationStatusRequest) returns (agynio.api.apps.v1.ReportInstallationStatusResponse);
+  rpc AppendInstallationAuditLogEntry(agynio.api.apps.v1.AppendInstallationAuditLogEntryRequest) returns (agynio.api.apps.v1.AppendInstallationAuditLogEntryResponse);
+  rpc ListInstallationAuditLogEntries(agynio.api.apps.v1.ListInstallationAuditLogEntriesRequest) returns (agynio.api.apps.v1.ListInstallationAuditLogEntriesResponse);
 }
