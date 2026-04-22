@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package agynio.api.gateway.v1;
 
+import "agynio/api/runner/v1/runner.proto";
 import "agynio/api/runners/v1/runners.proto";
 
 option go_package = "github.com/agynio/api/gen/agynio/api/gateway/v1;gatewayv1";
@@ -20,6 +21,7 @@ service RunnersGateway {
   rpc ListWorkloadsByThread(agynio.api.runners.v1.ListWorkloadsByThreadRequest) returns (agynio.api.runners.v1.ListWorkloadsByThreadResponse);
   rpc GetWorkload(agynio.api.runners.v1.GetWorkloadRequest) returns (agynio.api.runners.v1.GetWorkloadResponse);
   rpc TouchWorkload(agynio.api.runners.v1.TouchWorkloadRequest) returns (agynio.api.runners.v1.TouchWorkloadResponse);
+  rpc StreamWorkloadLogs(agynio.api.runner.v1.StreamWorkloadLogsRequest) returns (stream agynio.api.runner.v1.StreamWorkloadLogsResponse);
 
   // --- Volumes ---
   rpc GetVolume(agynio.api.runners.v1.GetVolumeRequest) returns (agynio.api.runners.v1.GetVolumeResponse);
