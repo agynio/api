@@ -21,7 +21,7 @@ service RunnersGateway {
   rpc GetWorkload(agynio.api.runners.v1.GetWorkloadRequest) returns (agynio.api.runners.v1.GetWorkloadResponse);
   rpc TouchWorkload(agynio.api.runners.v1.TouchWorkloadRequest) returns (agynio.api.runners.v1.TouchWorkloadResponse);
 
-  // --- Volume state ---
+  // --- Volumes ---
   rpc GetVolume(agynio.api.runners.v1.GetVolumeRequest) returns (agynio.api.runners.v1.GetVolumeResponse);
   rpc ListVolumes(agynio.api.runners.v1.ListVolumesRequest) returns (agynio.api.runners.v1.ListVolumesResponse);
   rpc ListVolumesByThread(agynio.api.runners.v1.ListVolumesByThreadRequest) returns (agynio.api.runners.v1.ListVolumesByThreadResponse);
