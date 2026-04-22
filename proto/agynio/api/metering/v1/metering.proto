@@ -43,6 +43,8 @@ message QueryUsageRequest {
   map<string, string> label_filters = 5;
   string group_by = 6;
   Granularity granularity = 7;
+  // IANA time zone ID. Empty defaults to UTC. Applies to bucket alignment for
+  // non-total granularities.
   string time_zone = 8;
 }
 
