@@ -43,12 +43,16 @@ message QueryUsageRequest {
   map<string, string> label_filters = 5;
   string group_by = 6;
   Granularity granularity = 7;
+  string time_zone = 8;
 }
 
 enum Granularity {
   GRANULARITY_UNSPECIFIED = 0;
   GRANULARITY_TOTAL = 1;
   GRANULARITY_DAY = 2;
+  GRANULARITY_FIVE_MINUTES = 3;
+  GRANULARITY_HOUR = 4;
+  GRANULARITY_SIX_HOURS = 5;
 }
 
 message UsageBucket {
