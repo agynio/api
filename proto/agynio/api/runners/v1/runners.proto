@@ -174,7 +174,7 @@ enum ContainerStatus {
 
 message Container {
   // Runtime-assigned identifier from the container runtime (audit only).
-  optional string container_id = 1;
+  string container_id = 1;
   // Stable name unique within the workload, matches the Pod container name.
   string name = 2;
   ContainerRole role = 3;
