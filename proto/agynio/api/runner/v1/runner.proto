@@ -34,6 +34,11 @@ service RunnerService {
   rpc PutArchive(PutArchiveRequest) returns (PutArchiveResponse);
 
   // Streaming logs/events (SSE equivalents)
+  // StreamWorkloadLogs streams logs for a workload container addressed by container_name.
+  // Error/EOF contract (returned via gRPC status codes, not in-band):
+  // - NotFound for unknown workload or container
+  // - OK when logs are exhausted or the container terminates with the Pod still present
+  // - Unavailable when the Pod is deleted mid-stream
   rpc StreamWorkloadLogs(StreamWorkloadLogsRequest) returns (stream StreamWorkloadLogsResponse);
   rpc StreamEvents(StreamEventsRequest) returns (stream StreamEventsResponse);
 
@@ -220,12 +225,43 @@ message RemoveWorkloadRequest {
 
 message RemoveWorkloadResponse {}
 
+enum ContainerRole {
+  CONTAINER_ROLE_UNSPECIFIED = 0;
+  CONTAINER_ROLE_MAIN = 1;
+  CONTAINER_ROLE_SIDECAR = 2;
+  CONTAINER_ROLE_INIT = 3;
+}
+
+enum ContainerStatus {
+  CONTAINER_STATUS_UNSPECIFIED = 0;
+  CONTAINER_STATUS_RUNNING = 1;
+  CONTAINER_STATUS_TERMINATED = 2;
+  CONTAINER_STATUS_WAITING = 3;
+}
+
+// Mirrors agynio.api.runners.v1.Container; keep fields in sync.
+message WorkloadContainer {
+  // Runtime-assigned identifier from the container runtime (audit only).
+  string container_id = 1;
+  // Stable name unique within the workload, matches the Pod container name.
+  string name = 2;
+  ContainerRole role = 3;
+  string image = 4;
+  ContainerStatus status = 5;
+  optional string reason = 6;
+  optional string message = 7;
+  optional int32 exit_code = 8;
+  int32 restart_count = 9;
+  optional google.protobuf.Timestamp started_at = 10;
+  optional google.protobuf.Timestamp finished_at = 11;
+}
+
 message InspectWorkloadRequest {
   string workload_id = 1;
 }
 
-// EXACT fields used today in platform:
-// id, name, image, config_image, config_labels, mounts, state_status, state_running
+// Inspect workload details plus per-container runtime state.
+// Existing fields are preserved for backward compatibility.
 message InspectWorkloadResponse {
   string id = 1;
   string name = 2;
@@ -238,6 +274,7 @@ message InspectWorkloadResponse {
 
   string state_status = 7;
   bool state_running = 8;
+  repeated WorkloadContainer containers = 9;
 }
 
 message TargetMount {
@@ -321,18 +358,32 @@ message StreamWorkloadLogsRequest {
   string workload_id = 1;
 
   bool follow = 2;
-  int64 since = 3; // epoch seconds; 0 = unset
-  uint32 tail = 4; // 0 = backend default
-  bool stdout = 5;
-  bool stderr = 6;
-  bool timestamps = 7;
+  // Deprecated: used only when since_time is unset.
+  int64 since = 3 [deprecated = true]; // epoch seconds; 0 = unset
+  // Deprecated: used only when tail_lines is unset.
+  uint32 tail = 4 [deprecated = true]; // 0 = backend default
+  // Deprecated: retained for backward compatibility; servers may ignore.
+  bool stdout = 5 [deprecated = true];
+  bool stderr = 6 [deprecated = true];
+  bool timestamps = 7 [deprecated = true];
+
+  // Stable container name within the workload. Required; empty -> InvalidArgument.
+  string container_name = 8;
+  // Number of lines from the end of the log to return (0 = backend default).
+  // When set (>0), overrides the deprecated tail field.
+  uint32 tail_lines = 9;
+  // Only return logs since this time (unset = all).
+  // When set, overrides the deprecated since field.
+  google.protobuf.Timestamp since_time = 10;
 }
 
 message StreamWorkloadLogsResponse {
   oneof event {
     LogChunk chunk = 1;
-    LogEnd end = 2;
-    RunnerError error = 3;
+    // Deprecated: end-of-stream is indicated by a clean gRPC EOF (OK).
+    LogEnd end = 2 [deprecated = true];
+    // Deprecated: errors must be surfaced via gRPC status codes.
+    RunnerError error = 3 [deprecated = true];
   }
 }
 
@@ -341,6 +392,7 @@ message LogChunk {
   google.protobuf.Timestamp ts = 2;
 }
 
+// Deprecated: end-of-stream is indicated by gRPC EOF.
 message LogEnd {}
 
 // -------------------- Runtime events streaming --------------------

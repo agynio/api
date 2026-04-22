@@ -173,11 +173,19 @@ enum ContainerStatus {
 }
 
 message Container {
+  // Runtime-assigned identifier from the container runtime (audit only).
   string container_id = 1;
+  // Stable name unique within the workload, matches the Pod container name.
   string name = 2;
   ContainerRole role = 3;
   string image = 4;
   ContainerStatus status = 5;
+  optional string reason = 6;
+  optional string message = 7;
+  optional int32 exit_code = 8;
+  int32 restart_count = 9;
+  optional google.protobuf.Timestamp started_at = 10;
+  optional google.protobuf.Timestamp finished_at = 11;
 }
 
 message Workload {
