@@ -28,6 +28,7 @@ service OrganizationsService {
   rpc ListMyMemberships(ListMyMembershipsRequest) returns (ListMyMembershipsResponse);
 
   // --- Org Nicknames ---
+  // Self-service org nickname update for the calling identity.
   rpc SetMyOrgNickname(SetMyOrgNicknameRequest) returns (SetMyOrgNicknameResponse);
 }
 
@@ -219,6 +220,7 @@ message ListMyMembershipsResponse {
 
 message SetMyOrgNicknameRequest {
   string organization_id = 1; // UUID
+  // Organization-scoped nickname for the caller.
   string nickname = 2;
 }
 
