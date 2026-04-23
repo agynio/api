@@ -26,6 +26,9 @@ service OrganizationsService {
   rpc UpdateMembershipRole(UpdateMembershipRoleRequest) returns (UpdateMembershipRoleResponse);
   rpc ListMembers(ListMembersRequest) returns (ListMembersResponse);
   rpc ListMyMemberships(ListMyMembershipsRequest) returns (ListMyMembershipsResponse);
+
+  // --- Org Nicknames ---
+  rpc SetMyOrgNickname(SetMyOrgNicknameRequest) returns (SetMyOrgNicknameResponse);
 }
 
 // ===========================================================================
@@ -209,3 +212,14 @@ message ListMyMembershipsResponse {
   repeated Membership memberships = 1;
   string next_page_token = 2;
 }
+
+// ===========================================================================
+// SetMyOrgNickname
+// ===========================================================================
+
+message SetMyOrgNicknameRequest {
+  string organization_id = 1; // UUID
+  string nickname = 2;
+}
+
+message SetMyOrgNicknameResponse {}

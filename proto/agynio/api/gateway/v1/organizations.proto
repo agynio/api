@@ -23,4 +23,7 @@ service OrganizationsGateway {
   rpc UpdateMembershipRole(agynio.api.organizations.v1.UpdateMembershipRoleRequest) returns (agynio.api.organizations.v1.UpdateMembershipRoleResponse);
   rpc ListMembers(agynio.api.organizations.v1.ListMembersRequest) returns (agynio.api.organizations.v1.ListMembersResponse);
   rpc ListMyMemberships(agynio.api.organizations.v1.ListMyMembershipsRequest) returns (agynio.api.organizations.v1.ListMyMembershipsResponse);
+
+  // --- Org Nicknames ---
+  rpc SetMyOrgNickname(agynio.api.organizations.v1.SetMyOrgNicknameRequest) returns (agynio.api.organizations.v1.SetMyOrgNicknameResponse);
 }

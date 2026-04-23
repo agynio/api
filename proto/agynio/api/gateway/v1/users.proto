@@ -9,6 +9,10 @@ option go_package = "github.com/agynio/api/gen/agynio/api/gateway/v1;gatewayv1";
 service UsersGateway {
   // --- Current User ---
   rpc GetMe(agynio.api.users.v1.GetMeRequest) returns (agynio.api.users.v1.GetMeResponse);
+  rpc UpdateMe(agynio.api.users.v1.UpdateMeRequest) returns (agynio.api.users.v1.UpdateMeResponse);
+
+  // --- User Directory ---
+  rpc SearchUsers(agynio.api.users.v1.SearchUsersRequest) returns (agynio.api.users.v1.SearchUsersResponse);
 
   // --- Admin User Management ---
   rpc CreateUser(agynio.api.users.v1.CreateUserRequest) returns (agynio.api.users.v1.CreateUserResponse);
