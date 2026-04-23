@@ -30,8 +30,7 @@ service RunnersService {
   rpc BatchUpdateWorkloadSampledAt(BatchUpdateWorkloadSampledAtRequest) returns (BatchUpdateWorkloadSampledAtResponse);
 
   // --- Workload logs ---
-  rpc StreamWorkloadLogs(agynio.api.runner.v1.StreamWorkloadLogsRequest)
-      returns (stream agynio.api.runner.v1.StreamWorkloadLogsResponse);
+  rpc StreamWorkloadLogs(agynio.api.runner.v1.StreamWorkloadLogsRequest) returns (stream agynio.api.runner.v1.StreamWorkloadLogsResponse);
 
   // --- Volume state ---
   rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse);
