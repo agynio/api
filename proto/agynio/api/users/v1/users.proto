@@ -19,6 +19,12 @@ service UsersService {
 
   // --- Current User ---
   rpc GetMe(GetMeRequest) returns (GetMeResponse);
+  // Updates cluster-wide profile fields (name/username). Org-scoped
+  // nicknames are managed via OrganizationsService.SetMyOrgNickname.
+  rpc UpdateMe(UpdateMeRequest) returns (UpdateMeResponse);
+
+  // --- User Directory ---
+  rpc SearchUsers(SearchUsersRequest) returns (SearchUsersResponse);
 
   // --- Admin User Management ---
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
@@ -62,7 +68,10 @@ message User {
   string name = 3;
   string email = 4;
   string photo_url = 5;
+  // Organization-scoped nickname (set via OrganizationsService.SetMyOrgNickname).
   string nickname = 6;
+  // Cluster-wide username. May be empty for existing users until set.
+  string username = 7;
 }
 
 // ===========================================================================
@@ -86,6 +95,7 @@ message ResolveOrCreateUserRequest {
   string name = 2;
   string email = 3;
   string photo_url = 4;
+  optional string preferred_username = 5;
 }
 
 message ResolveOrCreateUserResponse {
@@ -141,6 +151,7 @@ message UpdateUserRequest {
   optional string photo_url = 4;
   optional string nickname = 5;
   optional ClusterRole cluster_role = 6;
+  optional string username = 7;
 }
 
 message UpdateUserResponse {
@@ -156,6 +167,42 @@ message GetMeRequest {}
 message GetMeResponse {
   User user = 1;
   ClusterRole cluster_role = 2;
+}
+
+// ===========================================================================
+// UpdateMe
+// ===========================================================================
+
+message UpdateMeRequest {
+  optional string name = 1;
+  // Cluster-wide username. Org-scoped nicknames are set via OrganizationsService.SetMyOrgNickname.
+  optional string username = 2;
+}
+
+message UpdateMeResponse {
+  User user = 1;
+  ClusterRole cluster_role = 2;
+}
+
+// ===========================================================================
+// SearchUsers
+// ===========================================================================
+
+message UserDirectoryEntry {
+  string identity_id = 1;
+  string username = 2;
+  string name = 3;
+  string photo_url = 4;
+}
+
+message SearchUsersRequest {
+  string prefix = 1;
+  // Defaults to 10 when unset or zero. Max 20.
+  int32 limit = 2;
+}
+
+message SearchUsersResponse {
+  repeated UserDirectoryEntry users = 1;
 }
 
 // ===========================================================================
@@ -182,6 +229,7 @@ message CreateUserRequest {
   optional string nickname = 3;
   optional string photo_url = 4;
   ClusterRole cluster_role = 5;
+  optional string username = 6;
 }
 
 message CreateUserResponse {
