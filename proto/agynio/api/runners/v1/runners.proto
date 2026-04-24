@@ -162,6 +162,15 @@ enum WorkloadStatus {
   WORKLOAD_STATUS_FAILED = 5;
 }
 
+enum WorkloadFailureReason {
+  WORKLOAD_FAILURE_REASON_UNSPECIFIED = 0;
+  WORKLOAD_FAILURE_REASON_START_FAILED = 1;
+  WORKLOAD_FAILURE_REASON_IMAGE_PULL_FAILED = 2;
+  WORKLOAD_FAILURE_REASON_CONFIG_INVALID = 3;
+  WORKLOAD_FAILURE_REASON_CRASHLOOP = 4;
+  WORKLOAD_FAILURE_REASON_RUNTIME_LOST = 5;
+}
+
 enum ContainerRole {
   CONTAINER_ROLE_UNSPECIFIED = 0;
   CONTAINER_ROLE_MAIN = 1;
@@ -207,6 +216,8 @@ message Workload {
   optional google.protobuf.Timestamp removed_at = 12;
   int32 allocated_cpu_millicores = 13;
   int64 allocated_ram_bytes = 14;
+  optional WorkloadFailureReason failure_reason = 15;
+  optional string failure_message = 16;
 }
 
 message CreateWorkloadRequest {
@@ -233,6 +244,8 @@ message UpdateWorkloadRequest {
   optional string instance_id = 4;
   optional google.protobuf.Timestamp removed_at = 5;
   optional google.protobuf.Timestamp last_metering_sampled_at = 6;
+  optional WorkloadFailureReason failure_reason = 7;
+  optional string failure_message = 8;
 }
 
 message UpdateWorkloadResponse {
@@ -273,9 +286,12 @@ message ListWorkloadsByThreadRequest {
   string thread_id = 1;
   int32 page_size = 2;
   string page_token = 3;
+  optional string agent_id = 4;
+  repeated WorkloadStatus status_in = 5;
 }
 
 message ListWorkloadsByThreadResponse {
+  // Ordered by created_at DESC.
   repeated Workload workloads = 1;
   string next_page_token = 2;
 }
