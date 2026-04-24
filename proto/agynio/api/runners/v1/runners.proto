@@ -216,7 +216,12 @@ message Workload {
   optional google.protobuf.Timestamp removed_at = 12;
   int32 allocated_cpu_millicores = 13;
   int64 allocated_ram_bytes = 14;
+  // Machine-readable reason for failures when status is WORKLOAD_STATUS_FAILED.
+  // When status is not FAILED, this value may be unset or stale.
   optional WorkloadFailureReason failure_reason = 15;
+  // Human-readable failure detail for failed workloads; not intended for
+  // programmatic parsing. When status is not FAILED, this value may be unset
+  // or stale.
   optional string failure_message = 16;
 }
 
@@ -244,7 +249,9 @@ message UpdateWorkloadRequest {
   optional string instance_id = 4;
   optional google.protobuf.Timestamp removed_at = 5;
   optional google.protobuf.Timestamp last_metering_sampled_at = 6;
+  // Use this RPC to set or update failure details.
   optional WorkloadFailureReason failure_reason = 7;
+  // Human-readable failure detail; not intended for programmatic parsing.
   optional string failure_message = 8;
 }
 
@@ -252,6 +259,8 @@ message UpdateWorkloadResponse {
   Workload workload = 1;
 }
 
+// Updates status and containers only. Use UpdateWorkload to set failure
+// details such as failure_reason and failure_message.
 message UpdateWorkloadStatusRequest {
   string id = 1;
   WorkloadStatus status = 2;
@@ -287,11 +296,12 @@ message ListWorkloadsByThreadRequest {
   int32 page_size = 2;
   string page_token = 3;
   optional string agent_id = 4;
-  repeated WorkloadStatus status_in = 5;
+  // Optional status filter. An empty list returns workloads for all statuses.
+  repeated WorkloadStatus statuses = 5;
 }
 
 message ListWorkloadsByThreadResponse {
-  // Ordered by created_at DESC.
+  // Ordered by created_at DESC, id DESC for stable pagination.
   repeated Workload workloads = 1;
   string next_page_token = 2;
 }
