@@ -56,6 +56,12 @@ message SampledAtEntry {
   google.protobuf.Timestamp sampled_at = 2;
 }
 
+enum SortDirection {
+  SORT_DIRECTION_UNSPECIFIED = 0;
+  SORT_DIRECTION_ASC = 1;
+  SORT_DIRECTION_DESC = 2;
+}
+
 // ===========================================================================
 // Runner
 // ===========================================================================
@@ -223,6 +229,10 @@ message Workload {
   // programmatic parsing. When status is not FAILED, this value may be unset
   // or stale.
   optional string failure_message = 16;
+  // Denormalized display name for agent_id.
+  string agent_name = 17;
+  // Denormalized display name for runner_id.
+  string runner_name = 18;
 }
 
 message CreateWorkloadRequest {
@@ -291,6 +301,29 @@ message GetWorkloadResponse {
   Workload workload = 1;
 }
 
+enum ListWorkloadsSortField {
+  LIST_WORKLOADS_SORT_FIELD_UNSPECIFIED = 0;
+  LIST_WORKLOADS_SORT_FIELD_STARTED = 1;
+  LIST_WORKLOADS_SORT_FIELD_AGENT = 2;
+  LIST_WORKLOADS_SORT_FIELD_RUNNER = 3;
+  LIST_WORKLOADS_SORT_FIELD_STATUS = 4;
+  LIST_WORKLOADS_SORT_FIELD_DURATION = 5;
+}
+
+message ListWorkloadsSort {
+  ListWorkloadsSortField field = 1;
+  SortDirection direction = 2;
+}
+
+message ListWorkloadsFilter {
+  repeated string agent_id_in = 1;
+  repeated string runner_id_in = 2;
+  repeated WorkloadStatus status_in = 3;
+  optional google.protobuf.Timestamp started_after = 4;
+  optional google.protobuf.Timestamp started_before = 5;
+  optional bool pending_sample = 6;
+}
+
 message ListWorkloadsByThreadRequest {
   string thread_id = 1;
   int32 page_size = 2;
@@ -308,11 +341,18 @@ message ListWorkloadsByThreadResponse {
 
 message ListWorkloadsRequest {
   int32 page_size = 1;
+  // Opaque cursor; reuse only with the same sort and filter.
   string page_token = 2;
-  repeated WorkloadStatus statuses = 3;
+  // Deprecated: use filter.status_in instead.
+  repeated WorkloadStatus statuses = 3 [deprecated = true];
+  // Required organization scope; caller must hold can_view_workloads.
   optional string organization_id = 4;
-  optional string runner_id = 5;
-  optional bool pending_sample = 6;
+  // Deprecated: use filter.runner_id_in instead.
+  optional string runner_id = 5 [deprecated = true];
+  // Deprecated: use filter.pending_sample instead.
+  optional bool pending_sample = 6 [deprecated = true];
+  ListWorkloadsFilter filter = 7;
+  ListWorkloadsSort sort = 8;
 }
 
 message ListWorkloadsResponse {
@@ -351,6 +391,31 @@ message Volume {
   VolumeStatus status = 9;
   optional google.protobuf.Timestamp removed_at = 10;
   optional google.protobuf.Timestamp last_metering_sampled_at = 11;
+  // Denormalized display name for volume_id.
+  string volume_name = 12;
+  // Current attachments for this volume; empty when unattached.
+  repeated Attachment attachments = 13;
+}
+
+enum AttachmentKind {
+  ATTACHMENT_KIND_UNSPECIFIED = 0;
+  ATTACHMENT_KIND_AGENT = 1;
+  ATTACHMENT_KIND_MCP = 2;
+  ATTACHMENT_KIND_HOOK = 3;
+}
+
+message Attachment {
+  AttachmentKind kind = 1;
+  string id = 2;
+  string name = 3;
+}
+
+enum VolumeAttachmentFilterKind {
+  VOLUME_ATTACHMENT_FILTER_KIND_UNSPECIFIED = 0;
+  VOLUME_ATTACHMENT_FILTER_KIND_AGENT = 1;
+  VOLUME_ATTACHMENT_FILTER_KIND_MCP = 2;
+  VOLUME_ATTACHMENT_FILTER_KIND_HOOK = 3;
+  VOLUME_ATTACHMENT_FILTER_KIND_UNATTACHED = 4;
 }
 
 message CreateVolumeRequest {
@@ -388,13 +453,41 @@ message GetVolumeResponse {
   Volume volume = 1;
 }
 
+enum ListVolumesSortField {
+  LIST_VOLUMES_SORT_FIELD_UNSPECIFIED = 0;
+  LIST_VOLUMES_SORT_FIELD_NAME = 1;
+  LIST_VOLUMES_SORT_FIELD_SIZE = 2;
+  LIST_VOLUMES_SORT_FIELD_STATUS = 3;
+  LIST_VOLUMES_SORT_FIELD_CREATED = 4;
+}
+
+message ListVolumesSort {
+  ListVolumesSortField field = 1;
+  SortDirection direction = 2;
+}
+
+message ListVolumesFilter {
+  repeated VolumeStatus status_in = 1;
+  repeated string runner_id_in = 2;
+  repeated VolumeAttachmentFilterKind attached_to_kind_in = 3;
+  optional bool pending_sample = 4;
+  optional string volume_name_substring = 5;
+}
+
 message ListVolumesRequest {
   int32 page_size = 1;
+  // Opaque cursor; reuse only with the same sort and filter.
   string page_token = 2;
-  repeated VolumeStatus statuses = 3;
+  // Deprecated: use filter.status_in instead.
+  repeated VolumeStatus statuses = 3 [deprecated = true];
+  // Required organization scope; caller must hold can_view_volumes.
   optional string organization_id = 4;
-  optional string runner_id = 5;
-  optional bool pending_sample = 6;
+  // Deprecated: use filter.runner_id_in instead.
+  optional string runner_id = 5 [deprecated = true];
+  // Deprecated: use filter.pending_sample instead.
+  optional bool pending_sample = 6 [deprecated = true];
+  ListVolumesFilter filter = 7;
+  ListVolumesSort sort = 8;
 }
 
 message ListVolumesResponse {

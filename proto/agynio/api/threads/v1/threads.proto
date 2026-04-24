@@ -30,7 +30,11 @@ service ThreadsService {
   // List threads for a participant with pagination.
   rpc GetThreads(GetThreadsRequest) returns (GetThreadsResponse);
 
+  // List threads for an organization with pagination.
+  rpc ListOrganizationThreads(ListOrganizationThreadsRequest) returns (ListOrganizationThreadsResponse);
+
   // Get threads for an organization with pagination.
+  // Deprecated: use ListOrganizationThreads.
   rpc GetOrganizationThreads(GetOrganizationThreadsRequest) returns (GetOrganizationThreadsResponse);
 
   // Get a thread by ID.
@@ -64,6 +68,12 @@ enum MessageOrder {
   MESSAGE_ORDER_NEWEST_FIRST = 2;
 }
 
+enum SortDirection {
+  SORT_DIRECTION_UNSPECIFIED = 0;
+  SORT_DIRECTION_ASC = 1;
+  SORT_DIRECTION_DESC = 2;
+}
+
 // ===========================================================================
 // Entities
 // ===========================================================================
@@ -88,6 +98,8 @@ message Participant {
   google.protobuf.Timestamp joined_at = 2;
   // When true, the participant receives messages but does not trigger workload starts.
   bool passive = 3;
+  // Resolved @nickname for this participant in the organization context.
+  string nickname = 4;
 }
 
 // A message within a thread.
@@ -219,6 +231,44 @@ message GetThreadsRequest {
 }
 
 message GetThreadsResponse {
+  repeated Thread threads = 1;
+  string next_page_token = 2;
+}
+
+// ===========================================================================
+// ListOrganizationThreads
+// ===========================================================================
+
+enum ListOrganizationThreadsSortField {
+  LIST_ORGANIZATION_THREADS_SORT_FIELD_UNSPECIFIED = 0;
+  LIST_ORGANIZATION_THREADS_SORT_FIELD_CREATED = 1;
+  LIST_ORGANIZATION_THREADS_SORT_FIELD_UPDATED = 2;
+  LIST_ORGANIZATION_THREADS_SORT_FIELD_MESSAGE_COUNT = 3;
+  LIST_ORGANIZATION_THREADS_SORT_FIELD_STATUS = 4;
+}
+
+message ListOrganizationThreadsFilter {
+  repeated ThreadStatus status_in = 1;
+  repeated string participant_id_in = 2;
+  optional google.protobuf.Timestamp created_after = 3;
+  optional google.protobuf.Timestamp created_before = 4;
+}
+
+message ListOrganizationThreadsSort {
+  ListOrganizationThreadsSortField field = 1;
+  SortDirection direction = 2;
+}
+
+message ListOrganizationThreadsRequest {
+  string organization_id = 1; // UUID
+  ListOrganizationThreadsFilter filter = 2;
+  ListOrganizationThreadsSort sort = 3;
+  int32 page_size = 4;
+  // Opaque cursor; reuse only with the same sort and filter.
+  string page_token = 5;
+}
+
+message ListOrganizationThreadsResponse {
   repeated Thread threads = 1;
   string next_page_token = 2;
 }
