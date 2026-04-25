@@ -47,6 +47,9 @@ service ThreadsService {
   // List unacknowledged messages for a participant across all threads.
   rpc GetUnackedMessages(GetUnackedMessagesRequest) returns (GetUnackedMessagesResponse);
 
+  // Get unacknowledged message counts per thread for a participant.
+  rpc GetUnackedMessageCounts(GetUnackedMessageCountsRequest) returns (GetUnackedMessageCountsResponse);
+
   // Acknowledge messages as processed by a participant.
   rpc AckMessages(AckMessagesRequest) returns (AckMessagesResponse);
 }
@@ -335,6 +338,20 @@ message GetUnackedMessagesRequest {
 message GetUnackedMessagesResponse {
   repeated Message messages = 1;
   string next_page_token = 2;
+}
+
+// ===========================================================================
+// GetUnackedMessageCounts
+// ===========================================================================
+
+message GetUnackedMessageCountsRequest {
+  string participant_id = 1; // UUID
+}
+
+message GetUnackedMessageCountsResponse {
+  // key = thread_id, value = unacknowledged message count.
+  // Only threads with unacknowledged messages are included (missing key => 0).
+  map<string, int32> counts_by_thread_id = 1;
 }
 
 // ===========================================================================
