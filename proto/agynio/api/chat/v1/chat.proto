@@ -52,6 +52,13 @@ enum ChatStatus {
   CHAT_STATUS_CLOSED = 2;
 }
 
+enum ChatActivityStatus {
+  CHAT_ACTIVITY_STATUS_UNSPECIFIED = 0;
+  CHAT_ACTIVITY_STATUS_RUNNING = 1;
+  CHAT_ACTIVITY_STATUS_PENDING = 2;
+  CHAT_ACTIVITY_STATUS_FINISHED = 3;
+}
+
 // A chat thread between participants.
 message Chat {
   string id = 1; // UUID — maps to Threads thread_id
@@ -61,6 +68,13 @@ message Chat {
   string organization_id = 5; // UUID — owning organization
   ChatStatus status = 6;
   optional string summary = 7;
+  // Workload activity state for the chat.
+  ChatActivityStatus activity_status = 8;
+  // Unacknowledged message count for the authenticated user.
+  // Derived from Threads.GetUnackedMessageCounts.
+  int32 unread_count = 9;
+  // Active workload IDs associated with the chat.
+  repeated string active_workload_ids = 10;
 }
 
 // A participant in a chat.
