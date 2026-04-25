@@ -22,6 +22,9 @@ service IdentityService {
   rpc RemoveNickname(RemoveNicknameRequest) returns (RemoveNicknameResponse);
   // ResolveNickname resolves an @nickname within an org to its identity.
   rpc ResolveNickname(ResolveNicknameRequest) returns (ResolveNicknameResponse);
+  // BatchGetNicknames resolves identity IDs to nicknames within an org.
+  // Unknown or unset nicknames are omitted from the response.
+  rpc BatchGetNicknames(BatchGetNicknamesRequest) returns (BatchGetNicknamesResponse);
 }
 
 enum IdentityType {
@@ -90,4 +93,18 @@ message ResolveNicknameResponse {
   string identity_id = 1;
   IdentityType identity_type = 2;
   optional string installation_id = 3;
+}
+
+message BatchGetNicknamesRequest {
+  string organization_id = 1;
+  repeated string identity_ids = 2;
+}
+
+message NicknameEntry {
+  string identity_id = 1;
+  string nickname = 2;
+}
+
+message BatchGetNicknamesResponse {
+  repeated NicknameEntry entries = 1;
 }
