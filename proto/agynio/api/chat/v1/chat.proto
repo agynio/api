@@ -28,7 +28,7 @@ service ChatService {
   rpc UpdateChat(UpdateChatRequest) returns (UpdateChatResponse);
 
   // List messages in a chat with pagination.
-  // Returns an unread_count derived from Threads.GetUnackedMessages.
+  // Returns an unread_count derived from Threads.GetUnackedMessageCounts.
   // Read-only — does not change acknowledgment state.
   rpc GetMessages(GetMessagesRequest) returns (GetMessagesResponse);
 
@@ -53,9 +53,13 @@ enum ChatStatus {
 }
 
 enum ChatActivityStatus {
+  // No workload activity data available.
   CHAT_ACTIVITY_STATUS_UNSPECIFIED = 0;
+  // At least one active workload is running.
   CHAT_ACTIVITY_STATUS_RUNNING = 1;
+  // At least one active workload is pending and none running.
   CHAT_ACTIVITY_STATUS_PENDING = 2;
+  // No active workloads (active_workload_ids is empty).
   CHAT_ACTIVITY_STATUS_FINISHED = 3;
 }
 
@@ -68,12 +72,16 @@ message Chat {
   string organization_id = 5; // UUID — owning organization
   ChatStatus status = 6;
   optional string summary = 7;
-  // Workload activity state for the chat.
+  // Workload activity summary for the chat.
+  // RUNNING if any active workload is running; PENDING if none running
+  // and at least one pending; FINISHED if no active workloads. UNSPECIFIED
+  // when workload activity is not tracked for this chat.
   ChatActivityStatus activity_status = 8;
-  // Unacknowledged message count for the authenticated user.
-  // Derived from Threads.GetUnackedMessageCounts.
+  // Unacknowledged message count for the authenticated user in this chat.
+  // Derived from Threads.GetUnackedMessageCounts (missing entry => 0).
   int32 unread_count = 9;
-  // Active workload IDs associated with the chat.
+  // Workload IDs in pending or running state for this chat.
+  // Empty when activity_status is FINISHED or UNSPECIFIED.
   repeated string active_workload_ids = 10;
 }
 
@@ -152,7 +160,7 @@ message GetMessagesResponse {
   repeated ChatMessage messages = 1;
   string next_page_token = 2;
   // Number of unacknowledged messages for the authenticated user in this
-  // chat. Derived from Threads.GetUnackedMessages.
+  // chat. Derived from Threads.GetUnackedMessageCounts (missing entry => 0).
   int32 unread_count = 3;
 }
 

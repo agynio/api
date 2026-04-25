@@ -349,7 +349,8 @@ message GetUnackedMessageCountsRequest {
 }
 
 message GetUnackedMessageCountsResponse {
-  // key = thread_id, value = unacknowledged message count
+  // key = thread_id, value = unacknowledged message count.
+  // Only threads with unacknowledged messages are included (missing key => 0).
   map<string, int32> counts_by_thread_id = 1;
 }
 
