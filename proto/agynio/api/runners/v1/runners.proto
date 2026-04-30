@@ -162,10 +162,18 @@ message EnrollRunnerResponse {
 enum WorkloadStatus {
   WORKLOAD_STATUS_UNSPECIFIED = 0;
   WORKLOAD_STATUS_STARTING = 1;
+  // Container is up and healthy. This does not imply the agent is actively
+  // processing; see Workload.agent_state.
   WORKLOAD_STATUS_RUNNING = 2;
   WORKLOAD_STATUS_STOPPING = 3;
   WORKLOAD_STATUS_STOPPED = 4;
   WORKLOAD_STATUS_FAILED = 5;
+}
+
+enum WorkloadAgentState {
+  WORKLOAD_AGENT_STATE_UNSPECIFIED = 0;
+  WORKLOAD_AGENT_STATE_PROCESSING = 1;
+  WORKLOAD_AGENT_STATE_IDLE = 2;
 }
 
 enum WorkloadFailureReason {
@@ -233,6 +241,7 @@ message Workload {
   string agent_name = 17;
   // Denormalized display name for runner_id.
   string runner_name = 18;
+  WorkloadAgentState agent_state = 19;
 }
 
 message CreateWorkloadRequest {
