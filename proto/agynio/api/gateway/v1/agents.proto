@@ -13,6 +13,10 @@ service AgentsGateway {
   rpc UpdateAgent(agynio.api.agents.v1.UpdateAgentRequest) returns (agynio.api.agents.v1.UpdateAgentResponse);
   rpc DeleteAgent(agynio.api.agents.v1.DeleteAgentRequest) returns (agynio.api.agents.v1.DeleteAgentResponse);
   rpc ListAgents(agynio.api.agents.v1.ListAgentsRequest) returns (agynio.api.agents.v1.ListAgentsResponse);
+  rpc SetAgentRole(agynio.api.agents.v1.SetAgentRoleRequest) returns (agynio.api.agents.v1.SetAgentRoleResponse);
+  rpc RemoveAgentRole(agynio.api.agents.v1.RemoveAgentRoleRequest) returns (agynio.api.agents.v1.RemoveAgentRoleResponse);
+  rpc ListAgentRoles(agynio.api.agents.v1.ListAgentRolesRequest) returns (agynio.api.agents.v1.ListAgentRolesResponse);
+  rpc ListMyAgentRoles(agynio.api.agents.v1.ListMyAgentRolesRequest) returns (agynio.api.agents.v1.ListMyAgentRolesResponse);
 
   // --- Volumes ---
   rpc CreateVolume(agynio.api.agents.v1.CreateVolumeRequest) returns (agynio.api.agents.v1.CreateVolumeResponse);

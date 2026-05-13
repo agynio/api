@@ -20,6 +20,10 @@ service AgentsService {
   rpc UpdateAgent(UpdateAgentRequest) returns (UpdateAgentResponse);
   rpc DeleteAgent(DeleteAgentRequest) returns (DeleteAgentResponse);
   rpc ListAgents(ListAgentsRequest) returns (ListAgentsResponse);
+  rpc SetAgentRole(SetAgentRoleRequest) returns (SetAgentRoleResponse);
+  rpc RemoveAgentRole(RemoveAgentRoleRequest) returns (RemoveAgentRoleResponse);
+  rpc ListAgentRoles(ListAgentRolesRequest) returns (ListAgentRolesResponse);
+  rpc ListMyAgentRoles(ListMyAgentRolesRequest) returns (ListMyAgentRolesResponse);
 
   // --- Volumes ---
   rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse);
@@ -95,6 +99,19 @@ message ComputeResources {
   string limits_memory = 4;
 }
 
+enum AgentAvailability {
+  AGENT_AVAILABILITY_UNSPECIFIED = 0;
+  AGENT_AVAILABILITY_INTERNAL = 1;
+  AGENT_AVAILABILITY_PRIVATE = 2;
+}
+
+enum AgentRole {
+  AGENT_ROLE_UNSPECIFIED = 0;
+  AGENT_ROLE_OWNER = 1;
+  AGENT_ROLE_MAINTAINER = 2;
+  AGENT_ROLE_PARTICIPANT = 3;
+}
+
 // ===========================================================================
 // Agent
 // ===========================================================================
@@ -114,6 +131,7 @@ message Agent {
   optional string idle_timeout = 12; // Go duration string (e.g., "30s", "5m", "1h").
   // Capabilities supported by this agent. Free-form strings (e.g., "privileged", "dind").
   repeated string capabilities = 13;
+  AgentAvailability availability = 14;
 }
 
 message CreateAgentRequest {
@@ -130,6 +148,7 @@ message CreateAgentRequest {
   optional string idle_timeout = 11; // Go duration string (e.g., "30s", "5m", "1h").
   // Capabilities supported by this agent. Free-form strings (e.g., "privileged", "dind").
   repeated string capabilities = 12;
+  AgentAvailability availability = 13;
 }
 
 message CreateAgentResponse {
@@ -167,6 +186,7 @@ message UpdateAgentRequest {
   optional string idle_timeout = 11; // Go duration string (e.g., "30s", "5m", "1h").
   // Capabilities replace the existing list; an empty list clears all capabilities.
   repeated string capabilities = 12;
+  optional AgentAvailability availability = 13;
 }
 
 message UpdateAgentResponse {
@@ -188,6 +208,45 @@ message ListAgentsRequest {
 message ListAgentsResponse {
   repeated Agent agents = 1;
   string next_page_token = 2;
+}
+
+message AgentRoleAssignment {
+  string agent_id = 1; // UUID
+  string identity_id = 2; // UUID
+  AgentRole role = 3;
+}
+
+message SetAgentRoleRequest {
+  string agent_id = 1; // UUID
+  string identity_id = 2; // UUID
+  AgentRole role = 3;
+}
+
+message SetAgentRoleResponse {
+  AgentRoleAssignment assignment = 1;
+}
+
+message RemoveAgentRoleRequest {
+  string agent_id = 1; // UUID
+  string identity_id = 2; // UUID
+}
+
+message RemoveAgentRoleResponse {}
+
+message ListAgentRolesRequest {
+  string agent_id = 1; // UUID
+}
+
+message ListAgentRolesResponse {
+  repeated AgentRoleAssignment assignments = 1;
+}
+
+message ListMyAgentRolesRequest {
+  string organization_id = 1; // UUID
+}
+
+message ListMyAgentRolesResponse {
+  repeated AgentRoleAssignment assignments = 1;
 }
 
 // ===========================================================================
