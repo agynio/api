@@ -289,10 +289,12 @@ message DeleteServiceResponse {}
 // ===========================================================================
 
 message DebugServiceStateRequest {
-  // OpenZiti service ID, preferred when expose has persisted it.
-  string ziti_service_id = 1;
-  // OpenZiti service name fallback, e.g. "exposed-<id>".
-  string ziti_service_name = 2;
+  oneof service_identifier {
+    // OpenZiti service ID, preferred when expose has persisted it.
+    string ziti_service_id = 1;
+    // OpenZiti service name fallback, e.g. "exposed-<id>".
+    string ziti_service_name = 2;
+  }
 }
 
 message DebugServiceStateResponse {
