@@ -59,6 +59,9 @@ service ZitiManagementService {
   // Also deletes attached config objects.
   rpc DeleteService(DeleteServiceRequest) returns (DeleteServiceResponse);
 
+  // Expose Service -> inspect OpenZiti service state for timeout diagnostics.
+  rpc DebugServiceState(DebugServiceStateRequest) returns (DebugServiceStateResponse);
+
   // Users Service -> create an OpenZiti identity for a user device with
   // roleAttributes: ["devices"] and enrollment.ott: true.
   // Returns the identity ID and enrollment JWT.
@@ -280,6 +283,54 @@ message DeleteServiceRequest {
 }
 
 message DeleteServiceResponse {}
+
+// ===========================================================================
+// DebugServiceState
+// ===========================================================================
+
+message DebugServiceStateRequest {
+  // OpenZiti service ID, preferred when expose has persisted it.
+  string ziti_service_id = 1;
+  // OpenZiti service name fallback, e.g. "exposed-<id>".
+  string ziti_service_name = 2;
+}
+
+message DebugServiceStateResponse {
+  string ziti_service_id = 1;
+  string ziti_service_name = 2;
+  repeated string role_attributes = 3;
+  repeated DebugConfig configs = 4;
+  repeated DebugServicePolicy service_policies = 5;
+  repeated DebugTerminator terminators = 6;
+}
+
+message DebugConfig {
+  string id = 1;
+  string name = 2;
+  string config_type_id = 3;
+  string config_type_name = 4;
+  string json = 5;
+}
+
+message DebugServicePolicy {
+  string id = 1;
+  string name = 2;
+  string type = 3;
+  repeated string identity_roles = 4;
+  repeated string service_roles = 5;
+}
+
+message DebugTerminator {
+  string id = 1;
+  string identity = 2;
+  string router_id = 3;
+  string router_name = 4;
+  string precedence = 5;
+  int32 cost = 6;
+  int32 dynamic_cost = 7;
+  string binding = 8;
+  string address = 9;
+}
 
 // ===========================================================================
 // CreateDeviceIdentity
