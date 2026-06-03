@@ -102,6 +102,12 @@ message VolumeMount {
   bool read_only = 3;
 }
 
+// InlineFileMount references a file supplied through
+// StartWorkloadRequest.inline_files.
+message InlineFileMount {
+  string path = 1;
+}
+
 // ContainerSpec describes a single container within a workload.
 message ContainerSpec {
   string image = 1;
@@ -120,6 +126,9 @@ message ContainerSpec {
   // Example values: "privileged", "dind".
   repeated string required_capabilities = 8;
 
+  // Inline files mounted read-only into this container.
+  repeated InlineFileMount inline_file_mounts = 9;
+
   // Backend-specific optional properties.
   map<string, string> additional_properties = 100;
 }
@@ -137,6 +146,18 @@ message ImagePullCredential {
   string registry = 1;
   string username = 2;
   string password = 3;
+}
+
+// NetworkPolicy describes workload egress restrictions to materialize.
+message NetworkPolicy {
+  // CIDRs the workload is allowed to reach via egress.
+  repeated string allow_cidrs = 1;
+
+  // CIDRs the workload is forbidden to reach via egress.
+  repeated string block_cidrs = 2;
+
+  // Allows UDP/53 to cluster DNS regardless of CIDRs.
+  bool allow_cluster_dns = 3;
 }
 
 // A workload is a main container plus optional sidecars.
@@ -164,6 +185,13 @@ message StartWorkloadRequest {
   // Runner-level capabilities required by the workload. Free-form strings
   // (e.g., "privileged", "dind").
   repeated string capabilities = 9;
+
+  // Small files keyed by absolute container path and mounted read-only into
+  // containers that list the path in inline_file_mounts.
+  map<string, bytes> inline_files = 10;
+
+  // Optional egress restrictions for the workload.
+  NetworkPolicy network_policy = 11;
 
   map<string, string> additional_properties = 100;
 }
