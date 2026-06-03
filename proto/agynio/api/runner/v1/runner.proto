@@ -102,6 +102,12 @@ message VolumeMount {
   bool read_only = 3;
 }
 
+// InlineFileMount references a file supplied through
+// StartWorkloadRequest.inline_files.
+message InlineFileMount {
+  string path = 1;
+}
+
 // ContainerSpec describes a single container within a workload.
 message ContainerSpec {
   string image = 1;
@@ -119,6 +125,9 @@ message ContainerSpec {
   // Required capabilities that the backend must satisfy for this container.
   // Example values: "privileged", "dind".
   repeated string required_capabilities = 8;
+
+  // Inline files mounted read-only into this container.
+  repeated InlineFileMount inline_file_mounts = 9;
 
   // Backend-specific optional properties.
   map<string, string> additional_properties = 100;
@@ -166,7 +175,7 @@ message StartWorkloadRequest {
   repeated string capabilities = 9;
 
   // Small files keyed by absolute container path and mounted read-only into
-  // workload containers.
+  // containers that list the path in inline_file_mounts.
   map<string, bytes> inline_files = 10;
 
   map<string, string> additional_properties = 100;
