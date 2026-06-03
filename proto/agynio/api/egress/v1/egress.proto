@@ -84,23 +84,11 @@ message EgressRule {
   EgressRuleEffect effect = 6;
 }
 
-// Internal EgressRule representation with control-plane resource identifiers.
-message InternalEgressRule {
-  EgressRule egress_rule = 1;
-  string openziti_service_id = 2;
-}
-
 // Attachment binding an egress rule to an agent.
 message EgressRuleAttachment {
   EntityMeta meta = 1;
   string rule_id = 2;
   string agent_id = 3;
-}
-
-// Internal EgressRuleAttachment representation with control-plane resource identifiers.
-message InternalEgressRuleAttachment {
-  EgressRuleAttachment egress_rule_attachment = 1;
-  string openziti_dial_policy_id = 2;
 }
 
 message CreateEgressRuleRequest {
@@ -185,7 +173,7 @@ message ListEgressRulesByAgentRequest {
 }
 
 message ListEgressRulesByAgentResponse {
-  repeated InternalEgressRule egress_rules = 1;
+  repeated EgressRule egress_rules = 1;
 }
 
 message CountRulesReferencingSecretRequest {
