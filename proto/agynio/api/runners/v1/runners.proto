@@ -84,12 +84,6 @@ message Runner {
   string openziti_service_name = 7;
   // Capabilities supported by this runner. Free-form strings (e.g., "privileged", "dind").
   repeated string capabilities = 8;
-  // Cluster pod CIDR used to compute workload network policies.
-  string cluster_pod_cidr = 9;
-  // Cluster service CIDR used to compute workload network policies.
-  string cluster_service_cidr = 10;
-  // Additional internal CIDRs to block from agent workload egress.
-  repeated string additional_excluded_cidrs = 11;
 }
 
 message RegisterRunnerRequest {
@@ -98,12 +92,6 @@ message RegisterRunnerRequest {
   map<string, string> labels = 3;
   // Capabilities supported by this runner. Free-form strings (e.g., "privileged", "dind").
   repeated string capabilities = 4;
-  // Cluster pod CIDR. Required for external runners.
-  string cluster_pod_cidr = 5;
-  // Cluster service CIDR. Required for external runners.
-  string cluster_service_cidr = 6;
-  // Additional internal CIDRs to block from agent workload egress.
-  repeated string additional_excluded_cidrs = 7;
 }
 
 message RegisterRunnerResponse {
@@ -137,10 +125,6 @@ message UpdateRunnerRequest {
   map<string, string> labels = 3;
   // Capabilities replace the existing list; an empty list clears all capabilities.
   repeated string capabilities = 4;
-  optional string cluster_pod_cidr = 5;
-  optional string cluster_service_cidr = 6;
-  // Additional excluded CIDRs replace the existing list; an empty list clears them.
-  repeated string additional_excluded_cidrs = 7;
 }
 
 message UpdateRunnerResponse {
