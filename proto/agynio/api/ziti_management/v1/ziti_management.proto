@@ -18,6 +18,15 @@ service ZitiManagementService {
   // Runners Service, Apps Service -> create a per-runner or per-app OpenZiti service.
   rpc CreateService(CreateServiceRequest) returns (CreateServiceResponse);
 
+  // Egress Rules -> get a single OpenZiti service by ID or exact name.
+  rpc GetService(GetServiceRequest) returns (GetServiceResponse);
+
+  // Egress Rules -> list OpenZiti services using structured filters.
+  rpc ListServices(ListServicesRequest) returns (ListServicesResponse);
+
+  // Egress Rules -> update an OpenZiti service and upsert supported configs.
+  rpc UpdateService(UpdateServiceRequest) returns (UpdateServiceResponse);
+
   // Orchestrator -> delete OpenZiti identity and its platform mapping.
   rpc DeleteIdentity(DeleteIdentityRequest) returns (DeleteIdentityResponse);
 
@@ -51,6 +60,12 @@ service ZitiManagementService {
   // Expose Service -> create a single OpenZiti service policy (Bind or Dial).
   // Returns the policy ID.
   rpc CreateServicePolicy(CreateServicePolicyRequest) returns (CreateServicePolicyResponse);
+
+  // Egress Rules -> get a single OpenZiti service policy by ID or exact name.
+  rpc GetServicePolicy(GetServicePolicyRequest) returns (GetServicePolicyResponse);
+
+  // Egress Rules -> list OpenZiti service policies using structured filters.
+  rpc ListServicePolicies(ListServicePoliciesRequest) returns (ListServicePoliciesResponse);
 
   // Expose Service -> delete an OpenZiti service policy by ID.
   rpc DeleteServicePolicy(DeleteServicePolicyRequest) returns (DeleteServicePolicyResponse);
@@ -156,6 +171,8 @@ message CreateServiceRequest {
   // Optional intercept.v1 config to create and attach to the service.
   // Used by Expose Service for port exposure.
   optional InterceptV1Config intercept_v1_config = 4;
+  // Return an existing service with the same name instead of failing.
+  bool return_existing = 5;
 }
 
 message CreateServiceResponse {
@@ -163,6 +180,47 @@ message CreateServiceResponse {
   string ziti_service_id = 1;
   // The service name (echoed back)
   string ziti_service_name = 2;
+}
+
+message ZitiService {
+  string ziti_service_id = 1;
+  string name = 2;
+  repeated string role_attributes = 3;
+  optional HostV1Config host_v1_config = 4;
+  optional InterceptV1Config intercept_v1_config = 5;
+}
+
+message GetServiceRequest {
+  oneof selector {
+    string ziti_service_id = 1;
+    string name = 2;
+  }
+}
+
+message GetServiceResponse {
+  ZitiService service = 1;
+}
+
+message ListServicesRequest {
+  string name = 1;
+  string name_prefix = 2;
+  repeated string role_attributes = 3;
+}
+
+message ListServicesResponse {
+  repeated ZitiService services = 1;
+}
+
+message UpdateServiceRequest {
+  string ziti_service_id = 1;
+  string name = 2;
+  repeated string role_attributes = 3;
+  optional HostV1Config host_v1_config = 4;
+  optional InterceptV1Config intercept_v1_config = 5;
+}
+
+message UpdateServiceResponse {
+  ZitiService service = 1;
 }
 
 // Request to delete an app's OpenZiti identity and service by platform identity_id.
@@ -259,11 +317,44 @@ message CreateServicePolicyRequest {
   repeated string identity_roles = 3;
   // Service roles for the policy (e.g. ["@exposed-<id>"]).
   repeated string service_roles = 4;
+  // Return an existing policy with the same name instead of failing.
+  bool return_existing = 5;
 }
 
 message CreateServicePolicyResponse {
   // The OpenZiti service policy ID.
   string ziti_service_policy_id = 1;
+}
+
+message ZitiServicePolicy {
+  string ziti_service_policy_id = 1;
+  string name = 2;
+  ServicePolicyType type = 3;
+  repeated string identity_roles = 4;
+  repeated string service_roles = 5;
+}
+
+message GetServicePolicyRequest {
+  oneof selector {
+    string ziti_service_policy_id = 1;
+    string name = 2;
+  }
+}
+
+message GetServicePolicyResponse {
+  ZitiServicePolicy service_policy = 1;
+}
+
+message ListServicePoliciesRequest {
+  string name = 1;
+  string name_prefix = 2;
+  ServicePolicyType type = 3;
+  repeated string identity_roles = 4;
+  repeated string service_roles = 5;
+}
+
+message ListServicePoliciesResponse {
+  repeated ZitiServicePolicy service_policies = 1;
 }
 
 // ===========================================================================
