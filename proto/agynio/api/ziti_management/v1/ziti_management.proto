@@ -88,7 +88,19 @@ service ZitiManagementService {
   // Services managing OpenZiti resources -> list service policies matching tag filters.
   rpc ListServicePoliciesByTag(ListServicePoliciesByTagRequest) returns (ListServicePoliciesByTagResponse);
 
-  // Networks Service -> update an existing OpenZiti service's attached configs.
+  // Infrastructure services -> fetch one OpenZiti service by ID or exact name.
+  rpc GetService(GetServiceRequest) returns (GetServiceResponse);
+
+  // Infrastructure services -> list OpenZiti services using safe structured filters.
+  rpc ListServices(ListServicesRequest) returns (ListServicesResponse);
+
+  // Infrastructure services -> fetch one OpenZiti service policy by ID or exact name.
+  rpc GetServicePolicy(GetServicePolicyRequest) returns (GetServicePolicyResponse);
+
+  // Infrastructure services -> list OpenZiti service policies using safe structured filters.
+  rpc ListServicePolicies(ListServicePoliciesRequest) returns (ListServicePoliciesResponse);
+
+  // Infrastructure services -> update service metadata and upsert attached configs.
   rpc UpdateService(UpdateServiceRequest) returns (UpdateServiceResponse);
 }
 
@@ -190,6 +202,8 @@ message CreateServiceRequest {
   optional InterceptV1Config intercept_v1_config = 4;
   // Tags attached to the OpenZiti service and any created config resources.
   map<string, string> tags = 5;
+  // If true, duplicate-name creates return the existing service without mutation.
+  bool return_existing = 6;
 }
 
 message CreateServiceResponse {
@@ -299,6 +313,8 @@ message CreateServicePolicyRequest {
   repeated string service_roles = 4;
   // Tags attached to the OpenZiti service policy.
   map<string, string> tags = 5;
+  // If true, duplicate-name creates return the existing policy without mutation.
+  bool return_existing = 6;
 }
 
 message CreateServicePolicyResponse {
@@ -492,17 +508,82 @@ message ListServicePoliciesByTagResponse {
 
 message UpdateServiceRequest {
   string ziti_service_id = 1;
-  optional HostV1Config host_v1_config = 2;
-  optional InterceptV1Config intercept_v1_config = 3;
-  // Deprecated: use tags_update to distinguish omitted from empty.
-  map<string, string> tags = 4 [deprecated = true];
-  optional TagsUpdate tags_update = 5;
-}
-
-message TagsUpdate {
-  map<string, string> tags = 1;
+  optional string name = 2;
+  repeated string role_attributes = 3;
+  optional HostV1Config host_v1_config = 4;
+  optional InterceptV1Config intercept_v1_config = 5;
 }
 
 message UpdateServiceResponse {
-  OpenZitiService service = 1;
+  Service service = 1;
+}
+
+// ===========================================================================
+// Service reconciliation
+// ===========================================================================
+
+message Service {
+  string ziti_service_id = 1;
+  string name = 2;
+  repeated string role_attributes = 3;
+  optional HostV1Config host_v1_config = 4;
+  optional InterceptV1Config intercept_v1_config = 5;
+}
+
+message GetServiceRequest {
+  oneof lookup {
+    string ziti_service_id = 1;
+    string name = 2;
+  }
+}
+
+message GetServiceResponse {
+  Service service = 1;
+}
+
+message ListServicesRequest {
+  optional string name = 1;
+  optional string name_prefix = 2;
+  repeated string role_attributes = 3;
+  int32 page_size = 4;
+  string page_token = 5;
+}
+
+message ListServicesResponse {
+  repeated Service services = 1;
+  string next_page_token = 2;
+}
+
+message ServicePolicy {
+  string ziti_service_policy_id = 1;
+  string name = 2;
+  ServicePolicyType type = 3;
+  repeated string identity_roles = 4;
+  repeated string service_roles = 5;
+}
+
+message GetServicePolicyRequest {
+  oneof lookup {
+    string ziti_service_policy_id = 1;
+    string name = 2;
+  }
+}
+
+message GetServicePolicyResponse {
+  ServicePolicy service_policy = 1;
+}
+
+message ListServicePoliciesRequest {
+  optional string name = 1;
+  optional string name_prefix = 2;
+  ServicePolicyType type = 3;
+  repeated string identity_roles = 4;
+  repeated string service_roles = 5;
+  int32 page_size = 6;
+  string page_token = 7;
+}
+
+message ListServicePoliciesResponse {
+  repeated ServicePolicy service_policies = 1;
+  string next_page_token = 2;
 }
