@@ -214,6 +214,8 @@ message CreateRunnerIdentityRequest {
   string runner_id = 1;
   repeated string role_attributes = 2;
   // Tags attached to the OpenZiti identity.
+  reserved 3, 4;
+  reserved "ziti_service_id", "ziti_service_name";
   map<string, string> tags = 5;
 }
 
@@ -492,7 +494,13 @@ message UpdateServiceRequest {
   string ziti_service_id = 1;
   optional HostV1Config host_v1_config = 2;
   optional InterceptV1Config intercept_v1_config = 3;
-  map<string, string> tags = 4;
+  // Deprecated: use tags_update to distinguish omitted from empty.
+  map<string, string> tags = 4 [deprecated = true];
+  optional TagsUpdate tags_update = 5;
+}
+
+message TagsUpdate {
+  map<string, string> tags = 1;
 }
 
 message UpdateServiceResponse {

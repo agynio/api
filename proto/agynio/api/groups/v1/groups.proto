@@ -149,6 +149,7 @@ message ListMemberGroupsRequest {
   string member_id = 2;
   int32 page_size = 3;
   string page_token = 4;
+  string organization_id = 5;
 }
 
 message ListMemberGroupsResponse {

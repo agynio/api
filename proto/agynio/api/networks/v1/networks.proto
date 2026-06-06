@@ -125,6 +125,13 @@ message PrivateResourceAccess {
   string private_resource_id = 2;
   PrivateResourceAccessPrincipalType principal_type = 3;
   string principal_id = 4;
+  ProvisioningState provisioning_state = 5;
+}
+
+// Optional replacement for a port list in update requests.
+message PortListUpdate {
+  // Numeric ports. Each value must be in the range 1..65535.
+  repeated int32 ports = 1;
 }
 
 message CreateNetworkRequest {
@@ -248,11 +255,13 @@ message UpdatePrivateResourceRequest {
   optional string name = 2;
   optional PrivateResourceProtocol protocol = 3;
   optional string target_host = 4;
-  // Numeric target ports. Each value must be in the range 1..65535.
-  repeated int32 target_ports = 5;
+  // Deprecated: use target_ports_update to distinguish omitted from empty.
+  repeated int32 target_ports = 5 [deprecated = true];
   optional string intercept_host = 6;
-  // Numeric intercept ports. Each value must be in the range 1..65535.
-  repeated int32 intercept_ports = 7;
+  // Deprecated: use intercept_ports_update to distinguish omitted from empty.
+  repeated int32 intercept_ports = 7 [deprecated = true];
+  optional PortListUpdate target_ports_update = 8;
+  optional PortListUpdate intercept_ports_update = 9;
 }
 
 message UpdatePrivateResourceResponse {
