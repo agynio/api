@@ -153,14 +153,22 @@ message CreateAppIdentityResponse {
 
 // OpenZiti host.v1 config — tells the hosting sidecar where to forward traffic.
 message HostV1Config {
+  // Static target protocol. Leave empty only when forward_protocol is true.
   string protocol = 1;
+  // Static target host/address. Leave empty only when forward_address is true.
   string address = 2;
+  // Static single target port. Leave zero only when forward_port is true or
+  // allowed_port_ranges is populated for multi-port target mappings.
   int32 port = 3;
   bool forward_protocol = 4;
   bool forward_address = 5;
   bool forward_port = 6;
   repeated string allowed_protocols = 7;
   repeated string allowed_addresses = 8;
+  // Target port ranges allowed by host.v1. PrivateResource provisioning uses
+  // one single-port range per target port, in the same order as intercept.v1
+  // port_ranges. OpenZiti maps forwarded intercept ports to target ports
+  // positionally, so callers must preserve cardinality and ordering.
   repeated PortRange allowed_port_ranges = 9;
 }
 
@@ -168,10 +176,14 @@ message HostV1Config {
 message InterceptV1Config {
   repeated string protocols = 1;
   repeated string addresses = 2;
+  // Intercept port ranges. PrivateResource provisioning uses one single-port
+  // range per intercept port, in the same order as host.v1
+  // allowed_port_ranges. OpenZiti maps forwarded intercept ports to target
+  // ports positionally, so callers must preserve cardinality and ordering.
   repeated PortRange port_ranges = 3;
 }
 
-// A port range for intercept.v1 config.
+// A port range for host.v1 and intercept.v1 config.
 message PortRange {
   int32 low = 1;
   int32 high = 2;
