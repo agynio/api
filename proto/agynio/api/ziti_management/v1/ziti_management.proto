@@ -18,6 +18,12 @@ service ZitiManagementService {
   // Runners Service, Apps Service -> create a per-runner or per-app OpenZiti service.
   rpc CreateService(CreateServiceRequest) returns (CreateServiceResponse);
 
+  // Services managing OpenZiti resources -> fetch a service by ID or exact name.
+  rpc GetService(GetServiceRequest) returns (GetServiceResponse);
+
+  // Services managing OpenZiti resources -> list services by name, prefix, role attributes, and pagination.
+  rpc ListServices(ListServicesRequest) returns (ListServicesResponse);
+
   // Orchestrator -> delete OpenZiti identity and its platform mapping.
   rpc DeleteIdentity(DeleteIdentityRequest) returns (DeleteIdentityResponse);
 
@@ -51,6 +57,12 @@ service ZitiManagementService {
   // Expose Service -> create a single OpenZiti service policy (Bind or Dial).
   // Returns the policy ID.
   rpc CreateServicePolicy(CreateServicePolicyRequest) returns (CreateServicePolicyResponse);
+
+  // Services managing OpenZiti resources -> fetch a service policy by ID or exact name.
+  rpc GetServicePolicy(GetServicePolicyRequest) returns (GetServicePolicyResponse);
+
+  // Services managing OpenZiti resources -> list service policies by name, prefix, type, roles, and pagination.
+  rpc ListServicePolicies(ListServicePoliciesRequest) returns (ListServicePoliciesResponse);
 
   // Expose Service -> delete an OpenZiti service policy by ID.
   rpc DeleteServicePolicy(DeleteServicePolicyRequest) returns (DeleteServicePolicyResponse);
@@ -190,6 +202,8 @@ message CreateServiceRequest {
   optional InterceptV1Config intercept_v1_config = 4;
   // Tags attached to the OpenZiti service and any created config resources.
   map<string, string> tags = 5;
+  // If a create conflicts with an existing service name, return that service.
+  bool return_existing = 6;
 }
 
 message CreateServiceResponse {
@@ -197,6 +211,30 @@ message CreateServiceResponse {
   string ziti_service_id = 1;
   // The service name (echoed back)
   string ziti_service_name = 2;
+}
+
+message GetServiceRequest {
+  // OpenZiti service ID. If omitted, name must be set.
+  string ziti_service_id = 1;
+  // Exact OpenZiti service name. Used when ziti_service_id is omitted.
+  string name = 2;
+}
+
+message GetServiceResponse {
+  OpenZitiService service = 1;
+}
+
+message ListServicesRequest {
+  string name = 1;
+  string name_prefix = 2;
+  repeated string role_attributes = 3;
+  int32 page_size = 4;
+  string page_token = 5;
+}
+
+message ListServicesResponse {
+  repeated OpenZitiService services = 1;
+  string next_page_token = 2;
 }
 
 // Request to delete an app's OpenZiti identity and service by platform identity_id.
@@ -299,11 +337,39 @@ message CreateServicePolicyRequest {
   repeated string service_roles = 4;
   // Tags attached to the OpenZiti service policy.
   map<string, string> tags = 5;
+  // If a create conflicts with an existing service policy name, return that policy.
+  bool return_existing = 6;
 }
 
 message CreateServicePolicyResponse {
   // The OpenZiti service policy ID.
   string ziti_service_policy_id = 1;
+}
+
+message GetServicePolicyRequest {
+  // OpenZiti service policy ID. If omitted, name must be set.
+  string ziti_service_policy_id = 1;
+  // Exact OpenZiti service policy name. Used when ziti_service_policy_id is omitted.
+  string name = 2;
+}
+
+message GetServicePolicyResponse {
+  OpenZitiServicePolicy service_policy = 1;
+}
+
+message ListServicePoliciesRequest {
+  string name = 1;
+  string name_prefix = 2;
+  ServicePolicyType type = 3;
+  repeated string identity_roles = 4;
+  repeated string service_roles = 5;
+  int32 page_size = 6;
+  string page_token = 7;
+}
+
+message ListServicePoliciesResponse {
+  repeated OpenZitiServicePolicy service_policies = 1;
+  string next_page_token = 2;
 }
 
 // ===========================================================================
