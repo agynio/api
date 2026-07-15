@@ -18,6 +18,13 @@ service RunnersService {
   rpc ValidateServiceToken(ValidateServiceTokenRequest) returns (ValidateServiceTokenResponse);
   rpc EnrollRunner(EnrollRunnerRequest) returns (EnrollRunnerResponse);
 
+  // --- Flavors ---
+  rpc CreateFlavor(CreateFlavorRequest) returns (CreateFlavorResponse);
+  rpc GetFlavor(GetFlavorRequest) returns (GetFlavorResponse);
+  rpc UpdateFlavor(UpdateFlavorRequest) returns (UpdateFlavorResponse);
+  rpc DeleteFlavor(DeleteFlavorRequest) returns (DeleteFlavorResponse);
+  rpc ListFlavors(ListFlavorsRequest) returns (ListFlavorsResponse);
+
   // --- Workload state ---
   rpc CreateWorkload(CreateWorkloadRequest) returns (CreateWorkloadResponse);
   rpc UpdateWorkload(UpdateWorkloadRequest) returns (UpdateWorkloadResponse);
@@ -49,6 +56,13 @@ message EntityMeta {
   string id = 1;
   google.protobuf.Timestamp created_at = 2;
   google.protobuf.Timestamp updated_at = 3;
+}
+
+message ComputeResources {
+  string requests_cpu = 1;
+  string requests_memory = 2;
+  string limits_cpu = 3;
+  string limits_memory = 4;
 }
 
 message SampledAtEntry {
@@ -156,8 +170,79 @@ message EnrollRunnerResponse {
 }
 
 // ===========================================================================
+// Flavor
+// ===========================================================================
+
+message Flavor {
+  EntityMeta meta = 1;
+  string runner_id = 2;
+  string name = 3;
+  ComputeResources resources = 4;
+  bool default = 5;
+  bool deprecated = 6;
+  optional string organization_id = 7;
+  string runner_name = 8;
+}
+
+message CreateFlavorRequest {
+  string runner_id = 1;
+  string name = 2;
+  ComputeResources resources = 3;
+  bool default = 4;
+}
+
+message CreateFlavorResponse {
+  Flavor flavor = 1;
+}
+
+message GetFlavorRequest {
+  string id = 1;
+}
+
+message GetFlavorResponse {
+  Flavor flavor = 1;
+}
+
+message UpdateFlavorRequest {
+  string id = 1;
+  optional string name = 2;
+  optional ComputeResources resources = 3;
+  optional bool default = 4;
+  optional bool deprecated = 5;
+}
+
+message UpdateFlavorResponse {
+  Flavor flavor = 1;
+}
+
+message DeleteFlavorRequest {
+  string id = 1;
+}
+
+message DeleteFlavorResponse {}
+
+message ListFlavorsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  optional string runner_id = 3;
+  optional string organization_id = 4;
+  optional bool include_deprecated = 5;
+}
+
+message ListFlavorsResponse {
+  repeated Flavor flavors = 1;
+  string next_page_token = 2;
+}
+
+// ===========================================================================
 // Workload
 // ===========================================================================
+
+enum RuntimeOwnerKind {
+  RUNTIME_OWNER_KIND_UNSPECIFIED = 0;
+  RUNTIME_OWNER_KIND_AGENT_INSTANCE = 1;
+  RUNTIME_OWNER_KIND_SANDBOX = 2;
+}
 
 enum WorkloadStatus {
   WORKLOAD_STATUS_UNSPECIFIED = 0;
@@ -219,6 +304,7 @@ message Workload {
   EntityMeta meta = 1;
   string runner_id = 2;
   string thread_id = 3;
+  // Empty for sandbox-owned workloads.
   string agent_id = 4;
   string organization_id = 5;
   WorkloadStatus status = 6;
@@ -238,16 +324,21 @@ message Workload {
   // or stale.
   optional string failure_message = 16;
   // Denormalized display name for agent_id.
+  // Empty for sandbox-owned workloads.
   string agent_name = 17;
   // Denormalized display name for runner_id.
   string runner_name = 18;
   WorkloadAgentState agent_state = 19;
+  RuntimeOwnerKind owner_kind = 20;
+  string owner_id = 21;
+  optional string owner_name = 22;
 }
 
 message CreateWorkloadRequest {
   string id = 1;
   string runner_id = 2;
   string thread_id = 3;
+  // Empty for sandbox-owned workloads.
   string agent_id = 4;
   string organization_id = 5;
   WorkloadStatus status = 6;
@@ -255,6 +346,8 @@ message CreateWorkloadRequest {
   string ziti_identity_id = 8;
   int32 allocated_cpu_millicores = 9;
   int64 allocated_ram_bytes = 10;
+  RuntimeOwnerKind owner_kind = 11;
+  string owner_id = 12;
 }
 
 message CreateWorkloadResponse {
@@ -331,6 +424,8 @@ message ListWorkloadsFilter {
   optional google.protobuf.Timestamp started_after = 4;
   optional google.protobuf.Timestamp started_before = 5;
   optional bool pending_sample = 6;
+  repeated RuntimeOwnerKind owner_kind_in = 7;
+  repeated string owner_id_in = 8;
 }
 
 message ListWorkloadsByThreadRequest {
@@ -391,9 +486,11 @@ enum VolumeStatus {
 message Volume {
   EntityMeta meta = 1;
   optional string instance_id = 2;
+  // Empty for runtime-only sandbox workspace volumes.
   string volume_id = 3;
   string thread_id = 4;
   string runner_id = 5;
+  // Empty for sandbox-owned volumes.
   string agent_id = 6;
   string organization_id = 7;
   string size_gb = 8;
@@ -401,9 +498,13 @@ message Volume {
   optional google.protobuf.Timestamp removed_at = 10;
   optional google.protobuf.Timestamp last_metering_sampled_at = 11;
   // Denormalized display name for volume_id.
+  // Empty for runtime-only sandbox workspace volumes.
   string volume_name = 12;
   // Current attachments for this volume; empty when unattached.
   repeated Attachment attachments = 13;
+  RuntimeOwnerKind owner_kind = 14;
+  string owner_id = 15;
+  optional string owner_name = 16;
 }
 
 enum AttachmentKind {
@@ -429,13 +530,17 @@ enum VolumeAttachmentFilterKind {
 
 message CreateVolumeRequest {
   string id = 1;
+  // Empty for runtime-only sandbox workspace volumes.
   string volume_id = 2;
   string thread_id = 3;
   string runner_id = 4;
+  // Empty for sandbox-owned volumes.
   string agent_id = 5;
   string organization_id = 6;
   string size_gb = 7;
   VolumeStatus status = 8;
+  RuntimeOwnerKind owner_kind = 9;
+  string owner_id = 10;
 }
 
 message CreateVolumeResponse {
@@ -481,6 +586,8 @@ message ListVolumesFilter {
   repeated VolumeAttachmentFilterKind attached_to_kind_in = 3;
   optional bool pending_sample = 4;
   optional string volume_name_substring = 5;
+  repeated RuntimeOwnerKind owner_kind_in = 6;
+  repeated string owner_id_in = 7;
 }
 
 message ListVolumesRequest {
