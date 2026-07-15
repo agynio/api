@@ -539,7 +539,6 @@ message CreateSandboxRequest {
   string organization_id = 1;
   optional string name = 2;
   string environment_id = 3;
-  string owner_id = 4;
 }
 
 message CreateSandboxResponse {
@@ -738,6 +737,7 @@ message ImagePullSecretAttachment {
     string agent_id = 3;
     string mcp_id = 4;
     string hook_id = 5;
+    string environment_id = 6;
   }
 }
 
@@ -747,6 +747,7 @@ message CreateImagePullSecretAttachmentRequest {
     string agent_id = 2;
     string mcp_id = 3;
     string hook_id = 4;
+    string environment_id = 5;
   }
 }
 
@@ -775,6 +776,7 @@ message ListImagePullSecretAttachmentsRequest {
   string agent_id = 4;
   string mcp_id = 5;
   string hook_id = 6;
+  string environment_id = 7;
 }
 
 message ListImagePullSecretAttachmentsResponse {
@@ -982,6 +984,7 @@ message Env {
     string agent_id = 4;
     string mcp_id = 5;
     string hook_id = 6;
+    string environment_id = 9;
   }
   oneof source {
     string value = 7;
@@ -996,6 +999,7 @@ message CreateEnvRequest {
     string agent_id = 3;
     string mcp_id = 4;
     string hook_id = 5;
+    string environment_id = 8;
   }
   oneof source {
     string value = 6;
@@ -1039,6 +1043,7 @@ message ListEnvsRequest {
   string agent_id = 3;
   string mcp_id = 4;
   string hook_id = 5;
+  string environment_id = 6;
 }
 
 message ListEnvsResponse {

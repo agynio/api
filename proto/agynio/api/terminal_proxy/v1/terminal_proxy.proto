@@ -10,6 +10,9 @@ service TerminalProxyService {
 }
 
 message IssueTicketRequest {
+  // Authenticated identity supplied by Gateway from request context. This
+  // field is internal service-to-service data and must never come from client
+  // input.
   string identity_id = 1;
   string workload_id = 2;
   string container_name = 3;

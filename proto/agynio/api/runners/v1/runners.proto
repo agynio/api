@@ -304,8 +304,9 @@ message Workload {
   EntityMeta meta = 1;
   string runner_id = 2;
   string thread_id = 3;
-  // Empty for sandbox-owned workloads.
-  string agent_id = 4;
+  // Deprecated: use agent_class_id. Unset/absent agent ownership is expressed
+  // by owner_kind plus agent_class_id presence, not by an empty string sentinel.
+  string agent_id = 4 [deprecated = true];
   string organization_id = 5;
   WorkloadStatus status = 6;
   repeated Container containers = 7;
@@ -323,23 +324,26 @@ message Workload {
   // programmatic parsing. When status is not FAILED, this value may be unset
   // or stale.
   optional string failure_message = 16;
-  // Denormalized display name for agent_id.
-  // Empty for sandbox-owned workloads.
-  string agent_name = 17;
+  // Deprecated: use agent_class_name. Unset/absent agent ownership is
+  // expressed by agent_class_name presence, not by an empty string sentinel.
+  string agent_name = 17 [deprecated = true];
   // Denormalized display name for runner_id.
   string runner_name = 18;
   WorkloadAgentState agent_state = 19;
   RuntimeOwnerKind owner_kind = 20;
   string owner_id = 21;
   optional string owner_name = 22;
+  optional string agent_class_id = 23;
+  optional string agent_class_name = 24;
 }
 
 message CreateWorkloadRequest {
   string id = 1;
   string runner_id = 2;
   string thread_id = 3;
-  // Empty for sandbox-owned workloads.
-  string agent_id = 4;
+  // Deprecated: use agent_class_id. Unset/absent agent ownership is expressed
+  // by owner_kind plus agent_class_id presence, not by an empty string sentinel.
+  string agent_id = 4 [deprecated = true];
   string organization_id = 5;
   WorkloadStatus status = 6;
   repeated Container containers = 7;
@@ -348,6 +352,7 @@ message CreateWorkloadRequest {
   int64 allocated_ram_bytes = 10;
   RuntimeOwnerKind owner_kind = 11;
   string owner_id = 12;
+  optional string agent_class_id = 13;
 }
 
 message CreateWorkloadResponse {
@@ -486,25 +491,32 @@ enum VolumeStatus {
 message Volume {
   EntityMeta meta = 1;
   optional string instance_id = 2;
-  // Empty for runtime-only sandbox workspace volumes.
-  string volume_id = 3;
+  // Deprecated: use volume_definition_id. Runtime-only sandbox workspace
+  // volumes are expressed by owner_kind plus volume_definition_id presence,
+  // not by an empty string sentinel.
+  string volume_id = 3 [deprecated = true];
   string thread_id = 4;
   string runner_id = 5;
-  // Empty for sandbox-owned volumes.
-  string agent_id = 6;
+  // Deprecated: use agent_class_id. Sandbox-owned volumes are expressed by
+  // owner_kind plus agent_class_id presence, not by an empty string sentinel.
+  string agent_id = 6 [deprecated = true];
   string organization_id = 7;
   string size_gb = 8;
   VolumeStatus status = 9;
   optional google.protobuf.Timestamp removed_at = 10;
   optional google.protobuf.Timestamp last_metering_sampled_at = 11;
-  // Denormalized display name for volume_id.
-  // Empty for runtime-only sandbox workspace volumes.
-  string volume_name = 12;
+  // Deprecated: use volume_definition_name. Runtime-only sandbox workspace
+  // volumes are expressed by volume_definition_name presence, not by an empty
+  // string sentinel.
+  string volume_name = 12 [deprecated = true];
   // Current attachments for this volume; empty when unattached.
   repeated Attachment attachments = 13;
   RuntimeOwnerKind owner_kind = 14;
   string owner_id = 15;
   optional string owner_name = 16;
+  optional string volume_definition_id = 17;
+  optional string agent_class_id = 18;
+  optional string volume_definition_name = 19;
 }
 
 enum AttachmentKind {
@@ -530,17 +542,22 @@ enum VolumeAttachmentFilterKind {
 
 message CreateVolumeRequest {
   string id = 1;
-  // Empty for runtime-only sandbox workspace volumes.
-  string volume_id = 2;
+  // Deprecated: use volume_definition_id. Runtime-only sandbox workspace
+  // volumes are expressed by owner_kind plus volume_definition_id presence,
+  // not by an empty string sentinel.
+  string volume_id = 2 [deprecated = true];
   string thread_id = 3;
   string runner_id = 4;
-  // Empty for sandbox-owned volumes.
-  string agent_id = 5;
+  // Deprecated: use agent_class_id. Sandbox-owned volumes are expressed by
+  // owner_kind plus agent_class_id presence, not by an empty string sentinel.
+  string agent_id = 5 [deprecated = true];
   string organization_id = 6;
   string size_gb = 7;
   VolumeStatus status = 8;
   RuntimeOwnerKind owner_kind = 9;
   string owner_id = 10;
+  optional string volume_definition_id = 11;
+  optional string agent_class_id = 12;
 }
 
 message CreateVolumeResponse {
