@@ -25,6 +25,22 @@ service AgentsService {
   rpc ListAgentRoles(ListAgentRolesRequest) returns (ListAgentRolesResponse);
   rpc ListMyAgentRoles(ListMyAgentRolesRequest) returns (ListMyAgentRolesResponse);
 
+  // --- Agent Instances ---
+  rpc CreateInstance(CreateInstanceRequest) returns (CreateInstanceResponse);
+  rpc GetInstance(GetInstanceRequest) returns (GetInstanceResponse);
+  rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse);
+  rpc PauseInstance(PauseInstanceRequest) returns (PauseInstanceResponse);
+  rpc ResumeInstance(ResumeInstanceRequest) returns (ResumeInstanceResponse);
+  rpc DeleteInstance(DeleteInstanceRequest) returns (DeleteInstanceResponse);
+
+  // --- Instance Inbox ---
+  rpc WriteInboxItem(WriteInboxItemRequest) returns (WriteInboxItemResponse);
+  // Internal-only: called by Threads after thread authorization and participant resolution.
+  rpc FanoutInboxItem(FanoutInboxItemRequest) returns (FanoutInboxItemResponse);
+  rpc GetUnackedInboxItems(GetUnackedInboxItemsRequest) returns (GetUnackedInboxItemsResponse);
+  rpc AckInboxItems(AckInboxItemsRequest) returns (AckInboxItemsResponse);
+  rpc GetUnackedInboxCount(GetUnackedInboxCountRequest) returns (GetUnackedInboxCountResponse);
+
   // --- Volumes ---
   rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse);
   rpc GetVolume(GetVolumeRequest) returns (GetVolumeResponse);
@@ -112,6 +128,19 @@ enum AgentRole {
   AGENT_ROLE_PARTICIPANT = 3;
 }
 
+enum AgentInstanceState {
+  AGENT_INSTANCE_STATE_UNSPECIFIED = 0;
+  AGENT_INSTANCE_STATE_ACTIVE = 1;
+  AGENT_INSTANCE_STATE_PAUSED = 2;
+  AGENT_INSTANCE_STATE_TERMINATED = 3;
+}
+
+enum InboxItemSourceKind {
+  INBOX_ITEM_SOURCE_KIND_UNSPECIFIED = 0;
+  INBOX_ITEM_SOURCE_KIND_THREAD = 1;
+  INBOX_ITEM_SOURCE_KIND_DIRECT = 2;
+}
+
 // ===========================================================================
 // Agent
 // ===========================================================================
@@ -168,8 +197,11 @@ message ResolveAgentIdentityRequest {
 }
 
 message ResolveAgentIdentityResponse {
+  // Agent class ID for class identities and the owning class ID for instance identities.
   string agent_id = 1;
   string organization_id = 2;
+  // Set only when identity_id resolves to an agent_instance identity.
+  optional string agent_instance_id = 3;
 }
 
 message UpdateAgentRequest {
@@ -247,6 +279,157 @@ message ListMyAgentRolesRequest {
 
 message ListMyAgentRolesResponse {
   repeated AgentRoleAssignment assignments = 1;
+}
+
+// ===========================================================================
+// Agent Instance
+// ===========================================================================
+
+message AgentInstance {
+  EntityMeta meta = 1;
+  string agent_id = 2; // UUID of the agent class.
+  string organization_id = 3; // UUID
+  // User-chosen suffix, when explicitly supplied at creation time.
+  optional string label = 4;
+  // Effective handle suffix without leading #. Generated when label is unset.
+  string suffix = 5;
+  AgentInstanceState state = 6;
+  optional string pause_reason = 7;
+  google.protobuf.Timestamp last_activity_at = 8;
+  // Class handle stem without leading @.
+  string nickname = 9;
+  // Full instance handle in @nickname#suffix form.
+  string handle = 10;
+}
+
+message CreateInstanceRequest {
+  string agent_id = 1; // UUID of the agent class.
+  // Optional user-chosen handle suffix without leading #.
+  optional string label = 2;
+}
+
+message CreateInstanceResponse {
+  AgentInstance instance = 1;
+}
+
+message GetInstanceRequest {
+  string id = 1; // UUID
+}
+
+message GetInstanceResponse {
+  AgentInstance instance = 1;
+}
+
+message ListInstancesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string organization_id = 3; // UUID
+  optional string agent_id = 4; // UUID of the agent class.
+  repeated AgentInstanceState state_in = 5;
+  // When set, filters to instances that do or do not have unacked inbox items.
+  optional bool has_unacked = 6;
+}
+
+message ListInstancesResponse {
+  repeated AgentInstance instances = 1;
+  string next_page_token = 2;
+}
+
+message PauseInstanceRequest {
+  string id = 1; // UUID
+  string pause_reason = 2;
+}
+
+message PauseInstanceResponse {
+  AgentInstance instance = 1;
+}
+
+message ResumeInstanceRequest {
+  string id = 1; // UUID
+}
+
+message ResumeInstanceResponse {
+  AgentInstance instance = 1;
+}
+
+message DeleteInstanceRequest {
+  string id = 1; // UUID
+}
+
+message DeleteInstanceResponse {
+  AgentInstance instance = 1;
+}
+
+// ===========================================================================
+// Instance Inbox
+// ===========================================================================
+
+message InboxItem {
+  string id = 1; // UUID
+  string agent_instance_id = 2; // UUID
+  InboxItemSourceKind source_kind = 3;
+  // Set only when source_kind is INBOX_ITEM_SOURCE_KIND_THREAD.
+  optional string thread_id = 4; // UUID
+  // Set only when source_kind is INBOX_ITEM_SOURCE_KIND_THREAD.
+  optional string message_id = 5; // UUID
+  string sender_id = 6; // Identity UUID
+  string body = 7;
+  repeated string file_ids = 8; // UUIDs
+  google.protobuf.Timestamp accepted_at = 9;
+  optional google.protobuf.Timestamp acked_at = 10;
+}
+
+message WriteInboxItemRequest {
+  string agent_instance_id = 1; // UUID
+  string sender_id = 2; // Identity UUID
+  string body = 3;
+  repeated string file_ids = 4; // UUIDs
+}
+
+message WriteInboxItemResponse {
+  InboxItem item = 1;
+}
+
+message FanoutInboxItemRequest {
+  string agent_instance_id = 1; // UUID
+  string thread_id = 2; // UUID
+  string message_id = 3; // UUID
+  string sender_id = 4; // Identity UUID
+  string body = 5;
+  repeated string file_ids = 6; // UUIDs
+}
+
+message FanoutInboxItemResponse {
+  InboxItem item = 1;
+}
+
+message GetUnackedInboxItemsRequest {
+  string agent_instance_id = 1; // UUID
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message GetUnackedInboxItemsResponse {
+  repeated InboxItem items = 1;
+  string next_page_token = 2;
+}
+
+message AckInboxItemsRequest {
+  string agent_instance_id = 1; // UUID
+  repeated string item_ids = 2; // UUIDs
+}
+
+message AckInboxItemsResponse {
+  int32 acked_count = 1;
+}
+
+message GetUnackedInboxCountRequest {
+  string agent_instance_id = 1; // UUID
+  optional string thread_id = 2; // UUID
+}
+
+message GetUnackedInboxCountResponse {
+  int32 count = 1;
 }
 
 // ===========================================================================
