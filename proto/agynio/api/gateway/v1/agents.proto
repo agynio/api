@@ -18,6 +18,20 @@ service AgentsGateway {
   rpc ListAgentRoles(agynio.api.agents.v1.ListAgentRolesRequest) returns (agynio.api.agents.v1.ListAgentRolesResponse);
   rpc ListMyAgentRoles(agynio.api.agents.v1.ListMyAgentRolesRequest) returns (agynio.api.agents.v1.ListMyAgentRolesResponse);
 
+  // --- Agent Instances ---
+  rpc CreateInstance(agynio.api.agents.v1.CreateInstanceRequest) returns (agynio.api.agents.v1.CreateInstanceResponse);
+  rpc GetInstance(agynio.api.agents.v1.GetInstanceRequest) returns (agynio.api.agents.v1.GetInstanceResponse);
+  rpc ListInstances(agynio.api.agents.v1.ListInstancesRequest) returns (agynio.api.agents.v1.ListInstancesResponse);
+  rpc PauseInstance(agynio.api.agents.v1.PauseInstanceRequest) returns (agynio.api.agents.v1.PauseInstanceResponse);
+  rpc ResumeInstance(agynio.api.agents.v1.ResumeInstanceRequest) returns (agynio.api.agents.v1.ResumeInstanceResponse);
+  rpc DeleteInstance(agynio.api.agents.v1.DeleteInstanceRequest) returns (agynio.api.agents.v1.DeleteInstanceResponse);
+
+  // --- Instance Inbox ---
+  rpc WriteInboxItem(agynio.api.agents.v1.WriteInboxItemRequest) returns (agynio.api.agents.v1.WriteInboxItemResponse);
+  rpc GetUnackedInboxItems(agynio.api.agents.v1.GetUnackedInboxItemsRequest) returns (agynio.api.agents.v1.GetUnackedInboxItemsResponse);
+  rpc AckInboxItems(agynio.api.agents.v1.AckInboxItemsRequest) returns (agynio.api.agents.v1.AckInboxItemsResponse);
+  rpc GetUnackedInboxCount(agynio.api.agents.v1.GetUnackedInboxCountRequest) returns (agynio.api.agents.v1.GetUnackedInboxCountResponse);
+
   // --- Volumes ---
   rpc CreateVolume(agynio.api.agents.v1.CreateVolumeRequest) returns (agynio.api.agents.v1.CreateVolumeResponse);
   rpc GetVolume(agynio.api.agents.v1.GetVolumeRequest) returns (agynio.api.agents.v1.GetVolumeResponse);
