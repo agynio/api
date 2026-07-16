@@ -25,6 +25,22 @@ service AgentsService {
   rpc ListAgentRoles(ListAgentRolesRequest) returns (ListAgentRolesResponse);
   rpc ListMyAgentRoles(ListMyAgentRolesRequest) returns (ListMyAgentRolesResponse);
 
+  // --- Environments ---
+  rpc CreateEnvironment(CreateEnvironmentRequest) returns (CreateEnvironmentResponse);
+  rpc GetEnvironment(GetEnvironmentRequest) returns (GetEnvironmentResponse);
+  rpc UpdateEnvironment(UpdateEnvironmentRequest) returns (UpdateEnvironmentResponse);
+  rpc DeleteEnvironment(DeleteEnvironmentRequest) returns (DeleteEnvironmentResponse);
+  rpc ListEnvironments(ListEnvironmentsRequest) returns (ListEnvironmentsResponse);
+
+  // --- Sandboxes ---
+  rpc CreateSandbox(CreateSandboxRequest) returns (CreateSandboxResponse);
+  rpc GetSandbox(GetSandboxRequest) returns (GetSandboxResponse);
+  rpc ListSandboxes(ListSandboxesRequest) returns (ListSandboxesResponse);
+  rpc StopSandbox(StopSandboxRequest) returns (StopSandboxResponse);
+  rpc DeleteSandbox(DeleteSandboxRequest) returns (DeleteSandboxResponse);
+  rpc EnsureSandboxRunning(EnsureSandboxRunningRequest) returns (EnsureSandboxRunningResponse);
+  rpc UpdateSandboxLastSession(UpdateSandboxLastSessionRequest) returns (UpdateSandboxLastSessionResponse);
+
   // --- Agent Instances ---
   rpc CreateInstance(CreateInstanceRequest) returns (CreateInstanceResponse);
   rpc GetInstance(GetInstanceRequest) returns (GetInstanceResponse);
@@ -433,6 +449,165 @@ message GetUnackedInboxCountResponse {
 }
 
 // ===========================================================================
+// Environment
+// ===========================================================================
+
+message Environment {
+  EntityMeta meta = 1;
+  string organization_id = 2;
+  string name = 3;
+  string flavor_id = 4;
+  string image = 5;
+  string flavor_name = 6;
+}
+
+message CreateEnvironmentRequest {
+  string organization_id = 1;
+  string name = 2;
+  string flavor_id = 3;
+  string image = 4;
+}
+
+message CreateEnvironmentResponse {
+  Environment environment = 1;
+}
+
+message GetEnvironmentRequest {
+  string id = 1; // UUID
+}
+
+message GetEnvironmentResponse {
+  Environment environment = 1;
+}
+
+message UpdateEnvironmentRequest {
+  string id = 1; // UUID
+  optional string name = 2;
+  optional string flavor_id = 3;
+  optional string image = 4;
+}
+
+message UpdateEnvironmentResponse {
+  Environment environment = 1;
+}
+
+message DeleteEnvironmentRequest {
+  string id = 1; // UUID
+}
+
+message DeleteEnvironmentResponse {}
+
+message ListEnvironmentsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string organization_id = 3;
+}
+
+message ListEnvironmentsResponse {
+  repeated Environment environments = 1;
+  string next_page_token = 2;
+}
+
+// ===========================================================================
+// Sandbox
+// ===========================================================================
+
+enum SandboxStatus {
+  SANDBOX_STATUS_UNSPECIFIED = 0;
+  SANDBOX_STATUS_STARTING = 1;
+  SANDBOX_STATUS_RUNNING = 2;
+  SANDBOX_STATUS_STOPPED = 3;
+  SANDBOX_STATUS_FAILED = 4;
+  SANDBOX_STATUS_TERMINATED = 5;
+}
+
+message Sandbox {
+  EntityMeta meta = 1;
+  string organization_id = 2;
+  string name = 3;
+  string environment_id = 4;
+  string owner_id = 5;
+  SandboxStatus status = 6;
+  string idle_timeout = 7;
+  string ttl = 8;
+  optional google.protobuf.Timestamp last_session_at = 9;
+  string environment_name = 10;
+  optional string workload_id = 11;
+}
+
+message CreateSandboxRequest {
+  string organization_id = 1;
+  optional string name = 2;
+  string environment_id = 3;
+}
+
+message CreateSandboxResponse {
+  Sandbox sandbox = 1;
+}
+
+message GetSandboxRequest {
+  oneof ref {
+    string id = 1;
+    SandboxNameRef name = 2;
+  }
+}
+
+message SandboxNameRef {
+  string organization_id = 1;
+  string name = 2;
+}
+
+message GetSandboxResponse {
+  Sandbox sandbox = 1;
+}
+
+message ListSandboxesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string organization_id = 3;
+  optional string owner_id = 4;
+  bool include_terminated = 5;
+}
+
+message ListSandboxesResponse {
+  repeated Sandbox sandboxes = 1;
+  string next_page_token = 2;
+}
+
+message StopSandboxRequest {
+  string id = 1;
+}
+
+message StopSandboxResponse {
+  Sandbox sandbox = 1;
+}
+
+message DeleteSandboxRequest {
+  string id = 1;
+}
+
+message DeleteSandboxResponse {
+  Sandbox sandbox = 1;
+}
+
+message EnsureSandboxRunningRequest {
+  string id = 1;
+}
+
+message EnsureSandboxRunningResponse {
+  Sandbox sandbox = 1;
+}
+
+message UpdateSandboxLastSessionRequest {
+  string id = 1;
+  google.protobuf.Timestamp last_session_at = 2;
+}
+
+message UpdateSandboxLastSessionResponse {
+  Sandbox sandbox = 1;
+}
+
+// ===========================================================================
 // Volume
 // ===========================================================================
 
@@ -562,6 +737,7 @@ message ImagePullSecretAttachment {
     string agent_id = 3;
     string mcp_id = 4;
     string hook_id = 5;
+    string environment_id = 6;
   }
 }
 
@@ -571,6 +747,7 @@ message CreateImagePullSecretAttachmentRequest {
     string agent_id = 2;
     string mcp_id = 3;
     string hook_id = 4;
+    string environment_id = 5;
   }
 }
 
@@ -599,6 +776,7 @@ message ListImagePullSecretAttachmentsRequest {
   string agent_id = 4;
   string mcp_id = 5;
   string hook_id = 6;
+  string environment_id = 7;
 }
 
 message ListImagePullSecretAttachmentsResponse {
@@ -806,6 +984,7 @@ message Env {
     string agent_id = 4;
     string mcp_id = 5;
     string hook_id = 6;
+    string environment_id = 9;
   }
   oneof source {
     string value = 7;
@@ -820,6 +999,7 @@ message CreateEnvRequest {
     string agent_id = 3;
     string mcp_id = 4;
     string hook_id = 5;
+    string environment_id = 8;
   }
   oneof source {
     string value = 6;
@@ -863,6 +1043,7 @@ message ListEnvsRequest {
   string agent_id = 3;
   string mcp_id = 4;
   string hook_id = 5;
+  string environment_id = 6;
 }
 
 message ListEnvsResponse {

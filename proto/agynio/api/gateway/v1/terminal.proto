@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package agynio.api.gateway.v1;
+
+import "agynio/api/terminal_proxy/v1/terminal_proxy.proto";
+
+option go_package = "github.com/agynio/api/gen/agynio/api/gateway/v1;gatewayv1";
+
+service TerminalGateway {
+  rpc CreateTerminalSession(CreateTerminalSessionRequest) returns (CreateTerminalSessionResponse);
+}
+
+message CreateTerminalSessionRequest {
+  string workload_id = 1;
+  string container_name = 2;
+  optional agynio.api.terminal_proxy.v1.TerminalCommand command = 3;
+}
+
+message CreateTerminalSessionResponse {
+  string ticket = 1;
+  string websocket_url = 2;
+  int32 expires_in_seconds = 3;
+}
