@@ -8,20 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: bufbuild/buf-action@v1
         with:
-          fetch-depth: 0
-      - uses: actions/setup-go@v5
-        with:
-          go-version: '1.25.x'
-      - name: Install buf
-        run: |
-          go install github.com/bufbuild/buf/cmd/buf@v1.66.0
-          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
-      - name: Buf lint
-        run: buf lint
-      - name: Buf format
-        run: buf format --diff --exit-code
-      - name: Buf breaking
-        run: |
-          git fetch origin main:refs/remotes/origin/main
-          buf breaking --against '.git#branch=origin/main'
+          input: .
+          lint: true
+          breaking: true
