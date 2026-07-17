@@ -337,10 +337,11 @@ message Workload {
   optional string owner_name = 22;
   optional string agent_class_id = 23;
   optional string agent_class_name = 24;
-  // Platform agent instance identity for this workload. Distinct from
-  // instance_id, which is the runner-local workload identifier (for example,
-  // a Pod name).
-  string agent_instance_id = 25;
+  // Platform agent instance identity for this workload. Set when owner_kind is
+  // RUNTIME_OWNER_KIND_AGENT_INSTANCE. Absent for valid non-agent owners such
+  // as sandbox/runtime-only records. Distinct from instance_id, which is the
+  // runner-local workload identifier (for example, a Pod name).
+  optional string agent_instance_id = 25;
 }
 
 message CreateWorkloadRequest {
@@ -359,9 +360,11 @@ message CreateWorkloadRequest {
   RuntimeOwnerKind owner_kind = 11;
   string owner_id = 12;
   optional string agent_class_id = 13;
-  // Platform agent instance identity for this workload. Distinct from the
-  // runner-local instance_id that may later be set by UpdateWorkload.
-  string agent_instance_id = 14;
+  // Platform agent instance identity for this workload. Set when owner_kind is
+  // RUNTIME_OWNER_KIND_AGENT_INSTANCE. Absent for valid non-agent owners such
+  // as sandbox/runtime-only records. Distinct from the runner-local instance_id
+  // that may later be set by UpdateWorkload.
+  optional string agent_instance_id = 14;
 }
 
 message CreateWorkloadResponse {
@@ -540,10 +543,11 @@ message Volume {
   optional string volume_definition_id = 17;
   optional string agent_class_id = 18;
   optional string volume_definition_name = 19;
-  // Platform agent instance identity that owns/reuses this volume. Distinct
-  // from instance_id, which is the runner-local volume identifier (for
-  // example, a PVC name).
-  string agent_instance_id = 20;
+  // Platform agent instance identity that owns/reuses this volume. Set when
+  // owner_kind is RUNTIME_OWNER_KIND_AGENT_INSTANCE. Absent for valid non-agent
+  // owners such as sandbox/runtime-only records. Distinct from instance_id,
+  // which is the runner-local volume identifier (for example, a PVC name).
+  optional string agent_instance_id = 20;
 }
 
 enum AttachmentKind {
@@ -585,9 +589,11 @@ message CreateVolumeRequest {
   string owner_id = 10;
   optional string volume_definition_id = 11;
   optional string agent_class_id = 12;
-  // Platform agent instance identity that owns/reuses this volume. Distinct
-  // from the runner-local instance_id that may later be set by UpdateVolume.
-  string agent_instance_id = 13;
+  // Platform agent instance identity that owns/reuses this volume. Set when
+  // owner_kind is RUNTIME_OWNER_KIND_AGENT_INSTANCE. Absent for valid non-agent
+  // owners such as sandbox/runtime-only records. Distinct from the runner-local
+  // instance_id that may later be set by UpdateVolume.
+  optional string agent_instance_id = 13;
 }
 
 message CreateVolumeResponse {
