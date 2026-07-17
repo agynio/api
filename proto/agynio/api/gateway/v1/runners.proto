@@ -26,6 +26,7 @@ service RunnersGateway {
   // --- Workloads ---
   rpc ListWorkloads(agynio.api.runners.v1.ListWorkloadsRequest) returns (agynio.api.runners.v1.ListWorkloadsResponse);
   rpc ListWorkloadsByThread(agynio.api.runners.v1.ListWorkloadsByThreadRequest) returns (agynio.api.runners.v1.ListWorkloadsByThreadResponse);
+  rpc ListWorkloadsByAgentInstance(agynio.api.runners.v1.ListWorkloadsByAgentInstanceRequest) returns (agynio.api.runners.v1.ListWorkloadsByAgentInstanceResponse);
   rpc GetWorkload(agynio.api.runners.v1.GetWorkloadRequest) returns (agynio.api.runners.v1.GetWorkloadResponse);
   rpc TouchWorkload(agynio.api.runners.v1.TouchWorkloadRequest) returns (agynio.api.runners.v1.TouchWorkloadResponse);
   rpc StreamWorkloadLogs(agynio.api.runner.v1.StreamWorkloadLogsRequest) returns (stream agynio.api.runner.v1.StreamWorkloadLogsResponse);
@@ -34,4 +35,5 @@ service RunnersGateway {
   rpc GetVolume(agynio.api.runners.v1.GetVolumeRequest) returns (agynio.api.runners.v1.GetVolumeResponse);
   rpc ListVolumes(agynio.api.runners.v1.ListVolumesRequest) returns (agynio.api.runners.v1.ListVolumesResponse);
   rpc ListVolumesByThread(agynio.api.runners.v1.ListVolumesByThreadRequest) returns (agynio.api.runners.v1.ListVolumesByThreadResponse);
+  rpc ListVolumesByAgentInstance(agynio.api.runners.v1.ListVolumesByAgentInstanceRequest) returns (agynio.api.runners.v1.ListVolumesByAgentInstanceResponse);
 }

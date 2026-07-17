@@ -33,6 +33,7 @@ service RunnersService {
   rpc DeleteWorkload(DeleteWorkloadRequest) returns (DeleteWorkloadResponse);
   rpc GetWorkload(GetWorkloadRequest) returns (GetWorkloadResponse);
   rpc ListWorkloadsByThread(ListWorkloadsByThreadRequest) returns (ListWorkloadsByThreadResponse);
+  rpc ListWorkloadsByAgentInstance(ListWorkloadsByAgentInstanceRequest) returns (ListWorkloadsByAgentInstanceResponse);
   rpc ListWorkloads(ListWorkloadsRequest) returns (ListWorkloadsResponse);
   rpc BatchUpdateWorkloadSampledAt(BatchUpdateWorkloadSampledAtRequest) returns (BatchUpdateWorkloadSampledAtResponse);
 
@@ -45,6 +46,7 @@ service RunnersService {
   rpc GetVolume(GetVolumeRequest) returns (GetVolumeResponse);
   rpc ListVolumes(ListVolumesRequest) returns (ListVolumesResponse);
   rpc ListVolumesByThread(ListVolumesByThreadRequest) returns (ListVolumesByThreadResponse);
+  rpc ListVolumesByAgentInstance(ListVolumesByAgentInstanceRequest) returns (ListVolumesByAgentInstanceResponse);
   rpc BatchUpdateVolumeSampledAt(BatchUpdateVolumeSampledAtRequest) returns (BatchUpdateVolumeSampledAtResponse);
 }
 
@@ -335,6 +337,8 @@ message Workload {
   optional string owner_name = 22;
   optional string agent_class_id = 23;
   optional string agent_class_name = 24;
+  // Present when owner_kind is RUNTIME_OWNER_KIND_AGENT_INSTANCE; absent otherwise.
+  optional string agent_instance_id = 25;
 }
 
 message CreateWorkloadRequest {
@@ -353,6 +357,8 @@ message CreateWorkloadRequest {
   RuntimeOwnerKind owner_kind = 11;
   string owner_id = 12;
   optional string agent_class_id = 13;
+  // Present when owner_kind is RUNTIME_OWNER_KIND_AGENT_INSTANCE; absent otherwise.
+  optional string agent_instance_id = 14;
 }
 
 message CreateWorkloadResponse {
@@ -448,6 +454,20 @@ message ListWorkloadsByThreadResponse {
   string next_page_token = 2;
 }
 
+message ListWorkloadsByAgentInstanceRequest {
+  string agent_instance_id = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+  // Optional status filter. An empty list returns workloads for all statuses.
+  repeated WorkloadStatus statuses = 4;
+}
+
+message ListWorkloadsByAgentInstanceResponse {
+  // Ordered by created_at DESC, id DESC for stable pagination.
+  repeated Workload workloads = 1;
+  string next_page_token = 2;
+}
+
 message ListWorkloadsRequest {
   int32 page_size = 1;
   // Opaque cursor; reuse only with the same sort and filter.
@@ -517,6 +537,8 @@ message Volume {
   optional string volume_definition_id = 17;
   optional string agent_class_id = 18;
   optional string volume_definition_name = 19;
+  // Present when owner_kind is RUNTIME_OWNER_KIND_AGENT_INSTANCE; absent otherwise.
+  optional string agent_instance_id = 20;
 }
 
 enum AttachmentKind {
@@ -558,6 +580,8 @@ message CreateVolumeRequest {
   string owner_id = 10;
   optional string volume_definition_id = 11;
   optional string agent_class_id = 12;
+  // Present when owner_kind is RUNTIME_OWNER_KIND_AGENT_INSTANCE; absent otherwise.
+  optional string agent_instance_id = 13;
 }
 
 message CreateVolumeResponse {
@@ -635,6 +659,19 @@ message ListVolumesByThreadRequest {
 }
 
 message ListVolumesByThreadResponse {
+  repeated Volume volumes = 1;
+  string next_page_token = 2;
+}
+
+message ListVolumesByAgentInstanceRequest {
+  string agent_instance_id = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+  // Optional status filter. An empty list returns volumes for all statuses.
+  repeated VolumeStatus statuses = 4;
+}
+
+message ListVolumesByAgentInstanceResponse {
   repeated Volume volumes = 1;
   string next_page_token = 2;
 }
