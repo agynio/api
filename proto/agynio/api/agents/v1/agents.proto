@@ -39,6 +39,7 @@ service AgentsService {
   rpc StopSandbox(StopSandboxRequest) returns (StopSandboxResponse);
   rpc DeleteSandbox(DeleteSandboxRequest) returns (DeleteSandboxResponse);
   rpc EnsureSandboxRunning(EnsureSandboxRunningRequest) returns (EnsureSandboxRunningResponse);
+  rpc UpdateSandboxRuntimeState(UpdateSandboxRuntimeStateRequest) returns (UpdateSandboxRuntimeStateResponse);
   rpc UpdateSandboxLastSession(UpdateSandboxLastSessionRequest) returns (UpdateSandboxLastSessionResponse);
 
   // --- Agent Instances ---
@@ -595,6 +596,19 @@ message EnsureSandboxRunningRequest {
 }
 
 message EnsureSandboxRunningResponse {
+  Sandbox sandbox = 1;
+}
+
+message UpdateSandboxRuntimeStateRequest {
+  string id = 1;
+  optional SandboxStatus status = 2;
+  oneof workload_id_update {
+    string workload_id = 3;
+    bool clear_workload_id = 4;
+  }
+}
+
+message UpdateSandboxRuntimeStateResponse {
   Sandbox sandbox = 1;
 }
 
