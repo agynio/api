@@ -96,6 +96,9 @@ message ResolveOrCreateUserRequest {
   string email = 3;
   string photo_url = 4;
   optional string preferred_username = 5;
+  // Whether the IdP asserts the email claim is verified. Required for the
+  // first-admin claim when first_admin_email is configured.
+  bool email_verified = 6;
 }
 
 message ResolveOrCreateUserResponse {
