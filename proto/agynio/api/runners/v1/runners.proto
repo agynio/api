@@ -19,11 +19,29 @@ service RunnersService {
   rpc EnrollRunner(EnrollRunnerRequest) returns (EnrollRunnerResponse);
 
   // --- Flavors ---
-  rpc CreateFlavor(CreateFlavorRequest) returns (CreateFlavorResponse);
-  rpc GetFlavor(GetFlavorRequest) returns (GetFlavorResponse);
-  rpc UpdateFlavor(UpdateFlavorRequest) returns (UpdateFlavorResponse);
-  rpc DeleteFlavor(DeleteFlavorRequest) returns (DeleteFlavorResponse);
+  // Superseded by ReportRunnerCatalog: flavors are declared in the runner's
+  // own configuration, not managed through platform APIs. Retained so existing
+  // callers keep compiling while they migrate; the service does not implement
+  // them.
+  rpc CreateFlavor(CreateFlavorRequest) returns (CreateFlavorResponse) {
+    option deprecated = true;
+  }
+  rpc GetFlavor(GetFlavorRequest) returns (GetFlavorResponse) {
+    option deprecated = true;
+  }
+  rpc UpdateFlavor(UpdateFlavorRequest) returns (UpdateFlavorResponse) {
+    option deprecated = true;
+  }
+  rpc DeleteFlavor(DeleteFlavorRequest) returns (DeleteFlavorResponse) {
+    option deprecated = true;
+  }
   rpc ListFlavors(ListFlavorsRequest) returns (ListFlavorsResponse);
+
+  // --- Runner catalog ---
+  // The catalog is declared in the runner's own configuration and reported
+  // here; a report replaces the runner's stored catalog wholesale.
+  rpc ReportRunnerCatalog(ReportRunnerCatalogRequest) returns (ReportRunnerCatalogResponse);
+  rpc ListStorageClasses(ListStorageClassesRequest) returns (ListStorageClassesResponse);
 
   // --- Workload state ---
   rpc CreateWorkload(CreateWorkloadRequest) returns (CreateWorkloadResponse);
@@ -176,7 +194,10 @@ message EnrollRunnerResponse {
 // ===========================================================================
 
 message Flavor {
-  EntityMeta meta = 1;
+  // Catalog entries have no platform identity — they are named entries in a
+  // runner's report, replaced wholesale on the next report. Unset for reported
+  // entries; retained for callers still reading it.
+  EntityMeta meta = 1 [deprecated = true];
   string runner_id = 2;
   string name = 3;
   ComputeResources resources = 4;
@@ -233,6 +254,58 @@ message ListFlavorsRequest {
 
 message ListFlavorsResponse {
   repeated Flavor flavors = 1;
+  string next_page_token = 2;
+}
+
+message StorageClass {
+  string runner_id = 1;
+  string name = 2;
+  bool default = 3;
+  bool deprecated = 4;
+  optional string organization_id = 5;
+  string runner_name = 6;
+}
+
+// FlavorEntry and StorageClassEntry are what a runner declares in its own
+// configuration; the platform-scoped fields above are filled in on read.
+message FlavorEntry {
+  string name = 1;
+  ComputeResources resources = 2;
+  bool default = 3;
+  bool deprecated = 4;
+}
+
+message StorageClassEntry {
+  string name = 1;
+  bool default = 2;
+  bool deprecated = 3;
+}
+
+message ReportRunnerCatalogRequest {
+  string runner_id = 1;
+  // Authenticates the report, as for EnrollRunner.
+  string service_token = 2;
+  repeated FlavorEntry flavors = 3;
+  repeated StorageClassEntry storage_classes = 4;
+  repeated string capabilities = 5;
+}
+
+message ReportRunnerCatalogResponse {
+  int32 flavor_count = 1;
+  int32 storage_class_count = 2;
+  int32 capability_count = 3;
+}
+
+message ListStorageClassesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  optional string runner_id = 3;
+  optional string organization_id = 4;
+  optional bool include_deprecated = 5;
+}
+
+message ListStorageClassesResponse {
+  repeated StorageClass storage_classes = 1;
   string next_page_token = 2;
 }
 

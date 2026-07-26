@@ -15,6 +15,9 @@ service RunnersGateway {
   rpc UpdateRunner(agynio.api.runners.v1.UpdateRunnerRequest) returns (agynio.api.runners.v1.UpdateRunnerResponse);
   rpc DeleteRunner(agynio.api.runners.v1.DeleteRunnerRequest) returns (agynio.api.runners.v1.DeleteRunnerResponse);
   rpc EnrollRunner(agynio.api.runners.v1.EnrollRunnerRequest) returns (agynio.api.runners.v1.EnrollRunnerResponse);
+  // Service-token authenticated, like EnrollRunner: the runner reports the
+  // catalog it declares in its own configuration.
+  rpc ReportRunnerCatalog(agynio.api.runners.v1.ReportRunnerCatalogRequest) returns (agynio.api.runners.v1.ReportRunnerCatalogResponse);
 
   // --- Flavors ---
   rpc CreateFlavor(agynio.api.runners.v1.CreateFlavorRequest) returns (agynio.api.runners.v1.CreateFlavorResponse);
@@ -22,6 +25,7 @@ service RunnersGateway {
   rpc UpdateFlavor(agynio.api.runners.v1.UpdateFlavorRequest) returns (agynio.api.runners.v1.UpdateFlavorResponse);
   rpc DeleteFlavor(agynio.api.runners.v1.DeleteFlavorRequest) returns (agynio.api.runners.v1.DeleteFlavorResponse);
   rpc ListFlavors(agynio.api.runners.v1.ListFlavorsRequest) returns (agynio.api.runners.v1.ListFlavorsResponse);
+  rpc ListStorageClasses(agynio.api.runners.v1.ListStorageClassesRequest) returns (agynio.api.runners.v1.ListStorageClassesResponse);
 
   // --- Workloads ---
   rpc ListWorkloads(agynio.api.runners.v1.ListWorkloadsRequest) returns (agynio.api.runners.v1.ListWorkloadsResponse);
