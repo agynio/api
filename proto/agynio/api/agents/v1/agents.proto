@@ -457,16 +457,27 @@ message Environment {
   EntityMeta meta = 1;
   string organization_id = 2;
   string name = 3;
-  string flavor_id = 4;
+  // Superseded by runner_id + flavor: placement is now environment to runner
+  // directly, with the flavor named within that runner's catalog.
+  string flavor_id = 4 [deprecated = true];
   string image = 5;
-  string flavor_name = 6;
+  string flavor_name = 6 [deprecated = true];
+  // The runner this environment places workloads on.
+  string runner_id = 7;
+  // Catalog entry name, resolved against the runner's reported catalog at
+  // workload start. Empty resolves to the runner's default flavor.
+  // Deliberately not validated here: platform resources and runner
+  // configuration may be applied in either order.
+  string flavor = 8;
 }
 
 message CreateEnvironmentRequest {
   string organization_id = 1;
   string name = 2;
-  string flavor_id = 3;
+  string flavor_id = 3 [deprecated = true];
   string image = 4;
+  string runner_id = 5;
+  string flavor = 6;
 }
 
 message CreateEnvironmentResponse {
@@ -484,8 +495,10 @@ message GetEnvironmentResponse {
 message UpdateEnvironmentRequest {
   string id = 1; // UUID
   optional string name = 2;
-  optional string flavor_id = 3;
+  optional string flavor_id = 3 [deprecated = true];
   optional string image = 4;
+  optional string runner_id = 5;
+  optional string flavor = 6;
 }
 
 message UpdateEnvironmentResponse {
