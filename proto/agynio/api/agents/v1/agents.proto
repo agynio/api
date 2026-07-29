@@ -799,6 +799,10 @@ message DeleteImagePullSecretAttachmentResponse {}
 message ListImagePullSecretAttachmentsRequest {
   int32 page_size = 1;
   string page_token = 2;
+  // The organization whose image pull secret attachments are listed. Required
+  // of a caller presenting an identity; the remaining ids only narrow the
+  // result within it.
+  string organization_id = 8; // UUID
   string image_pull_secret_id = 3;
   string agent_id = 4;
   string mcp_id = 5;
