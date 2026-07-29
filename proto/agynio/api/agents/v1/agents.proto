@@ -1067,6 +1067,9 @@ message DeleteEnvResponse {}
 message ListEnvsRequest {
   int32 page_size = 1;
   string page_token = 2;
+  // The organization whose envs are listed. Required of a caller presenting an
+  // identity; the remaining ids only narrow the result within it.
+  string organization_id = 7; // UUID
   string agent_id = 3;
   string mcp_id = 4;
   string hook_id = 5;
