@@ -169,8 +169,11 @@ message Agent {
   string model = 4; // UUID
   string description = 5;
   string configuration = 6;
-  string image = 7;
-  ComputeResources resources = 8;
+  // Superseded by environment_id: the image and compute an agent runs with are
+  // an environment's to define, so agents and sandboxes can share one runtime
+  // definition instead of each carrying its own copy.
+  string image = 7 [deprecated = true];
+  ComputeResources resources = 8 [deprecated = true];
   string init_image = 9;
   string organization_id = 10;
   string nickname = 11;
@@ -178,6 +181,10 @@ message Agent {
   // Capabilities supported by this agent. Free-form strings (e.g., "privileged", "dind").
   repeated string capabilities = 13;
   AgentAvailability availability = 14;
+  // The environment this agent runs in, supplying its image and compute.
+  // Empty on agents created before environments existed, which still carry
+  // the deprecated inline image and resources.
+  string environment_id = 15; // UUID
 }
 
 message CreateAgentRequest {
@@ -186,8 +193,8 @@ message CreateAgentRequest {
   string model = 3; // UUID
   string description = 4;
   string configuration = 5;
-  string image = 6;
-  ComputeResources resources = 7;
+  string image = 6 [deprecated = true];
+  ComputeResources resources = 7 [deprecated = true];
   string organization_id = 8;
   string init_image = 9;
   string nickname = 10;
@@ -195,6 +202,8 @@ message CreateAgentRequest {
   // Capabilities supported by this agent. Free-form strings (e.g., "privileged", "dind").
   repeated string capabilities = 12;
   AgentAvailability availability = 13;
+  // Preferred over image and resources, which are deprecated.
+  string environment_id = 14; // UUID
 }
 
 message CreateAgentResponse {
@@ -228,14 +237,15 @@ message UpdateAgentRequest {
   optional string model = 4;
   optional string description = 5;
   optional string configuration = 6;
-  optional string image = 7;
-  optional ComputeResources resources = 8;
+  optional string image = 7 [deprecated = true];
+  optional ComputeResources resources = 8 [deprecated = true];
   optional string init_image = 9;
   optional string nickname = 10;
   optional string idle_timeout = 11; // Go duration string (e.g., "30s", "5m", "1h").
   // Capabilities replace the existing list; an empty list clears all capabilities.
   repeated string capabilities = 12;
   optional AgentAvailability availability = 13;
+  optional string environment_id = 14; // UUID
 }
 
 message UpdateAgentResponse {
