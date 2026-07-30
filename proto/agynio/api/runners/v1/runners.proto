@@ -392,6 +392,8 @@ message Workload {
   optional google.protobuf.Timestamp removed_at = 12;
   int32 allocated_cpu_millicores = 13;
   int64 allocated_ram_bytes = 14;
+  // Flavor the workload started on. Empty when it started without an environment.
+  string flavor = 26;
   // Machine-readable reason for failures when status is WORKLOAD_STATUS_FAILED.
   // When status is not FAILED, this value may be unset or stale.
   optional WorkloadFailureReason failure_reason = 15;
@@ -432,6 +434,7 @@ message CreateWorkloadRequest {
   optional string agent_class_id = 13;
   // Present when owner_kind is RUNTIME_OWNER_KIND_AGENT_INSTANCE; absent otherwise.
   optional string agent_instance_id = 14;
+  string flavor = 15;
 }
 
 message CreateWorkloadResponse {
