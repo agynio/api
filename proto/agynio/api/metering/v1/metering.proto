@@ -17,6 +17,10 @@ enum Unit {
   UNIT_CORE_SECONDS = 2;
   UNIT_GB_SECONDS = 3;
   UNIT_COUNT = 4;
+  // A workload occupying one flavor for one second. Compute is billed per
+  // flavor: CPU and memory are two numbers inside one, so billing them
+  // separately re-derives a shape the platform already names.
+  UNIT_FLAVOR_SECONDS = 5;
 }
 
 message UsageRecord {

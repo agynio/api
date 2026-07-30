@@ -392,6 +392,12 @@ message Workload {
   optional google.protobuf.Timestamp removed_at = 12;
   int32 allocated_cpu_millicores = 13;
   int64 allocated_ram_bytes = 14;
+  // Flavor the workload started on, resolved from its environment against this
+  // runner's reported catalog. Recorded rather than re-resolved so metering
+  // does not move when the environment is repointed or the catalog changes —
+  // the same reason a volume records its storage class. Empty for a workload
+  // started without an environment, which emits no compute usage.
+  string flavor = 26;
   // Machine-readable reason for failures when status is WORKLOAD_STATUS_FAILED.
   // When status is not FAILED, this value may be unset or stale.
   optional WorkloadFailureReason failure_reason = 15;
