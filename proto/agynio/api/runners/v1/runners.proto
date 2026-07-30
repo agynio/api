@@ -438,6 +438,10 @@ message CreateWorkloadRequest {
   optional string agent_class_id = 13;
   // Present when owner_kind is RUNTIME_OWNER_KIND_AGENT_INSTANCE; absent otherwise.
   optional string agent_instance_id = 14;
+  // Flavor this workload is starting on, resolved from its environment. Stored
+  // as given and never re-resolved, so metering keeps billing what the workload
+  // actually started on. Empty for a workload started without an environment.
+  string flavor = 15;
 }
 
 message CreateWorkloadResponse {
