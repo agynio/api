@@ -209,7 +209,10 @@ message AddParticipantResponse {
 // ===========================================================================
 
 message SendMessageRequest {
-  string thread_id = 1; // UUID
+  // UUID. May be left empty by an agent instance, which resolves it to that
+  // instance's default_thread_id. Every other caller must name a thread, as
+  // must an instance whose default is unset.
+  string thread_id = 1;
   string sender_id = 2; // UUID — must be a participant
   // Text content. May be empty when file_ids is non-empty.
   // At least one of body or file_ids must be provided.

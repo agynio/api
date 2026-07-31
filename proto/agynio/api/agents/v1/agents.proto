@@ -49,6 +49,7 @@ service AgentsService {
   rpc PauseInstance(PauseInstanceRequest) returns (PauseInstanceResponse);
   rpc ResumeInstance(ResumeInstanceRequest) returns (ResumeInstanceResponse);
   rpc DeleteInstance(DeleteInstanceRequest) returns (DeleteInstanceResponse);
+  rpc SetInstanceDefaultThread(SetInstanceDefaultThreadRequest) returns (SetInstanceDefaultThreadResponse);
 
   // --- Instance Inbox ---
   rpc WriteInboxItem(WriteInboxItemRequest) returns (WriteInboxItemResponse);
@@ -138,6 +139,28 @@ enum AgentAvailability {
   AGENT_AVAILABILITY_PRIVATE = 2;
 }
 
+// Where an instance's default thread comes from when the platform creates it
+// rather than a person naming one.
+enum AgentDefaultThread {
+  AGENT_DEFAULT_THREAD_UNSPECIFIED = 0;
+  // The thread that added the instance becomes its default. Composes for
+  // delegation: sub-threads are created downward, so the origin is the thread
+  // the instance owes an answer to.
+  AGENT_DEFAULT_THREAD_ORIGIN = 1;
+  // Infer nothing. The instance starts with no default; naming one explicitly
+  // still works.
+  AGENT_DEFAULT_THREAD_NONE = 2;
+}
+
+// What becomes of the text an agent CLI produces at the end of a turn.
+enum AgentFinalMessage {
+  AGENT_FINAL_MESSAGE_UNSPECIFIED = 0;
+  // Dropped. Agents that send explicitly would otherwise post twice.
+  AGENT_FINAL_MESSAGE_DISCARD = 1;
+  // Posted to the instance's default thread.
+  AGENT_FINAL_MESSAGE_DEFAULT_THREAD = 2;
+}
+
 enum AgentRole {
   AGENT_ROLE_UNSPECIFIED = 0;
   AGENT_ROLE_OWNER = 1;
@@ -185,6 +208,13 @@ message Agent {
   // Empty on agents created before environments existed, which still carry
   // the deprecated inline image and resources.
   string environment_id = 15; // UUID
+  // Governs the automatic creation path only; naming a default thread
+  // explicitly is always allowed. Defaults to ORIGIN.
+  AgentDefaultThread default_thread = 16;
+  // Whether the turn's final text is a deliverable or an internal artifact --
+  // a property of how the agent is written, so it lives on the class rather
+  // than the instance. Defaults to DISCARD.
+  AgentFinalMessage final_message = 17;
 }
 
 message CreateAgentRequest {
@@ -204,6 +234,8 @@ message CreateAgentRequest {
   AgentAvailability availability = 13;
   // Preferred over image and resources, which are deprecated.
   string environment_id = 14; // UUID
+  AgentDefaultThread default_thread = 15;
+  AgentFinalMessage final_message = 16;
 }
 
 message CreateAgentResponse {
@@ -246,6 +278,8 @@ message UpdateAgentRequest {
   repeated string capabilities = 12;
   optional AgentAvailability availability = 13;
   optional string environment_id = 14; // UUID
+  optional AgentDefaultThread default_thread = 15;
+  optional AgentFinalMessage final_message = 16;
 }
 
 message UpdateAgentResponse {
@@ -327,12 +361,28 @@ message AgentInstance {
   string nickname = 9;
   // Full instance handle in @nickname#suffix form.
   string handle = 10;
+  // Where this instance's untargeted messages go. Unset when the class asked
+  // for no inference and nobody has named one since.
+  optional string default_thread_id = 11; // UUID
+}
+
+// What the caller knows about why an instance is being created. These are
+// facts to report, not instructions: the class policy decides what they mean.
+message CreateInstanceContext {
+  // The thread whose participant list the instance was added to, when that is
+  // what created it.
+  optional string thread_id = 1; // UUID
 }
 
 message CreateInstanceRequest {
   string agent_id = 1; // UUID of the agent class.
   // Optional user-chosen handle suffix without leading #.
   optional string label = 2;
+  // Circumstances of creation, for the class policy to act on.
+  CreateInstanceContext context = 3;
+  // Names the default thread outright, bypassing the class policy. A
+  // deliberate act by a caller who knows the destination.
+  optional string default_thread_id = 4; // UUID
 }
 
 message CreateInstanceResponse {
@@ -344,6 +394,17 @@ message GetInstanceRequest {
 }
 
 message GetInstanceResponse {
+  AgentInstance instance = 1;
+}
+
+message SetInstanceDefaultThreadRequest {
+  string id = 1; // UUID of the agent instance.
+  // Unset clears the default, leaving the instance with no destination for
+  // untargeted messages.
+  optional string default_thread_id = 2; // UUID
+}
+
+message SetInstanceDefaultThreadResponse {
   AgentInstance instance = 1;
 }
 
