@@ -215,6 +215,11 @@ message Agent {
   // a property of how the agent is written, so it lives on the class rather
   // than the instance. Defaults to DISCARD.
   AgentFinalMessage final_message = 17;
+  // How long an instance may sit idle before the platform pauses it with
+  // pause_reason "idle_ttl_exceeded". Idleness is measured from the instance's
+  // last activity, and a paused instance keeps its thread and its inbox --
+  // ResumeInstance picks up whatever arrived. Empty means never.
+  optional string instance_idle_ttl = 18; // Go duration string (e.g., "30m", "6h").
 }
 
 message CreateAgentRequest {
@@ -236,6 +241,11 @@ message CreateAgentRequest {
   string environment_id = 14; // UUID
   AgentDefaultThread default_thread = 15;
   AgentFinalMessage final_message = 16;
+  // How long an instance may sit idle before the platform pauses it with
+  // pause_reason "idle_ttl_exceeded". Idleness is measured from the instance's
+  // last activity, and a paused instance keeps its thread and its inbox --
+  // ResumeInstance picks up whatever arrived. Empty means never.
+  optional string instance_idle_ttl = 17; // Go duration string (e.g., "30m", "6h").
 }
 
 message CreateAgentResponse {
@@ -280,6 +290,11 @@ message UpdateAgentRequest {
   optional string environment_id = 14; // UUID
   optional AgentDefaultThread default_thread = 15;
   optional AgentFinalMessage final_message = 16;
+  // How long an instance may sit idle before the platform pauses it with
+  // pause_reason "idle_ttl_exceeded". Idleness is measured from the instance's
+  // last activity, and a paused instance keeps its thread and its inbox --
+  // ResumeInstance picks up whatever arrived. Empty means never.
+  optional string instance_idle_ttl = 17; // Go duration string (e.g., "30m", "6h").
 }
 
 message UpdateAgentResponse {
