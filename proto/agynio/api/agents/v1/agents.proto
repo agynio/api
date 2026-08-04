@@ -87,11 +87,21 @@ service AgentsService {
   rpc ListSkills(ListSkillsRequest) returns (ListSkillsResponse);
 
   // --- Hooks ---
-  rpc CreateHook(CreateHookRequest) returns (CreateHookResponse) { option deprecated = true; }
-  rpc GetHook(GetHookRequest) returns (GetHookResponse) { option deprecated = true; }
-  rpc UpdateHook(UpdateHookRequest) returns (UpdateHookResponse) { option deprecated = true; }
-  rpc DeleteHook(DeleteHookRequest) returns (DeleteHookResponse) { option deprecated = true; }
-  rpc ListHooks(ListHooksRequest) returns (ListHooksResponse) { option deprecated = true; }
+  rpc CreateHook(CreateHookRequest) returns (CreateHookResponse) {
+    option deprecated = true;
+  }
+  rpc GetHook(GetHookRequest) returns (GetHookResponse) {
+    option deprecated = true;
+  }
+  rpc UpdateHook(UpdateHookRequest) returns (UpdateHookResponse) {
+    option deprecated = true;
+  }
+  rpc DeleteHook(DeleteHookRequest) returns (DeleteHookResponse) {
+    option deprecated = true;
+  }
+  rpc ListHooks(ListHooksRequest) returns (ListHooksResponse) {
+    option deprecated = true;
+  }
 
   // --- Envs ---
   rpc CreateEnv(CreateEnvRequest) returns (CreateEnvResponse);
@@ -108,10 +118,18 @@ service AgentsService {
   rpc ListInitScripts(ListInitScriptsRequest) returns (ListInitScriptsResponse);
 
   // --- Image Pull Secret Attachments (no Update - immutable) ---
-  rpc CreateImagePullSecretAttachment(CreateImagePullSecretAttachmentRequest) returns (CreateImagePullSecretAttachmentResponse) { option deprecated = true; }
-  rpc GetImagePullSecretAttachment(GetImagePullSecretAttachmentRequest) returns (GetImagePullSecretAttachmentResponse) { option deprecated = true; }
-  rpc DeleteImagePullSecretAttachment(DeleteImagePullSecretAttachmentRequest) returns (DeleteImagePullSecretAttachmentResponse) { option deprecated = true; }
-  rpc ListImagePullSecretAttachments(ListImagePullSecretAttachmentsRequest) returns (ListImagePullSecretAttachmentsResponse) { option deprecated = true; }
+  rpc CreateImagePullSecretAttachment(CreateImagePullSecretAttachmentRequest) returns (CreateImagePullSecretAttachmentResponse) {
+    option deprecated = true;
+  }
+  rpc GetImagePullSecretAttachment(GetImagePullSecretAttachmentRequest) returns (GetImagePullSecretAttachmentResponse) {
+    option deprecated = true;
+  }
+  rpc DeleteImagePullSecretAttachment(DeleteImagePullSecretAttachmentRequest) returns (DeleteImagePullSecretAttachmentResponse) {
+    option deprecated = true;
+  }
+  rpc ListImagePullSecretAttachments(ListImagePullSecretAttachmentsRequest) returns (ListImagePullSecretAttachmentsResponse) {
+    option deprecated = true;
+  }
 }
 
 // ===========================================================================
