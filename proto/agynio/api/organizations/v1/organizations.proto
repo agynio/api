@@ -13,6 +13,9 @@ option go_package = "github.com/agynio/api/gen/agynio/api/organizations/v1;organ
 service OrganizationsService {
   rpc CreateOrganization(CreateOrganizationRequest) returns (CreateOrganizationResponse);
   rpc GetOrganization(GetOrganizationRequest) returns (GetOrganizationResponse);
+  // Resolve a slug to an organization. Internal: the Image Proxy resolves the
+  // slug in a reference path before asking the catalog for the image.
+  rpc GetOrganizationBySlug(GetOrganizationBySlugRequest) returns (GetOrganizationBySlugResponse);
   rpc UpdateOrganization(UpdateOrganizationRequest) returns (UpdateOrganizationResponse);
   rpc DeleteOrganization(DeleteOrganizationRequest) returns (DeleteOrganizationResponse);
   rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse);
@@ -59,13 +62,27 @@ message Organization {
   google.protobuf.Timestamp updated_at = 4;
   string sandbox_default_idle_timeout = 5;
   string sandbox_default_ttl = 6;
+  // Cluster-wide unique short name. Appears in identifiers that must resolve
+  // without an organization already in context: an app's address and an image
+  // proxy reference. Max 64 chars, pattern ^[a-z0-9-]+$.
+  string slug = 7;
 }
 
 message CreateOrganizationRequest {
   string name = 1;
+  // Optional. Derived from the name when empty.
+  string slug = 2;
 }
 
 message CreateOrganizationResponse {
+  Organization organization = 1;
+}
+
+message GetOrganizationBySlugRequest {
+  string slug = 1;
+}
+
+message GetOrganizationBySlugResponse {
   Organization organization = 1;
 }
 
@@ -82,6 +99,10 @@ message UpdateOrganizationRequest {
   optional string name = 2;
   optional string sandbox_default_idle_timeout = 3;
   optional string sandbox_default_ttl = 4;
+  // A rename is visible: app addresses change and image references change,
+  // which costs a one-time container-image cache miss per node. Nothing breaks,
+  // because neither consumer stores a resolved reference.
+  optional string slug = 5;
 }
 
 message UpdateOrganizationResponse {
