@@ -535,7 +535,9 @@ message Environment {
   // Superseded by runner_id + flavor: placement is now environment to runner
   // directly, with the flavor named within that runner's catalog.
   string flavor_id = 4 [deprecated = true];
-  string image = 5;
+  // Superseded by workspace_image_id + workspace_image_tag: an environment
+  // names catalog records rather than holding a registry address.
+  string image = 5 [deprecated = true];
   string flavor_name = 6 [deprecated = true];
   // The runner this environment places workloads on.
   string runner_id = 7;
@@ -544,15 +546,29 @@ message Environment {
   // Deliberately not validated here: platform resources and runner
   // configuration may be applied in either order.
   string flavor = 8;
+  // The image the workload's main container runs. Must be a visible Image of
+  // type workspace; the tag must be one discovery has seen. Validated on
+  // write and resolved again at each workload start.
+  string workspace_image_id = 9; // UUID
+  string workspace_image_tag = 10;
+  // The image supplying the agent CLI, injected as an init container. Empty
+  // means a workspace-only environment: usable by sandboxes, rejected by
+  // CreateAgent.
+  string agent_runtime_image_id = 11; // UUID
+  string agent_runtime_image_tag = 12;
 }
 
 message CreateEnvironmentRequest {
   string organization_id = 1;
   string name = 2;
   string flavor_id = 3 [deprecated = true];
-  string image = 4;
+  string image = 4 [deprecated = true];
   string runner_id = 5;
   string flavor = 6;
+  string workspace_image_id = 7; // UUID
+  string workspace_image_tag = 8;
+  string agent_runtime_image_id = 9; // UUID
+  string agent_runtime_image_tag = 10;
 }
 
 message CreateEnvironmentResponse {
@@ -571,9 +587,14 @@ message UpdateEnvironmentRequest {
   string id = 1; // UUID
   optional string name = 2;
   optional string flavor_id = 3 [deprecated = true];
-  optional string image = 4;
+  optional string image = 4 [deprecated = true];
   optional string runner_id = 5;
   optional string flavor = 6;
+  optional string workspace_image_id = 7; // UUID
+  optional string workspace_image_tag = 8;
+  // Clearing both makes the environment workspace-only.
+  optional string agent_runtime_image_id = 9; // UUID
+  optional string agent_runtime_image_tag = 10;
 }
 
 message UpdateEnvironmentResponse {
@@ -897,20 +918,27 @@ message ListImagePullSecretAttachmentsResponse {
 message Mcp {
   EntityMeta meta = 1;
   string agent_id = 2; // UUID
-  string image = 3;
+  // Superseded by image_id + image_tag.
+  string image = 3 [deprecated = true];
   string command = 4;
   ComputeResources resources = 5;
   string description = 6;
   string name = 7; // MCP server name, unique within agent
+  // An Image of type mcp or workspace: a purpose-built server and a
+  // devcontainer are both legitimate ways to host one.
+  string image_id = 8; // UUID
+  string image_tag = 9;
 }
 
 message CreateMcpRequest {
   string agent_id = 1; // UUID
-  string image = 2;
+  string image = 2 [deprecated = true];
   string command = 3;
   ComputeResources resources = 4;
   string description = 5;
   string name = 6; // MCP server name
+  string image_id = 7; // UUID
+  string image_tag = 8;
 }
 
 message CreateMcpResponse {
@@ -927,10 +955,12 @@ message GetMcpResponse {
 
 message UpdateMcpRequest {
   string id = 1; // UUID
-  optional string image = 2;
+  optional string image = 2 [deprecated = true];
   optional string command = 3;
   optional ComputeResources resources = 4;
   optional string description = 5;
+  optional string image_id = 6; // UUID
+  optional string image_tag = 7;
 }
 
 message UpdateMcpResponse {
