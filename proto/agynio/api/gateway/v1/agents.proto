@@ -74,12 +74,6 @@ service AgentsGateway {
   rpc DeleteSkill(agynio.api.agents.v1.DeleteSkillRequest) returns (agynio.api.agents.v1.DeleteSkillResponse);
   rpc ListSkills(agynio.api.agents.v1.ListSkillsRequest) returns (agynio.api.agents.v1.ListSkillsResponse);
 
-  // --- Hooks ---
-  rpc CreateHook(agynio.api.agents.v1.CreateHookRequest) returns (agynio.api.agents.v1.CreateHookResponse);
-  rpc GetHook(agynio.api.agents.v1.GetHookRequest) returns (agynio.api.agents.v1.GetHookResponse);
-  rpc UpdateHook(agynio.api.agents.v1.UpdateHookRequest) returns (agynio.api.agents.v1.UpdateHookResponse);
-  rpc DeleteHook(agynio.api.agents.v1.DeleteHookRequest) returns (agynio.api.agents.v1.DeleteHookResponse);
-  rpc ListHooks(agynio.api.agents.v1.ListHooksRequest) returns (agynio.api.agents.v1.ListHooksResponse);
 
   // --- Envs ---
   rpc CreateEnv(agynio.api.agents.v1.CreateEnvRequest) returns (agynio.api.agents.v1.CreateEnvResponse);
