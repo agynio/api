@@ -6,13 +6,7 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/agynio/api/gen/agynio/api/images/v1;imagesv1";
 
-// ImagesService owns the image catalog: the Image records an organization
-// authors, and the Version records the platform discovers by reading upstream
-// repositories.
-//
-// It is the only service in the platform that stores a registry URL or a
-// registry credential. Versions are discovered, never authored - there is no
-// create, update, or delete RPC for them.
+// Image catalog. Versions are discovered, not authored.
 service ImagesService {
   // --- Images ---
   rpc CreateImage(CreateImageRequest) returns (CreateImageResponse);
@@ -22,26 +16,17 @@ service ImagesService {
   rpc ListImages(ListImagesRequest) returns (ListImagesResponse);
 
   // --- Versions ---
-  // List discovered versions, newest first. Serves stored rows - never blocks
-  // on the upstream registry.
+  // Discovered versions, newest first.
   rpc ListVersions(ListVersionsRequest) returns (ListVersionsResponse);
-  // Trigger an immediate discovery pass, so a freshly pushed tag appears
-  // without waiting for the poll interval.
+  // Run a discovery pass now.
   rpc RefreshImage(RefreshImageRequest) returns (RefreshImageResponse);
 
   // --- Internal ---
-  // Resolve a reference to an upstream repository and credential. Used by the
-  // Agents service to validate a reference on write, and by the Image Proxy to
-  // serve a pull. Internal only - restricted by Istio, not by an identity
-  // check.
+  // Resolve (image, tag) to an upstream repository and credential.
   rpc ResolveVersion(ResolveVersionRequest) returns (ResolveVersionResponse);
-  // Resolve a reference to an upstream repository and credential without
-  // naming a tag. A blob request carries a digest and no tag, so the Image
-  // Proxy cannot use ResolveVersion for it. Internal only.
+  // Resolve an image to an upstream repository and credential, without a tag.
   rpc ResolveImage(ResolveImageRequest) returns (ResolveImageResponse);
-  // Create an image if no image of that name exists in the organization, and
-  // return the existing one otherwise. Never updates, so re-running an upgrade
-  // cannot overwrite a change someone made by hand. Internal only.
+  // Create if absent; return the existing record otherwise. Never updates.
   rpc RegisterPlatformImage(RegisterPlatformImageRequest) returns (RegisterPlatformImageResponse);
 }
 
@@ -109,14 +94,9 @@ message Image {
   optional google.protobuf.Timestamp stale_since = 11;
   // When discovery last completed successfully.
   optional google.protobuf.Timestamp last_discovery_at = 12;
-  // The owning organization's display name. Not an identifier - two
-  // organizations may share one - but the readable half of an attribution.
+  // Owning organization. Resolved on read; not stored on the image.
   string organization_name = 13;
-  // The owning organization's slug, resolved on read. A public image is listed
-  // to organizations that cannot read the owner's record, and a bare id tells
-  // the reader nothing about who is sharing it. The slug rather than the name:
-  // it is unique platform-wide and is what the image proxy already puts in
-  // every rewritten reference, so one identifier names the owner everywhere.
+  // Owning organization's slug. Unique platform-wide.
   string organization_slug = 14;
 }
 
