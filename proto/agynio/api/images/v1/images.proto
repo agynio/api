@@ -109,9 +109,9 @@ message Image {
   optional google.protobuf.Timestamp stale_since = 11;
   // When discovery last completed successfully.
   optional google.protobuf.Timestamp last_discovery_at = 12;
-  // Superseded by organization_slug: a name is not unique platform-wide, so it
-  // cannot identify an owner on its own.
-  string organization_name = 13 [deprecated = true];
+  // The owning organization's display name. Not an identifier - two
+  // organizations may share one - but the readable half of an attribution.
+  string organization_name = 13;
   // The owning organization's slug, resolved on read. A public image is listed
   // to organizations that cannot read the owner's record, and a bare id tells
   // the reader nothing about who is sharing it. The slug rather than the name:
