@@ -13,7 +13,17 @@ service TerminalGateway {
 message CreateTerminalSessionRequest {
   string workload_id = 1;
   string container_name = 2;
+
+  // The command to run. Meaningful only when kind is EXEC; every other kind
+  // has a platform-defined command and ignores this field.
   optional agynio.api.terminal_proxy.v1.TerminalCommand command = 3;
+
+  // Required. UNSPECIFIED is rejected with InvalidArgument.
+  agynio.api.terminal_proxy.v1.SessionKind kind = 4;
+
+  // The directory to serve. Meaningful only when kind is SYNC. Must be
+  // absolute.
+  string sync_root = 5;
 }
 
 message CreateTerminalSessionResponse {

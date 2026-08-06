@@ -9,6 +9,27 @@ service TerminalProxyService {
   rpc IssueTicket(IssueTicketRequest) returns (IssueTicketResponse);
 }
 
+// SessionKind selects what runs in the container. The command for each kind is
+// platform-defined and bound into the ticket at issuance, so a client never
+// supplies one and cannot change it at attach time.
+enum SessionKind {
+  // Rejected with InvalidArgument. It does not default to SHELL: silently
+  // defaulting the field that selects a command is how an unintended command
+  // ends up in a ticket.
+  SESSION_KIND_UNSPECIFIED = 0;
+
+  // A login shell on a PTY, with the platform binaries on PATH.
+  SESSION_KIND_SHELL = 1;
+
+  // A caller-supplied command on a PTY. Carries no more privilege than SHELL —
+  // binding the command at issuance buys immutability, not permission.
+  SESSION_KIND_EXEC = 2;
+
+  // The workspace sync endpoint. Non-TTY: no PTY, no resize, and stdout kept
+  // separate from stderr so diagnostics cannot corrupt protocol frames.
+  SESSION_KIND_SYNC = 3;
+}
+
 message IssueTicketRequest {
   // Authenticated identity supplied by Gateway from request context. This
   // field is internal service-to-service data and must never come from client
@@ -16,7 +37,17 @@ message IssueTicketRequest {
   string identity_id = 1;
   string workload_id = 2;
   string container_name = 3;
+
+  // The command to run. Meaningful only when kind is EXEC; every other kind
+  // has a platform-defined command and ignores this field.
   TerminalCommand command = 4;
+
+  SessionKind kind = 5;
+
+  // The directory to serve. Meaningful only when kind is SYNC. Must be
+  // absolute; it is normalized before being bound into the ticket, and
+  // resolved against the real filesystem inside the container.
+  string sync_root = 6;
 }
 
 message IssueTicketResponse {
