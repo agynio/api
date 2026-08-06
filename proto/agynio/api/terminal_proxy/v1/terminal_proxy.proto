@@ -9,6 +9,28 @@ service TerminalProxyService {
   rpc IssueTicket(IssueTicketRequest) returns (IssueTicketResponse);
 }
 
+// TerminalSessionKind selects what the platform runs. The Gateway holds the
+// command for each kind, so a client never supplies one and the ticket always
+// describes something the platform defined.
+enum TerminalSessionKind {
+  // Rejected with InvalidArgument. It does not default to SHELL: silently
+  // defaulting the field that selects a command is how an unintended command
+  // ends up in a ticket.
+  TERMINAL_SESSION_KIND_UNSPECIFIED = 0;
+
+  // A login shell, TTY. The platform binaries are put on PATH after the login
+  // profile runs, since /etc/profile assigns PATH outright on common bases.
+  TERMINAL_SESSION_KIND_SHELL = 1;
+
+  // A caller-supplied command, TTY. Authorized by the same check as SHELL —
+  // binding the command at issuance buys immutability, not permission.
+  TERMINAL_SESSION_KIND_EXEC = 2;
+
+  // The workspace sync endpoint. Non-TTY: no PTY, no resize, and stdout kept
+  // separate from stderr so protocol frames are not corrupted by diagnostics.
+  TERMINAL_SESSION_KIND_SYNC = 3;
+}
+
 message IssueTicketRequest {
   // Authenticated identity supplied by Gateway from request context. This
   // field is internal service-to-service data and must never come from client
@@ -16,7 +38,17 @@ message IssueTicketRequest {
   string identity_id = 1;
   string workload_id = 2;
   string container_name = 3;
+
+  // Set only for EXEC. The Gateway derives the command for every other kind.
   TerminalCommand command = 4;
+
+  TerminalSessionKind kind = 5;
+
+  // Set only for SYNC: the directory to serve. The Gateway validates it
+  // lexically — absolute, normalized, no traversal — and the endpoint resolves
+  // it against the real filesystem and confines it to the workspace mount,
+  // which is the only place either can be checked.
+  string sync_root = 6;
 }
 
 message IssueTicketResponse {
