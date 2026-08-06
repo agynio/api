@@ -14,15 +14,15 @@ message CreateTerminalSessionRequest {
   string workload_id = 1;
   string container_name = 2;
 
-  // Set only for EXEC. The Gateway derives the command for every other kind,
-  // so a client cannot escalate beyond what its kind was authorized for.
+  // The command to run. Meaningful only when kind is EXEC; every other kind
+  // has a platform-defined command and ignores this field.
   optional agynio.api.terminal_proxy.v1.TerminalCommand command = 3;
 
   // Required. UNSPECIFIED is rejected with InvalidArgument.
-  agynio.api.terminal_proxy.v1.TerminalSessionKind kind = 4;
+  agynio.api.terminal_proxy.v1.SessionKind kind = 4;
 
-  // Set only for SYNC: the directory to serve, validated as absolute and
-  // normalized before being bound into the ticket.
+  // The directory to serve. Meaningful only when kind is SYNC. Must be
+  // absolute.
   string sync_root = 5;
 }
 
