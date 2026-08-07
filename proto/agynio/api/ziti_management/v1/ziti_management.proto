@@ -136,12 +136,18 @@ message ManagedIdentity {
 }
 
 message CreateAgentIdentityRequest {
+  // The agent instance this workload serves; it is what the identity resolves to.
   string agent_id = 1;
   string workload_id = 2;
   // Extra role attributes such as group-<id>. Base agent attributes are added by Ziti Management.
   repeated string additional_role_attributes = 3;
   // Tags attached to the OpenZiti identity.
   map<string, string> tags = 4;
+  // The class the instance was spawned from, and the environment it runs.
+  // Recorded on the identity so a data-plane service can answer "what is this
+  // workload configured to do" from the connection alone.
+  string agent_class_id = 5;
+  string environment_id = 6;
 }
 
 message CreateAgentIdentityResponse {
@@ -321,6 +327,10 @@ message ResolveIdentityResponse {
   string identity_id = 1;
   agynio.api.identity.v1.IdentityType identity_type = 2;
   optional string workload_id = 3;
+  // Workload identities only. agent_id is additionally absent for a sandbox,
+  // which runs an environment with no agent behind it.
+  optional string agent_id = 4;
+  optional string environment_id = 5;
 }
 
 message RequestServiceIdentityRequest {

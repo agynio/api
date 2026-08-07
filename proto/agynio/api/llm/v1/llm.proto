@@ -6,7 +6,8 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/agynio/api/gen/agynio/api/llm/v1;llmv1";
 
-// LLMService manages provider and model resources and resolves models.
+// LLMService manages provider, model, and subscription resources and resolves
+// them for the LLM Proxy.
 service LLMService {
   // --- Providers ---
   rpc CreateLLMProvider(CreateLLMProviderRequest) returns (CreateLLMProviderResponse);
@@ -22,11 +23,28 @@ service LLMService {
   rpc DeleteModel(DeleteModelRequest) returns (DeleteModelResponse);
   rpc ListModels(ListModelsRequest) returns (ListModelsResponse);
 
+  // --- Subscriptions ---
+  rpc CreateSubscription(CreateSubscriptionRequest) returns (CreateSubscriptionResponse);
+  rpc GetSubscription(GetSubscriptionRequest) returns (GetSubscriptionResponse);
+  rpc UpdateSubscription(UpdateSubscriptionRequest) returns (UpdateSubscriptionResponse);
+  rpc DeleteSubscription(DeleteSubscriptionRequest) returns (DeleteSubscriptionResponse);
+  rpc ListSubscriptions(ListSubscriptionsRequest) returns (ListSubscriptionsResponse);
+
+  // --- Subscription attachments ---
+  rpc CreateSubscriptionAttachment(CreateSubscriptionAttachmentRequest) returns (CreateSubscriptionAttachmentResponse);
+  rpc DeleteSubscriptionAttachment(DeleteSubscriptionAttachmentRequest) returns (DeleteSubscriptionAttachmentResponse);
+  rpc ListSubscriptionAttachments(ListSubscriptionAttachmentsRequest) returns (ListSubscriptionAttachmentsResponse);
+
   // --- Test ---
   rpc TestModel(TestModelRequest) returns (TestModelResponse);
 
   // --- Resolution ---
   rpc ResolveModel(ResolveModelRequest) returns (ResolveModelResponse);
+  rpc ResolveSubscription(ResolveSubscriptionRequest) returns (ResolveSubscriptionResponse);
+
+  // --- Internal ---
+  // Secrets -> refuse deleting a secret a subscription references.
+  rpc CountSubscriptionsReferencingSecret(CountSubscriptionsReferencingSecretRequest) returns (CountSubscriptionsReferencingSecretResponse);
 }
 
 // ===========================================================================
@@ -53,6 +71,15 @@ enum Protocol {
   PROTOCOL_UNSPECIFIED = 0;
   PROTOCOL_RESPONSES = 1;
   PROTOCOL_ANTHROPIC_MESSAGES = 2;
+}
+
+// Vendor whose own consumer plan a Subscription holds a credential for. Closed:
+// each value fixes an intercepted host, an upstream, a protocol, a header set,
+// and the container placeholder variable name.
+enum Vendor {
+  VENDOR_UNSPECIFIED = 0;
+  VENDOR_CLAUDE = 1;
+  VENDOR_CODEX = 2;
 }
 
 // ===========================================================================
@@ -176,6 +203,135 @@ message ListModelsResponse {
 }
 
 // ===========================================================================
+// Subscription
+// ===========================================================================
+
+message Subscription {
+  EntityMeta meta = 1;
+  string name = 2;
+  Vendor vendor = 3;
+  // The token is held by reference. The value is resolved at binding time and
+  // never stored or returned here.
+  string secret_id = 4; // UUID
+  // Empty unless the vendor's API requires an account identifier. Not a secret.
+  string account_id = 5;
+  string organization_id = 6; // UUID
+}
+
+message CreateSubscriptionRequest {
+  string organization_id = 1;
+  string name = 2;
+  Vendor vendor = 3;
+  string secret_id = 4; // UUID
+  string account_id = 5;
+}
+
+message CreateSubscriptionResponse {
+  Subscription subscription = 1;
+}
+
+message GetSubscriptionRequest {
+  string id = 1; // UUID
+}
+
+message GetSubscriptionResponse {
+  Subscription subscription = 1;
+}
+
+// vendor is absent deliberately: changing it would silently redirect every
+// workload the subscription is attached to.
+message UpdateSubscriptionRequest {
+  string id = 1; // UUID
+  optional string name = 2;
+  optional string secret_id = 3; // UUID
+  optional string account_id = 4;
+}
+
+message UpdateSubscriptionResponse {
+  Subscription subscription = 1;
+}
+
+message DeleteSubscriptionRequest {
+  string id = 1; // UUID
+}
+
+message DeleteSubscriptionResponse {}
+
+message ListSubscriptionsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string organization_id = 3;
+}
+
+message ListSubscriptionsResponse {
+  repeated Subscription subscriptions = 1;
+  string next_page_token = 2;
+}
+
+// ===========================================================================
+// Subscription attachment
+// ===========================================================================
+
+// Binds a Subscription to an agent or an environment. Unique on
+// (vendor, target): an intercepted request carries nothing that identifies a
+// credential, so the resolution key must never have two candidates.
+message SubscriptionAttachment {
+  EntityMeta meta = 1;
+  string subscription_id = 2; // UUID
+  // Denormalized from the subscription, which cannot change vendor. Carried
+  // here so the orchestrator gets role attributes without a second call.
+  Vendor vendor = 3;
+  // Name of the container environment variable holding this vendor's
+  // placeholder credential. Empty for a vendor that has none.
+  string placeholder_env = 4;
+  oneof target {
+    string agent_id = 5; // UUID
+    string environment_id = 6; // UUID
+  }
+}
+
+message CreateSubscriptionAttachmentRequest {
+  string subscription_id = 1; // UUID
+  oneof target {
+    string agent_id = 2; // UUID
+    string environment_id = 3; // UUID
+  }
+}
+
+message CreateSubscriptionAttachmentResponse {
+  SubscriptionAttachment subscription_attachment = 1;
+}
+
+message DeleteSubscriptionAttachmentRequest {
+  string id = 1; // UUID
+}
+
+message DeleteSubscriptionAttachmentResponse {}
+
+message ListSubscriptionAttachmentsRequest {
+  string organization_id = 1;
+  optional string subscription_id = 2; // UUID
+  optional string agent_id = 3; // UUID
+  optional string environment_id = 4; // UUID
+  int32 page_size = 5;
+  string page_token = 6;
+}
+
+message ListSubscriptionAttachmentsResponse {
+  repeated SubscriptionAttachment subscription_attachments = 1;
+  string next_page_token = 2;
+}
+
+message CountSubscriptionsReferencingSecretRequest {
+  string secret_id = 1; // UUID
+}
+
+message CountSubscriptionsReferencingSecretResponse {
+  int32 count = 1;
+  repeated string subscription_ids = 2;
+}
+
+// ===========================================================================
 // Test
 // ===========================================================================
 
@@ -202,4 +358,30 @@ message ResolveModelResponse {
   string organization_id = 4; // UUID
   Protocol protocol = 5;
   AuthMethod auth_method = 6;
+}
+
+// Both identifiers come from the caller's OpenZiti identity; neither is
+// self-asserted by the workload. vendor is the intercept service the connection
+// arrived on.
+message ResolveSubscriptionRequest {
+  // Empty for a sandbox, which runs no agent class.
+  string agent_id = 1; // UUID
+  string environment_id = 2; // UUID
+  Vendor vendor = 3;
+}
+
+// Everything the proxy needs to serve a native-mode connection, so it performs
+// no configuration lookups of its own. placeholder_env is deliberately absent:
+// the proxy strips Authorization and x-api-key whatever they were called.
+message ResolveSubscriptionResponse {
+  // Metering records this as resource_id; the proxy has no other source.
+  string subscription_id = 1; // UUID
+  string token = 2;
+  string account_id = 3;
+  string upstream_endpoint = 4;
+  Protocol protocol = 5;
+  // The environment's llm_allowed_models, read by the LLM service from Agents.
+  // Empty means no restriction.
+  repeated string allowed_models = 6;
+  string organization_id = 7; // UUID
 }

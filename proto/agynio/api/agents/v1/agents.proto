@@ -203,6 +203,15 @@ enum EnvironmentAvailability {
   ENVIRONMENT_AVAILABILITY_PRIVATE = 2;
 }
 
+// How workloads in an environment reach an LLM. PLATFORM points the agent CLI
+// at the LLM Proxy with platform Model IDs; NATIVE leaves the CLI in its stock
+// configuration and intercepts its vendor traffic.
+enum LLMMode {
+  LLM_MODE_UNSPECIFIED = 0;
+  LLM_MODE_PLATFORM = 1;
+  LLM_MODE_NATIVE = 2;
+}
+
 enum EnvironmentRole {
   ENVIRONMENT_ROLE_UNSPECIFIED = 0;
   ENVIRONMENT_ROLE_OWNER = 1;
@@ -258,6 +267,9 @@ message Agent {
   // than the instance. Defaults to DISCARD.
   AgentFinalMessage final_message = 17;
   optional string instance_idle_ttl = 18; // Go duration string (e.g., "30m", "6h").
+  // Vendor model name for native mode, opaque to the platform. Mutually
+  // exclusive with model, which mode the environment is in decides.
+  string model_name = 19;
 }
 
 message CreateAgentRequest {
@@ -280,6 +292,8 @@ message CreateAgentRequest {
   AgentDefaultThread default_thread = 15;
   AgentFinalMessage final_message = 16;
   optional string instance_idle_ttl = 17; // Go duration string (e.g., "30m", "6h").
+  // Required-and-exclusive against model, decided by the environment's llm_mode.
+  string model_name = 18;
 }
 
 message CreateAgentResponse {
@@ -325,6 +339,7 @@ message UpdateAgentRequest {
   optional AgentDefaultThread default_thread = 15;
   optional AgentFinalMessage final_message = 16;
   optional string instance_idle_ttl = 17; // Go duration string (e.g., "30m", "6h").
+  optional string model_name = 18;
 }
 
 message UpdateAgentResponse {
@@ -599,6 +614,11 @@ message Environment {
   string agent_runtime_image_id = 11; // UUID
   string agent_runtime_image_tag = 12;
   EnvironmentAvailability availability = 13;
+  // How workloads here reach an LLM. Defaults to PLATFORM.
+  LLMMode llm_mode = 14;
+  // Vendor model names a native-mode workload may request, enforced by the LLM
+  // Proxy. Empty means no restriction. Ignored in platform mode.
+  repeated string llm_allowed_models = 15;
 }
 
 message CreateEnvironmentRequest {
@@ -613,6 +633,9 @@ message CreateEnvironmentRequest {
   string agent_runtime_image_id = 9; // UUID
   string agent_runtime_image_tag = 10;
   EnvironmentAvailability availability = 11;
+  // Unspecified defaults to PLATFORM.
+  LLMMode llm_mode = 12;
+  repeated string llm_allowed_models = 13;
 }
 
 message CreateEnvironmentResponse {
@@ -640,6 +663,11 @@ message UpdateEnvironmentRequest {
   optional string agent_runtime_image_id = 9; // UUID
   optional string agent_runtime_image_tag = 10;
   optional EnvironmentAvailability availability = 11;
+  // Rejected while any agent references the environment: every such agent's
+  // model / model_name becomes invalid in the other mode.
+  optional LLMMode llm_mode = 12;
+  // Replaces the existing list; an empty list clears the allowlist.
+  repeated string llm_allowed_models = 13;
 }
 
 message UpdateEnvironmentResponse {
