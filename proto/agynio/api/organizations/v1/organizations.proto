@@ -72,6 +72,7 @@ message Organization {
   // without an organization already in context: an app's address and an image
   // proxy reference. Max 64 chars, pattern ^[a-z0-9-]+$.
   string slug = 7;
+  string sandbox_max_idle_timeout = 8;
 }
 
 message CreateOrganizationRequest {
@@ -121,6 +122,7 @@ message UpdateOrganizationRequest {
   // which costs a one-time container-image cache miss per node. Nothing breaks,
   // because neither consumer stores a resolved reference.
   optional string slug = 5;
+  optional string sandbox_max_idle_timeout = 6;
 }
 
 message UpdateOrganizationResponse {

@@ -667,6 +667,7 @@ message CreateSandboxRequest {
   string organization_id = 1;
   optional string name = 2;
   string environment_id = 3;
+  optional string idle_timeout = 4;
 }
 
 message CreateSandboxResponse {
