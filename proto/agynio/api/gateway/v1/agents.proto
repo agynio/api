@@ -24,6 +24,9 @@ service AgentsGateway {
   rpc UpdateEnvironment(agynio.api.agents.v1.UpdateEnvironmentRequest) returns (agynio.api.agents.v1.UpdateEnvironmentResponse);
   rpc DeleteEnvironment(agynio.api.agents.v1.DeleteEnvironmentRequest) returns (agynio.api.agents.v1.DeleteEnvironmentResponse);
   rpc ListEnvironments(agynio.api.agents.v1.ListEnvironmentsRequest) returns (agynio.api.agents.v1.ListEnvironmentsResponse);
+  rpc SetEnvironmentRole(agynio.api.agents.v1.SetEnvironmentRoleRequest) returns (agynio.api.agents.v1.SetEnvironmentRoleResponse);
+  rpc RemoveEnvironmentRole(agynio.api.agents.v1.RemoveEnvironmentRoleRequest) returns (agynio.api.agents.v1.RemoveEnvironmentRoleResponse);
+  rpc ListEnvironmentRoles(agynio.api.agents.v1.ListEnvironmentRolesRequest) returns (agynio.api.agents.v1.ListEnvironmentRolesResponse);
 
   // --- Sandboxes ---
   rpc CreateSandbox(agynio.api.agents.v1.CreateSandboxRequest) returns (agynio.api.agents.v1.CreateSandboxResponse);
@@ -54,11 +57,19 @@ service AgentsGateway {
   rpc DeleteVolume(agynio.api.agents.v1.DeleteVolumeRequest) returns (agynio.api.agents.v1.DeleteVolumeResponse);
   rpc ListVolumes(agynio.api.agents.v1.ListVolumesRequest) returns (agynio.api.agents.v1.ListVolumesResponse);
 
-  // --- Volume Attachments (no Update) ---
-  rpc CreateVolumeAttachment(agynio.api.agents.v1.CreateVolumeAttachmentRequest) returns (agynio.api.agents.v1.CreateVolumeAttachmentResponse);
-  rpc GetVolumeAttachment(agynio.api.agents.v1.GetVolumeAttachmentRequest) returns (agynio.api.agents.v1.GetVolumeAttachmentResponse);
-  rpc DeleteVolumeAttachment(agynio.api.agents.v1.DeleteVolumeAttachmentRequest) returns (agynio.api.agents.v1.DeleteVolumeAttachmentResponse);
-  rpc ListVolumeAttachments(agynio.api.agents.v1.ListVolumeAttachmentsRequest) returns (agynio.api.agents.v1.ListVolumeAttachmentsResponse);
+  // --- Volume Attachments (superseded by a volume's own target) ---
+  rpc CreateVolumeAttachment(agynio.api.agents.v1.CreateVolumeAttachmentRequest) returns (agynio.api.agents.v1.CreateVolumeAttachmentResponse) {
+    option deprecated = true;
+  }
+  rpc GetVolumeAttachment(agynio.api.agents.v1.GetVolumeAttachmentRequest) returns (agynio.api.agents.v1.GetVolumeAttachmentResponse) {
+    option deprecated = true;
+  }
+  rpc DeleteVolumeAttachment(agynio.api.agents.v1.DeleteVolumeAttachmentRequest) returns (agynio.api.agents.v1.DeleteVolumeAttachmentResponse) {
+    option deprecated = true;
+  }
+  rpc ListVolumeAttachments(agynio.api.agents.v1.ListVolumeAttachmentsRequest) returns (agynio.api.agents.v1.ListVolumeAttachmentsResponse) {
+    option deprecated = true;
+  }
 
   // --- MCPs ---
   rpc CreateMcp(agynio.api.agents.v1.CreateMcpRequest) returns (agynio.api.agents.v1.CreateMcpResponse);

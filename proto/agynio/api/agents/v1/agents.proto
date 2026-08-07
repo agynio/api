@@ -6,8 +6,8 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/agynio/api/gen/agynio/api/agents/v1;agentsv1";
 
-// AgentsService manages agent resources: agents, volumes, volume attachments,
-// MCP servers, skills, hooks, environment variables, and init scripts.
+// AgentsService manages agent resources: agents, environments, volumes,
+// MCP servers, skills, environment variables, and init scripts.
 //
 // This is a control-plane service. It stores desired state;
 // other services reconcile toward it.
@@ -31,6 +31,9 @@ service AgentsService {
   rpc UpdateEnvironment(UpdateEnvironmentRequest) returns (UpdateEnvironmentResponse);
   rpc DeleteEnvironment(DeleteEnvironmentRequest) returns (DeleteEnvironmentResponse);
   rpc ListEnvironments(ListEnvironmentsRequest) returns (ListEnvironmentsResponse);
+  rpc SetEnvironmentRole(SetEnvironmentRoleRequest) returns (SetEnvironmentRoleResponse);
+  rpc RemoveEnvironmentRole(RemoveEnvironmentRoleRequest) returns (RemoveEnvironmentRoleResponse);
+  rpc ListEnvironmentRoles(ListEnvironmentRolesRequest) returns (ListEnvironmentRolesResponse);
 
   // --- Sandboxes ---
   rpc CreateSandbox(CreateSandboxRequest) returns (CreateSandboxResponse);
@@ -66,11 +69,19 @@ service AgentsService {
   rpc DeleteVolume(DeleteVolumeRequest) returns (DeleteVolumeResponse);
   rpc ListVolumes(ListVolumesRequest) returns (ListVolumesResponse);
 
-  // --- Volume Attachments (no Update) ---
-  rpc CreateVolumeAttachment(CreateVolumeAttachmentRequest) returns (CreateVolumeAttachmentResponse);
-  rpc GetVolumeAttachment(GetVolumeAttachmentRequest) returns (GetVolumeAttachmentResponse);
-  rpc DeleteVolumeAttachment(DeleteVolumeAttachmentRequest) returns (DeleteVolumeAttachmentResponse);
-  rpc ListVolumeAttachments(ListVolumeAttachmentsRequest) returns (ListVolumeAttachmentsResponse);
+  // --- Volume Attachments (superseded by a volume's own target) ---
+  rpc CreateVolumeAttachment(CreateVolumeAttachmentRequest) returns (CreateVolumeAttachmentResponse) {
+    option deprecated = true;
+  }
+  rpc GetVolumeAttachment(GetVolumeAttachmentRequest) returns (GetVolumeAttachmentResponse) {
+    option deprecated = true;
+  }
+  rpc DeleteVolumeAttachment(DeleteVolumeAttachmentRequest) returns (DeleteVolumeAttachmentResponse) {
+    option deprecated = true;
+  }
+  rpc ListVolumeAttachments(ListVolumeAttachmentsRequest) returns (ListVolumeAttachmentsResponse) {
+    option deprecated = true;
+  }
 
   // --- MCPs ---
   rpc CreateMcp(CreateMcpRequest) returns (CreateMcpResponse);
@@ -184,6 +195,19 @@ enum AgentRole {
   AGENT_ROLE_OWNER = 1;
   AGENT_ROLE_MAINTAINER = 2;
   AGENT_ROLE_PARTICIPANT = 3;
+}
+
+enum EnvironmentAvailability {
+  ENVIRONMENT_AVAILABILITY_UNSPECIFIED = 0;
+  ENVIRONMENT_AVAILABILITY_INTERNAL = 1;
+  ENVIRONMENT_AVAILABILITY_PRIVATE = 2;
+}
+
+enum EnvironmentRole {
+  ENVIRONMENT_ROLE_UNSPECIFIED = 0;
+  ENVIRONMENT_ROLE_OWNER = 1;
+  ENVIRONMENT_ROLE_MAINTAINER = 2;
+  ENVIRONMENT_ROLE_USER = 3;
 }
 
 enum AgentInstanceState {
@@ -574,6 +598,7 @@ message Environment {
   // CreateAgent.
   string agent_runtime_image_id = 11; // UUID
   string agent_runtime_image_tag = 12;
+  EnvironmentAvailability availability = 13;
 }
 
 message CreateEnvironmentRequest {
@@ -587,6 +612,7 @@ message CreateEnvironmentRequest {
   string workspace_image_tag = 8;
   string agent_runtime_image_id = 9; // UUID
   string agent_runtime_image_tag = 10;
+  EnvironmentAvailability availability = 11;
 }
 
 message CreateEnvironmentResponse {
@@ -613,6 +639,7 @@ message UpdateEnvironmentRequest {
   // Clearing both makes the environment workspace-only.
   optional string agent_runtime_image_id = 9; // UUID
   optional string agent_runtime_image_tag = 10;
+  optional EnvironmentAvailability availability = 11;
 }
 
 message UpdateEnvironmentResponse {
@@ -634,6 +661,37 @@ message ListEnvironmentsRequest {
 message ListEnvironmentsResponse {
   repeated Environment environments = 1;
   string next_page_token = 2;
+}
+
+message EnvironmentRoleAssignment {
+  string environment_id = 1; // UUID
+  string identity_id = 2; // UUID
+  EnvironmentRole role = 3;
+}
+
+message SetEnvironmentRoleRequest {
+  string environment_id = 1; // UUID
+  string identity_id = 2; // UUID
+  EnvironmentRole role = 3;
+}
+
+message SetEnvironmentRoleResponse {
+  EnvironmentRoleAssignment assignment = 1;
+}
+
+message RemoveEnvironmentRoleRequest {
+  string environment_id = 1; // UUID
+  string identity_id = 2; // UUID
+}
+
+message RemoveEnvironmentRoleResponse {}
+
+message ListEnvironmentRolesRequest {
+  string environment_id = 1; // UUID
+}
+
+message ListEnvironmentRolesResponse {
+  repeated EnvironmentRoleAssignment assignments = 1;
 }
 
 // ===========================================================================
@@ -758,17 +816,29 @@ message Volume {
   bool persistent = 2;
   string mount_path = 3;
   string size = 4;
-  string description = 5;
+  string description = 5 [deprecated = true];
   optional string ttl = 6;
+  string name = 7;
+  optional string storage_class = 8;
+  oneof target {
+    string environment_id = 9; // UUID
+    string mcp_id = 10; // UUID
+  }
 }
 
 message CreateVolumeRequest {
   bool persistent = 1;
   string mount_path = 2;
   string size = 3;
-  string description = 4;
-  string organization_id = 5;
+  string description = 4 [deprecated = true];
+  string organization_id = 5 [deprecated = true];
   optional string ttl = 6;
+  string name = 7;
+  optional string storage_class = 8;
+  oneof target {
+    string environment_id = 9; // UUID
+    string mcp_id = 10; // UUID
+  }
 }
 
 message CreateVolumeResponse {
@@ -788,8 +858,10 @@ message UpdateVolumeRequest {
   optional bool persistent = 2;
   optional string mount_path = 3;
   optional string size = 4;
-  optional string description = 5;
+  optional string description = 5 [deprecated = true];
   optional string ttl = 6;
+  optional string name = 7;
+  optional string storage_class = 8;
 }
 
 message UpdateVolumeResponse {
@@ -805,7 +877,9 @@ message DeleteVolumeResponse {}
 message ListVolumesRequest {
   int32 page_size = 1;
   string page_token = 2;
-  string organization_id = 3;
+  string organization_id = 3 [deprecated = true];
+  string environment_id = 4;
+  string mcp_id = 5;
 }
 
 message ListVolumesResponse {
@@ -818,6 +892,7 @@ message ListVolumesResponse {
 // ===========================================================================
 
 message VolumeAttachment {
+  option deprecated = true;
   EntityMeta meta = 1;
   string volume_id = 2; // UUID
   oneof target {
@@ -828,6 +903,7 @@ message VolumeAttachment {
 }
 
 message CreateVolumeAttachmentRequest {
+  option deprecated = true;
   string volume_id = 1; // UUID
   oneof target {
     string agent_id = 2;
@@ -837,24 +913,31 @@ message CreateVolumeAttachmentRequest {
 }
 
 message CreateVolumeAttachmentResponse {
+  option deprecated = true;
   VolumeAttachment volume_attachment = 1;
 }
 
 message GetVolumeAttachmentRequest {
+  option deprecated = true;
   string id = 1; // UUID
 }
 
 message GetVolumeAttachmentResponse {
+  option deprecated = true;
   VolumeAttachment volume_attachment = 1;
 }
 
 message DeleteVolumeAttachmentRequest {
+  option deprecated = true;
   string id = 1; // UUID
 }
 
-message DeleteVolumeAttachmentResponse {}
+message DeleteVolumeAttachmentResponse {
+  option deprecated = true;
+}
 
 message ListVolumeAttachmentsRequest {
+  option deprecated = true;
   int32 page_size = 1;
   string page_token = 2;
   string volume_id = 3;
@@ -864,6 +947,7 @@ message ListVolumeAttachmentsRequest {
 }
 
 message ListVolumeAttachmentsResponse {
+  option deprecated = true;
   repeated VolumeAttachment volume_attachments = 1;
   string next_page_token = 2;
 }
@@ -964,6 +1048,8 @@ message Mcp {
   // devcontainer are both legitimate ways to host one.
   string image_id = 8; // UUID
   string image_tag = 9;
+  repeated string shared_volumes = 10;
+  string environment_id = 11; // UUID
 }
 
 message CreateMcpRequest {
@@ -975,6 +1061,8 @@ message CreateMcpRequest {
   string name = 6; // MCP server name
   string image_id = 7; // UUID
   string image_tag = 8;
+  repeated string shared_volumes = 9;
+  string environment_id = 10; // UUID
 }
 
 message CreateMcpResponse {
@@ -997,6 +1085,7 @@ message UpdateMcpRequest {
   optional string description = 5;
   optional string image_id = 6; // UUID
   optional string image_tag = 7;
+  repeated string shared_volumes = 8;
 }
 
 message UpdateMcpResponse {
@@ -1013,6 +1102,7 @@ message ListMcpsRequest {
   int32 page_size = 1;
   string page_token = 2;
   string agent_id = 3;
+  string environment_id = 4;
 }
 
 message ListMcpsResponse {
@@ -1255,6 +1345,7 @@ message InitScript {
     string agent_id = 4;
     string mcp_id = 5;
     string hook_id = 6 [deprecated = true];
+    string environment_id = 7;
   }
 }
 
@@ -1265,6 +1356,7 @@ message CreateInitScriptRequest {
     string agent_id = 3;
     string mcp_id = 4;
     string hook_id = 5 [deprecated = true];
+    string environment_id = 6;
   }
 }
 
@@ -1302,6 +1394,7 @@ message ListInitScriptsRequest {
   string agent_id = 3;
   string mcp_id = 4;
   string hook_id = 5 [deprecated = true];
+  string environment_id = 6;
 }
 
 message ListInitScriptsResponse {
