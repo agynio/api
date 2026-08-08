@@ -76,8 +76,6 @@ enum Protocol {
 // Vendor whose own consumer plan a Subscription holds a credential for. Closed:
 // each value fixes an intercepted host, an upstream, a protocol, a header set,
 // and the container placeholder variable name.
-// Named after the API the credential authenticates. The old names are aliases
-// on the same numbers.
 enum Vendor {
   // buf:lint:ignore ENUM_NO_ALLOW_ALIAS
   option allow_alias = true;
@@ -88,8 +86,6 @@ enum Vendor {
   VENDOR_CODEX = 2 [deprecated = true];
 }
 
-// How a vendor's placeholder credential reaches the container. ENV is the
-// orchestrator's to set; FILE is agynd's to write.
 enum PlaceholderKind {
   PLACEHOLDER_KIND_UNSPECIFIED = 0;
   PLACEHOLDER_KIND_ENV = 1;
@@ -296,9 +292,8 @@ message SubscriptionAttachment {
   // here so the orchestrator gets role attributes without a second call.
   Vendor vendor = 3;
   PlaceholderKind placeholder_kind = 7;
-  // ENV kind only.
   string placeholder_env = 4;
-  // FILE kind only. Path is relative to HOME.
+  // Relative to HOME.
   string placeholder_path = 8;
   string placeholder_contents = 9;
   oneof target {
