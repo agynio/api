@@ -35,6 +35,9 @@ enum IdentityType {
   IDENTITY_TYPE_APP = 5;
   IDENTITY_TYPE_AGENT_INSTANCE = 6;
   IDENTITY_TYPE_SANDBOX = 7;
+  // The platform admin identity, which provisions what a release ships. Not a
+  // user: it has no account in Users and must never acquire one.
+  IDENTITY_TYPE_PLATFORM = 8;
   reserved 3;
   reserved "IDENTITY_TYPE_CHANNEL";
 }
