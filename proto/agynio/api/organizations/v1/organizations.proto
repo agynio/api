@@ -16,12 +16,13 @@ service OrganizationsService {
   // Resolve a slug to an organization. Internal: the Image Proxy resolves the
   // slug in a reference path before asking the catalog for the image.
   rpc GetOrganizationBySlug(GetOrganizationBySlugRequest) returns (GetOrganizationBySlugResponse);
-  // Create the organization platform-shipped resources live in, if no
-  // organization holds that slug, and return the existing one otherwise. It has
-  // no members: cluster admins already hold owner-level access to every
-  // organization, so it is administrable without anyone being added to it.
-  // Internal-only, authenticated as a service identity rather than a user.
-  rpc RegisterPlatformOrganization(RegisterPlatformOrganizationRequest) returns (RegisterPlatformOrganizationResponse);
+  // Superseded by provisioning: the system organization is declared by the
+  // release and created through CreateOrganization as a cluster admin, so no
+  // second creation path exists for install. Retained so existing callers keep
+  // compiling while they migrate; the service does not implement it.
+  rpc RegisterPlatformOrganization(RegisterPlatformOrganizationRequest) returns (RegisterPlatformOrganizationResponse) {
+    option deprecated = true;
+  }
   rpc UpdateOrganization(UpdateOrganizationRequest) returns (UpdateOrganizationResponse);
   rpc DeleteOrganization(DeleteOrganizationRequest) returns (DeleteOrganizationResponse);
   rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse);
@@ -86,11 +87,15 @@ message CreateOrganizationResponse {
 }
 
 message RegisterPlatformOrganizationRequest {
+  option deprecated = true;
+
   string slug = 1;
   string name = 2;
 }
 
 message RegisterPlatformOrganizationResponse {
+  option deprecated = true;
+
   Organization organization = 1;
   // False when an organization already held that slug, in which case
   // organization is the existing record, untouched.
