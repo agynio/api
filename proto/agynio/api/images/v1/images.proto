@@ -26,8 +26,13 @@ service ImagesService {
   rpc ResolveVersion(ResolveVersionRequest) returns (ResolveVersionResponse);
   // Resolve an image to an upstream repository and credential, without a tag.
   rpc ResolveImage(ResolveImageRequest) returns (ResolveImageResponse);
-  // Create if absent; return the existing record otherwise. Never updates.
-  rpc RegisterPlatformImage(RegisterPlatformImageRequest) returns (RegisterPlatformImageResponse);
+  // Superseded by provisioning: the images a release ships are declared by it
+  // and created through CreateImage as a cluster admin, so no second creation
+  // path exists for install. Retained so existing callers keep compiling while
+  // they migrate; the service does not implement it.
+  rpc RegisterPlatformImage(RegisterPlatformImageRequest) returns (RegisterPlatformImageResponse) {
+    option deprecated = true;
+  }
 }
 
 // ===========================================================================
@@ -265,6 +270,8 @@ message ResolveImageResponse {
 }
 
 message RegisterPlatformImageRequest {
+  option deprecated = true;
+
   string organization_id = 1;
   string name = 2;
   string description = 3;
@@ -277,6 +284,8 @@ message RegisterPlatformImageRequest {
 }
 
 message RegisterPlatformImageResponse {
+  option deprecated = true;
+
   Image image = 1;
   // False when an image of that name already existed, in which case image is
   // the existing record, untouched.
