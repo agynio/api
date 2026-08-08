@@ -77,9 +77,19 @@ enum Protocol {
 // each value fixes an intercepted host, an upstream, a protocol, a header set,
 // and the container placeholder variable name.
 enum Vendor {
+  // buf:lint:ignore ENUM_NO_ALLOW_ALIAS
+  option allow_alias = true;
   VENDOR_UNSPECIFIED = 0;
-  VENDOR_CLAUDE = 1;
-  VENDOR_CODEX = 2;
+  VENDOR_ANTHROPIC = 1;
+  VENDOR_CLAUDE = 1 [deprecated = true];
+  VENDOR_OPENAI = 2;
+  VENDOR_CODEX = 2 [deprecated = true];
+}
+
+enum PlaceholderKind {
+  PLACEHOLDER_KIND_UNSPECIFIED = 0;
+  PLACEHOLDER_KIND_ENV = 1;
+  PLACEHOLDER_KIND_FILE = 2;
 }
 
 // ===========================================================================
@@ -281,9 +291,11 @@ message SubscriptionAttachment {
   // Denormalized from the subscription, which cannot change vendor. Carried
   // here so the orchestrator gets role attributes without a second call.
   Vendor vendor = 3;
-  // Name of the container environment variable holding this vendor's
-  // placeholder credential. Empty for a vendor that has none.
+  PlaceholderKind placeholder_kind = 7;
   string placeholder_env = 4;
+  // Relative to HOME.
+  string placeholder_path = 8;
+  string placeholder_contents = 9;
   oneof target {
     string agent_id = 5; // UUID
     string environment_id = 6; // UUID
