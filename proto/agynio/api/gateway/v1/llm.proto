@@ -21,6 +21,23 @@ service LLMGateway {
   rpc DeleteModel(agynio.api.llm.v1.DeleteModelRequest) returns (agynio.api.llm.v1.DeleteModelResponse);
   rpc ListModels(agynio.api.llm.v1.ListModelsRequest) returns (agynio.api.llm.v1.ListModelsResponse);
 
+  // --- Subscriptions ---
+  rpc CreateSubscription(agynio.api.llm.v1.CreateSubscriptionRequest) returns (agynio.api.llm.v1.CreateSubscriptionResponse);
+  rpc GetSubscription(agynio.api.llm.v1.GetSubscriptionRequest) returns (agynio.api.llm.v1.GetSubscriptionResponse);
+  rpc UpdateSubscription(agynio.api.llm.v1.UpdateSubscriptionRequest) returns (agynio.api.llm.v1.UpdateSubscriptionResponse);
+  rpc DeleteSubscription(agynio.api.llm.v1.DeleteSubscriptionRequest) returns (agynio.api.llm.v1.DeleteSubscriptionResponse);
+  rpc ListSubscriptions(agynio.api.llm.v1.ListSubscriptionsRequest) returns (agynio.api.llm.v1.ListSubscriptionsResponse);
+
+  // --- Subscription attachments ---
+  rpc CreateSubscriptionAttachment(agynio.api.llm.v1.CreateSubscriptionAttachmentRequest) returns (agynio.api.llm.v1.CreateSubscriptionAttachmentResponse);
+  rpc DeleteSubscriptionAttachment(agynio.api.llm.v1.DeleteSubscriptionAttachmentRequest) returns (agynio.api.llm.v1.DeleteSubscriptionAttachmentResponse);
+  rpc ListSubscriptionAttachments(agynio.api.llm.v1.ListSubscriptionAttachmentsRequest) returns (agynio.api.llm.v1.ListSubscriptionAttachmentsResponse);
+
   // --- Test ---
   rpc TestModel(agynio.api.llm.v1.TestModelRequest) returns (agynio.api.llm.v1.TestModelResponse);
 }
+
+// ResolveModel, ResolveSubscription, and CountSubscriptionsReferencingSecret are
+// deliberately absent: they are internal calls over Istio, and a subscription
+// credential is not something an external caller should reach through the
+// Gateway.
