@@ -52,6 +52,12 @@ enum DeviceStatus {
   DEVICE_STATUS_ENROLLED = 2;
 }
 
+enum DeviceConnectivity {
+  DEVICE_CONNECTIVITY_UNSPECIFIED = 0;
+  DEVICE_CONNECTIVITY_ONLINE = 1;
+  DEVICE_CONNECTIVITY_OFFLINE = 2;
+}
+
 // ===========================================================================
 // Common
 // ===========================================================================
@@ -83,7 +89,12 @@ message Device {
   string user_identity_id = 2;
   string name = 3;
   string openziti_identity_id = 4;
+  // Whether the enrollment token has been redeemed.
   DeviceStatus status = 5;
+  // Whether the enrolled device currently holds an edge router connection.
+  DeviceConnectivity connectivity = 6;
+  optional google.protobuf.Timestamp enrolled_at = 7;
+  optional google.protobuf.Timestamp last_seen_at = 8;
 }
 
 // ===========================================================================
