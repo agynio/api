@@ -9,13 +9,12 @@ option go_package = "github.com/agynio/api/gen/agynio/api/expose/v1;exposev1";
 // ExposeService manages the lifecycle of port exposures — making ports inside
 // a workload accessible over the OpenZiti network.
 service ExposeService {
-  // Expose a port on a workload. Creates OpenZiti resources and returns the
-  // exposure record (including the access URL). Idempotent per
-  // (workload_id, port): a port already exposed returns its existing record.
+  // Expose a port on a workload. Creates OpenZiti resources and returns
+  // the exposure record (including the access URL).
   rpc AddExposure(AddExposureRequest) returns (AddExposureResponse);
 
-  // Un-expose a port on a workload. Deletes the OpenZiti resources and the
-  // exposure record.
+  // Un-expose a port on a workload. Deletes the OpenZiti resources and
+  // the exposure record.
   rpc RemoveExposure(RemoveExposureRequest) returns (RemoveExposureResponse);
 
   // List active exposures for a workload.
@@ -34,9 +33,6 @@ enum ExposureStatus {
   EXPOSURE_STATUS_REMOVING = 4;
 }
 
-// What kind of entity the exposing workload runs for. Mirrors
-// agynio.api.runners.v1.RuntimeOwnerKind by value; domain packages do not
-// import one another.
 enum ExposureOwnerKind {
   EXPOSURE_OWNER_KIND_UNSPECIFIED = 0;
   EXPOSURE_OWNER_KIND_AGENT_INSTANCE = 1;
@@ -60,25 +56,16 @@ message EntityMeta {
 message Exposure {
   EntityMeta meta = 1;
   string workload_id = 2;
-  // Deprecated: read owner_kind and owner_id instead. Still populated for
-  // agent-instance-owned exposures; always empty for sandbox-owned ones.
   string agent_id = 3 [deprecated = true];
   int32 port = 4;
   string openziti_service_id = 5;
   string openziti_bind_policy_id = 6;
   string openziti_dial_policy_id = 7;
-  // Access URL: http://<hostname>:<port>.
   string url = 8;
   ExposureStatus status = 9;
   ExposureOwnerKind owner_kind = 10;
-  // Agent instance or sandbox the exposing workload runs for. Names the
-  // exposure — see the hostname field.
   string owner_id = 11;
   string organization_id = 12;
-  // Resolved intercept address, e.g. super-sandbox.acme.agyn. Derived from the
-  // owner and its organization at creation, re-derived by reconciliation, and
-  // written into the service's intercept.v1 config. Falls back to
-  // exposed-<id>.agyn when no readable form can be derived.
   string hostname = 13;
 }
 
@@ -87,12 +74,8 @@ message Exposure {
 // ===========================================================================
 
 message AddExposureRequest {
-  // Cluster admins only. Omitted on the standard path, where the workload is
-  // read from the x-workload-id header the Gateway injects.
   string workload_id = 1;
   int32 port = 2;
-  // Deprecated: the owner is resolved from the workload record. Accepted and
-  // ignored.
   string agent_id = 3 [deprecated = true];
 }
 
