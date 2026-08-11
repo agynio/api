@@ -45,6 +45,11 @@ service AgentsService {
   rpc UpdateSandboxRuntimeState(UpdateSandboxRuntimeStateRequest) returns (UpdateSandboxRuntimeStateResponse);
   rpc UpdateSandboxLastSession(UpdateSandboxLastSessionRequest) returns (UpdateSandboxLastSessionResponse);
 
+  // --- Sandbox Layouts ---
+  rpc GetSandboxLayout(GetSandboxLayoutRequest) returns (GetSandboxLayoutResponse);
+  rpc SetSandboxLayout(SetSandboxLayoutRequest) returns (SetSandboxLayoutResponse);
+  rpc SetSandboxLayoutDirectories(SetSandboxLayoutDirectoriesRequest) returns (SetSandboxLayoutDirectoriesResponse);
+
   // --- Agent Instances ---
   rpc CreateInstance(CreateInstanceRequest) returns (CreateInstanceResponse);
   rpc GetInstance(GetInstanceRequest) returns (GetInstanceResponse);
@@ -836,6 +841,98 @@ message UpdateSandboxLastSessionRequest {
 
 message UpdateSandboxLastSessionResponse {
   Sandbox sandbox = 1;
+}
+
+// ===========================================================================
+// Sandbox Layout
+// ===========================================================================
+
+// One identity's set of open shells in one sandbox — what a client reopens to
+// find its work where it left it.
+//
+// The service never looks in the container. Attaching creates a shell that
+// does not exist, so a layout naming a shell the container lost is not an
+// inconsistency to reconcile but the ordinary case after a restart.
+message SandboxLayout {
+  string sandbox_id = 1;
+
+  // Whose layout this is. Always the caller's own — resolved from
+  // authenticated context, never accepted as input on the external methods.
+  string identity_id = 2;
+
+  // Incremented on every write. A writer supplies the version it read and is
+  // rejected with FailedPrecondition when it no longer matches.
+  int64 version = 3;
+
+  // Ordered. Position is display order.
+  repeated SandboxTab tabs = 4;
+}
+
+message SandboxTab {
+  // Opaque, client-generated, ^[A-Za-z0-9_-]{1,64}$. Passed verbatim as
+  // shell_id on a SHELL_ATTACH terminal session.
+  string shell_id = 1;
+
+  // Assigned when the tab is opened and never reused within the layout. The
+  // last-resort display name, so closing one tab does not rename the others.
+  int32 number = 2;
+
+  // A name the user gave this tab. Unset means the client derives one — the
+  // title the shell announces, else its directory. The derived name is never
+  // stored: it goes stale the moment the shell changes directory.
+  optional string name_override = 3;
+
+  // Last known working directory, absolute. Supplied as shell_cwd and applied
+  // only when the shell has to be created. Written by the Orchestrator before
+  // a planned stop, which is the last moment it can be read and the first it
+  // is about to be needed.
+  optional string cwd = 4;
+
+  // When a session last attached. Orders "the one I was just in".
+  optional google.protobuf.Timestamp last_attached_at = 5;
+}
+
+message GetSandboxLayoutRequest {
+  string sandbox_id = 1;
+}
+
+message GetSandboxLayoutResponse {
+  // A sandbox never worked in returns an empty layout at version 0 rather than
+  // NotFound — no client needs to tell those apart.
+  SandboxLayout layout = 1;
+}
+
+message SetSandboxLayoutRequest {
+  string sandbox_id = 1;
+
+  // The version the caller read. A mismatch is FailedPrecondition; the caller
+  // refetches and reapplies.
+  int64 version = 2;
+
+  repeated SandboxTab tabs = 3;
+}
+
+message SetSandboxLayoutResponse {
+  SandboxLayout layout = 1;
+}
+
+// Internal only. Writes cwd onto the tabs of every layout of one sandbox,
+// matching by shell_id and ignoring ids it does not find.
+//
+// Version-free: it touches one field the caller is the sole writer of, and
+// failing on a concurrent tab reorder would lose the snapshot for no benefit.
+message SetSandboxLayoutDirectoriesRequest {
+  string sandbox_id = 1;
+  repeated ShellDirectory directories = 2;
+}
+
+message ShellDirectory {
+  string shell_id = 1;
+  string cwd = 2;
+}
+
+message SetSandboxLayoutDirectoriesResponse {
+  int32 tabs_updated = 1;
 }
 
 // ===========================================================================

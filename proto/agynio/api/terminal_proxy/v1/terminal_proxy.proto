@@ -18,7 +18,8 @@ enum SessionKind {
   // ends up in a ticket.
   SESSION_KIND_UNSPECIFIED = 0;
 
-  // A login shell on a PTY, with the platform binaries on PATH.
+  // A login shell on a PTY, with the platform binaries on PATH. Ephemeral: the
+  // PTY closes with the connection, as a dropped SSH connection does.
   SESSION_KIND_SHELL = 1;
 
   // A caller-supplied command on a PTY. Carries no more privilege than SHELL —
@@ -28,6 +29,15 @@ enum SessionKind {
   // The workspace sync endpoint. Non-TTY: no PTY, no resize, and stdout kept
   // separate from stderr so diagnostics cannot corrupt protocol frames.
   SESSION_KIND_SYNC = 3;
+
+  // Attach to a persistent shell, creating it when it does not exist. The PTY
+  // belongs to a process in the container and outlives this session; the next
+  // session attaches to the same one. A second session displaces the first —
+  // one shell carries one attachment.
+  //
+  // A separate kind rather than a flag on SHELL, so the command stays a
+  // function of the kind and its parameters.
+  SESSION_KIND_SHELL_ATTACH = 4;
 }
 
 message IssueTicketRequest {
@@ -48,6 +58,22 @@ message IssueTicketRequest {
   // absolute; it is normalized before being bound into the ticket, and
   // resolved against the real filesystem inside the container.
   string sync_root = 6;
+
+  // Names the shell to attach to. Required when kind is SHELL_ATTACH and
+  // ignored otherwise. Client-generated and opaque, matching
+  // ^[A-Za-z0-9_-]{1,64}$ — '.' and ':' are excluded because the multiplexer
+  // behind a shell reads them as target separators.
+  //
+  // Not a capability: anyone who may open a shell in a container can reach
+  // every shell in it from inside. Keeping one identity's shells out of
+  // another's view is the layout owner's decision, not this service's.
+  string shell_id = 7;
+
+  // Working directory for the shell, applied only when it has to be created
+  // and ignored when it already exists — so a caller may pass its stored value
+  // on every attach. Optional. Must be absolute; normalized before being bound
+  // into the ticket, as sync_root is.
+  string shell_cwd = 8;
 }
 
 message IssueTicketResponse {
