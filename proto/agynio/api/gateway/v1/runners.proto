@@ -18,6 +18,7 @@ service RunnersGateway {
   // Service-token authenticated, like EnrollRunner: the runner reports the
   // catalog it declares in its own configuration.
   rpc ReportRunnerCatalog(agynio.api.runners.v1.ReportRunnerCatalogRequest) returns (agynio.api.runners.v1.ReportRunnerCatalogResponse);
+  rpc ReportWorkloadState(agynio.api.runners.v1.ReportWorkloadStateRequest) returns (agynio.api.runners.v1.ReportWorkloadStateResponse);
 
   // --- Flavors ---
   rpc CreateFlavor(agynio.api.runners.v1.CreateFlavorRequest) returns (agynio.api.runners.v1.CreateFlavorResponse);

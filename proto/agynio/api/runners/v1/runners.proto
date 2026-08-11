@@ -47,6 +47,7 @@ service RunnersService {
   rpc CreateWorkload(CreateWorkloadRequest) returns (CreateWorkloadResponse);
   rpc UpdateWorkload(UpdateWorkloadRequest) returns (UpdateWorkloadResponse);
   rpc UpdateWorkloadStatus(UpdateWorkloadStatusRequest) returns (UpdateWorkloadStatusResponse);
+  rpc ReportWorkloadState(ReportWorkloadStateRequest) returns (ReportWorkloadStateResponse);
   rpc TouchWorkload(TouchWorkloadRequest) returns (TouchWorkloadResponse);
   rpc DeleteWorkload(DeleteWorkloadRequest) returns (DeleteWorkloadResponse);
   rpc GetWorkload(GetWorkloadRequest) returns (GetWorkloadResponse);
@@ -456,6 +457,19 @@ message UpdateWorkloadRequest {
 
 message UpdateWorkloadResponse {
   Workload workload = 1;
+}
+
+message ReportWorkloadStateRequest {
+  string runner_id = 1;
+  string service_token = 2;
+  string workload_id = 3;
+  WorkloadStatus status = 4;
+  repeated Container containers = 5;
+  google.protobuf.Timestamp observed_at = 6;
+}
+
+message ReportWorkloadStateResponse {
+  bool applied = 1;
 }
 
 // Updates status and containers only. Use UpdateWorkload to set failure
