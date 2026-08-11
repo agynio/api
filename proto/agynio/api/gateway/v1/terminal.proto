@@ -25,12 +25,12 @@ message CreateTerminalSessionRequest {
   // absolute.
   string sync_root = 5;
 
-  // Names the shell to attach to. Required when kind is SHELL_ATTACH and
-  // ignored otherwise. Opaque, ^[A-Za-z0-9_-]{1,64}$.
+  // Names the shell. Required when kind is SHELL_ATTACH, ignored otherwise.
+  // Opaque, ^[A-Za-z0-9_-]{1,64}$.
   string shell_id = 6;
 
-  // Working directory for the shell, applied only when it has to be created.
-  // Optional; must be absolute when set.
+  // Working directory for the shell. Optional; applied when the shell is
+  // created. Must be absolute when set.
   string shell_cwd = 7;
 }
 

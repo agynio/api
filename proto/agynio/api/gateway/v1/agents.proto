@@ -37,9 +37,8 @@ service AgentsGateway {
   rpc EnsureSandboxRunning(agynio.api.agents.v1.EnsureSandboxRunningRequest) returns (agynio.api.agents.v1.EnsureSandboxRunningResponse);
 
   // --- Sandbox Layouts ---
-  // Always the caller's own layout: identity comes from authenticated context
-  // and is not a request field, so there is no call that reads or writes
-  // another person's tabs.
+  // Operate on the caller's own layout; identity comes from authenticated
+  // context and is not a request field.
   rpc GetSandboxLayout(agynio.api.agents.v1.GetSandboxLayoutRequest) returns (agynio.api.agents.v1.GetSandboxLayoutResponse);
   rpc SetSandboxLayout(agynio.api.agents.v1.SetSandboxLayoutRequest) returns (agynio.api.agents.v1.SetSandboxLayoutResponse);
 

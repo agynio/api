@@ -847,21 +847,15 @@ message UpdateSandboxLastSessionResponse {
 // Sandbox Layout
 // ===========================================================================
 
-// One identity's set of open shells in one sandbox — what a client reopens to
-// find its work where it left it.
-//
-// The service never looks in the container. Attaching creates a shell that
-// does not exist, so a layout naming a shell the container lost is not an
-// inconsistency to reconcile but the ordinary case after a restart.
+// One identity's ordered set of shells in one sandbox.
 message SandboxLayout {
   string sandbox_id = 1;
 
-  // Whose layout this is. Always the caller's own — resolved from
-  // authenticated context, never accepted as input on the external methods.
+  // Whose layout this is. Resolved from authenticated context on the external
+  // methods; not accepted as request input.
   string identity_id = 2;
 
-  // Incremented on every write. A writer supplies the version it read and is
-  // rejected with FailedPrecondition when it no longer matches.
+  // Incremented on every write.
   int64 version = 3;
 
   // Ordered. Position is display order.
@@ -869,26 +863,20 @@ message SandboxLayout {
 }
 
 message SandboxTab {
-  // Opaque, client-generated, ^[A-Za-z0-9_-]{1,64}$. Passed verbatim as
-  // shell_id on a SHELL_ATTACH terminal session.
+  // Opaque, client-generated, ^[A-Za-z0-9_-]{1,64}$. Matches shell_id on a
+  // SHELL_ATTACH terminal session.
   string shell_id = 1;
 
-  // Assigned when the tab is opened and never reused within the layout. The
-  // last-resort display name, so closing one tab does not rename the others.
+  // Assigned when the tab is opened; not reused within a layout.
   int32 number = 2;
 
-  // A name the user gave this tab. Unset means the client derives one — the
-  // title the shell announces, else its directory. The derived name is never
-  // stored: it goes stale the moment the shell changes directory.
+  // A caller-supplied name. Unset means the client derives one.
   optional string name_override = 3;
 
-  // Last known working directory, absolute. Supplied as shell_cwd and applied
-  // only when the shell has to be created. Written by the Orchestrator before
-  // a planned stop, which is the last moment it can be read and the first it
-  // is about to be needed.
+  // Working directory, absolute.
   optional string cwd = 4;
 
-  // When a session last attached. Orders "the one I was just in".
+  // When a session last attached to this shell.
   optional google.protobuf.Timestamp last_attached_at = 5;
 }
 
@@ -897,16 +885,14 @@ message GetSandboxLayoutRequest {
 }
 
 message GetSandboxLayoutResponse {
-  // A sandbox never worked in returns an empty layout at version 0 rather than
-  // NotFound — no client needs to tell those apart.
+  // Empty at version 0 when no layout exists.
   SandboxLayout layout = 1;
 }
 
 message SetSandboxLayoutRequest {
   string sandbox_id = 1;
 
-  // The version the caller read. A mismatch is FailedPrecondition; the caller
-  // refetches and reapplies.
+  // The version the caller read. A mismatch returns FailedPrecondition.
   int64 version = 2;
 
   repeated SandboxTab tabs = 3;
@@ -916,11 +902,8 @@ message SetSandboxLayoutResponse {
   SandboxLayout layout = 1;
 }
 
-// Internal only. Writes cwd onto the tabs of every layout of one sandbox,
-// matching by shell_id and ignoring ids it does not find.
-//
-// Version-free: it touches one field the caller is the sole writer of, and
-// failing on a concurrent tab reorder would lose the snapshot for no benefit.
+// Internal only. Sets cwd on tabs of every layout of one sandbox, matched by
+// shell_id. Unmatched ids are ignored. Not version-checked.
 message SetSandboxLayoutDirectoriesRequest {
   string sandbox_id = 1;
   repeated ShellDirectory directories = 2;
