@@ -18,7 +18,7 @@ enum SessionKind {
   // ends up in a ticket.
   SESSION_KIND_UNSPECIFIED = 0;
 
-  // A login shell on a PTY, with the platform binaries on PATH.
+  // A login shell on a PTY. The PTY closes with the connection.
   SESSION_KIND_SHELL = 1;
 
   // A caller-supplied command on a PTY. Carries no more privilege than SHELL —
@@ -28,6 +28,11 @@ enum SessionKind {
   // The workspace sync endpoint. Non-TTY: no PTY, no resize, and stdout kept
   // separate from stderr so diagnostics cannot corrupt protocol frames.
   SESSION_KIND_SYNC = 3;
+
+  // A PTY on a named shell that outlives the session. Attaches to shell_id,
+  // creating it when it does not exist. A second session on the same shell
+  // displaces the first.
+  SESSION_KIND_SHELL_ATTACH = 4;
 }
 
 message IssueTicketRequest {
@@ -48,6 +53,15 @@ message IssueTicketRequest {
   // absolute; it is normalized before being bound into the ticket, and
   // resolved against the real filesystem inside the container.
   string sync_root = 6;
+
+  // Names the shell. Required when kind is SHELL_ATTACH, ignored otherwise.
+  // Client-generated and opaque, matching ^[A-Za-z0-9_-]{1,64}$.
+  string shell_id = 7;
+
+  // Working directory for the shell. Optional; meaningful only when kind is
+  // SHELL_ATTACH. Applied when the shell is created and ignored when it
+  // already exists. Must be absolute.
+  string shell_cwd = 8;
 }
 
 message IssueTicketResponse {

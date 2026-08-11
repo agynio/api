@@ -45,6 +45,11 @@ service AgentsService {
   rpc UpdateSandboxRuntimeState(UpdateSandboxRuntimeStateRequest) returns (UpdateSandboxRuntimeStateResponse);
   rpc UpdateSandboxLastSession(UpdateSandboxLastSessionRequest) returns (UpdateSandboxLastSessionResponse);
 
+  // --- Sandbox Layouts ---
+  rpc GetSandboxLayout(GetSandboxLayoutRequest) returns (GetSandboxLayoutResponse);
+  rpc SetSandboxLayout(SetSandboxLayoutRequest) returns (SetSandboxLayoutResponse);
+  rpc SetSandboxLayoutDirectories(SetSandboxLayoutDirectoriesRequest) returns (SetSandboxLayoutDirectoriesResponse);
+
   // --- Agent Instances ---
   rpc CreateInstance(CreateInstanceRequest) returns (CreateInstanceResponse);
   rpc GetInstance(GetInstanceRequest) returns (GetInstanceResponse);
@@ -836,6 +841,81 @@ message UpdateSandboxLastSessionRequest {
 
 message UpdateSandboxLastSessionResponse {
   Sandbox sandbox = 1;
+}
+
+// ===========================================================================
+// Sandbox Layout
+// ===========================================================================
+
+// One identity's ordered set of shells in one sandbox.
+message SandboxLayout {
+  string sandbox_id = 1;
+
+  // Whose layout this is. Resolved from authenticated context on the external
+  // methods; not accepted as request input.
+  string identity_id = 2;
+
+  // Incremented on every write.
+  int64 version = 3;
+
+  // Ordered. Position is display order.
+  repeated SandboxTab tabs = 4;
+}
+
+message SandboxTab {
+  // Opaque, client-generated, ^[A-Za-z0-9_-]{1,64}$. Matches shell_id on a
+  // SHELL_ATTACH terminal session.
+  string shell_id = 1;
+
+  // Assigned when the tab is opened; not reused within a layout.
+  int32 number = 2;
+
+  // A caller-supplied name. Unset means the client derives one.
+  optional string name_override = 3;
+
+  // Working directory, absolute.
+  optional string cwd = 4;
+
+  // When a session last attached to this shell.
+  optional google.protobuf.Timestamp last_attached_at = 5;
+}
+
+message GetSandboxLayoutRequest {
+  string sandbox_id = 1;
+}
+
+message GetSandboxLayoutResponse {
+  // Empty at version 0 when no layout exists.
+  SandboxLayout layout = 1;
+}
+
+message SetSandboxLayoutRequest {
+  string sandbox_id = 1;
+
+  // The version the caller read. A mismatch returns FailedPrecondition.
+  int64 version = 2;
+
+  repeated SandboxTab tabs = 3;
+}
+
+message SetSandboxLayoutResponse {
+  SandboxLayout layout = 1;
+}
+
+// Internal only. Sets cwd on tabs of every layout of one sandbox, matched by
+// shell_id. Unmatched ids are ignored. Not version-checked.
+message SetSandboxLayoutDirectoriesRequest {
+  string sandbox_id = 1;
+  repeated ShellDirectory directories = 2;
+}
+
+message ShellDirectory {
+  string shell_id = 1;
+  string cwd = 2;
+}
+
+message SetSandboxLayoutDirectoriesResponse {
+  int32 tabs_updated = 1;
 }
 
 // ===========================================================================

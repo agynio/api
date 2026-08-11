@@ -36,6 +36,12 @@ service AgentsGateway {
   rpc DeleteSandbox(agynio.api.agents.v1.DeleteSandboxRequest) returns (agynio.api.agents.v1.DeleteSandboxResponse);
   rpc EnsureSandboxRunning(agynio.api.agents.v1.EnsureSandboxRunningRequest) returns (agynio.api.agents.v1.EnsureSandboxRunningResponse);
 
+  // --- Sandbox Layouts ---
+  // Operate on the caller's own layout; identity comes from authenticated
+  // context and is not a request field.
+  rpc GetSandboxLayout(agynio.api.agents.v1.GetSandboxLayoutRequest) returns (agynio.api.agents.v1.GetSandboxLayoutResponse);
+  rpc SetSandboxLayout(agynio.api.agents.v1.SetSandboxLayoutRequest) returns (agynio.api.agents.v1.SetSandboxLayoutResponse);
+
   // --- Agent Instances ---
   rpc CreateInstance(agynio.api.agents.v1.CreateInstanceRequest) returns (agynio.api.agents.v1.CreateInstanceResponse);
   rpc GetInstance(agynio.api.agents.v1.GetInstanceRequest) returns (agynio.api.agents.v1.GetInstanceResponse);
