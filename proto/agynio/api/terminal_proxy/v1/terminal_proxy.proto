@@ -13,12 +13,6 @@ service TerminalProxyService {
 // platform-defined and bound into the ticket at issuance, so a client never
 // supplies one and cannot change it at attach time.
 enum SessionKind {
-  // SHELL_ATTACH (4) was a second interactive kind. Whether a shell outlives
-  // its connection is now a property of the workload, not a choice the caller
-  // makes, so SHELL covers both.
-  reserved 4;
-  reserved "SESSION_KIND_SHELL_ATTACH";
-
   // Rejected with InvalidArgument. It does not default to SHELL: silently
   // defaulting the field that selects a command is how an unintended command
   // ends up in a ticket.
@@ -36,6 +30,10 @@ enum SessionKind {
   // separate from stderr so diagnostics cannot corrupt protocol frames.
   SESSION_KIND_SYNC = 3;
 
+  // Deprecated: use SHELL. Whether a shell outlives its connection is a
+  // property of the workload rather than a choice the caller makes, so SHELL
+  // covers both. Accepted as an alias for SHELL.
+  SESSION_KIND_SHELL_ATTACH = 4 [deprecated = true];
 }
 
 message IssueTicketRequest {
