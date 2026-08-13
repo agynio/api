@@ -33,6 +33,9 @@ service ImagesService {
   rpc RegisterPlatformImage(RegisterPlatformImageRequest) returns (RegisterPlatformImageResponse) {
     option deprecated = true;
   }
+  // Count the images holding a secret by reference. Called by the Secrets
+  // service before a delete.
+  rpc CountImagesReferencingSecret(CountImagesReferencingSecretRequest) returns (CountImagesReferencingSecretResponse);
 }
 
 // ===========================================================================
@@ -112,11 +115,13 @@ message CreateImageRequest {
   ImageType type = 4;
   string repository = 5;
   string username = 6;
-  // Registry password. Write-only: stored as a Secret owned by the same
-  // organization and never returned.
-  string password = 7;
+  // Superseded by secret_id. Not implemented.
+  string password = 7 [deprecated = true];
   ImageVisibility visibility = 8;
   string tag_filter = 9;
+  // UUID - Secret holding the registry password. Must belong to
+  // organization_id. Empty for anonymously readable repositories
+  string secret_id = 10;
 }
 
 message CreateImageResponse {
@@ -139,9 +144,12 @@ message UpdateImageRequest {
   optional string name = 2;
   optional string description = 3;
   optional string username = 4;
-  optional string password = 5;
+  // Superseded by secret_id. Not implemented.
+  optional string password = 5 [deprecated = true];
   optional ImageVisibility visibility = 6;
   optional string tag_filter = 7;
+  // UUID, or empty to drop the credential.
+  optional string secret_id = 8;
 }
 
 message UpdateImageResponse {
@@ -290,4 +298,13 @@ message RegisterPlatformImageResponse {
   // False when an image of that name already existed, in which case image is
   // the existing record, untouched.
   bool created = 2;
+}
+
+message CountImagesReferencingSecretRequest {
+  string secret_id = 1; // UUID
+}
+
+message CountImagesReferencingSecretResponse {
+  int32 count = 1;
+  repeated string image_ids = 2;
 }
