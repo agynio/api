@@ -13,12 +13,19 @@ service TerminalProxyService {
 // platform-defined and bound into the ticket at issuance, so a client never
 // supplies one and cannot change it at attach time.
 enum SessionKind {
+  // SHELL_ATTACH (4) was a second interactive kind. Whether a shell outlives
+  // its connection is now a property of the workload, not a choice the caller
+  // makes, so SHELL covers both.
+  reserved 4;
+  reserved "SESSION_KIND_SHELL_ATTACH";
+
   // Rejected with InvalidArgument. It does not default to SHELL: silently
   // defaulting the field that selects a command is how an unintended command
   // ends up in a ticket.
   SESSION_KIND_UNSPECIFIED = 0;
 
-  // A login shell on a PTY. The PTY closes with the connection.
+  // A shell on a PTY. Whether it outlives the connection is decided by the
+  // workload, not by this request.
   SESSION_KIND_SHELL = 1;
 
   // A caller-supplied command on a PTY. Carries no more privilege than SHELL —
@@ -29,10 +36,6 @@ enum SessionKind {
   // separate from stderr so diagnostics cannot corrupt protocol frames.
   SESSION_KIND_SYNC = 3;
 
-  // A PTY on a named shell that outlives the session. Attaches to shell_id,
-  // creating it when it does not exist. A second session on the same shell
-  // displaces the first.
-  SESSION_KIND_SHELL_ATTACH = 4;
 }
 
 message IssueTicketRequest {
@@ -54,13 +57,13 @@ message IssueTicketRequest {
   // resolved against the real filesystem inside the container.
   string sync_root = 6;
 
-  // Names the shell. Required when kind is SHELL_ATTACH, ignored otherwise.
-  // Client-generated and opaque, matching ^[A-Za-z0-9_-]{1,64}$.
+  // Names the shell to attach to. Optional; meaningful only when kind is
+  // SHELL and the workload keeps shells. Client-generated and opaque,
+  // matching ^[A-Za-z0-9_-]{1,64}$.
   string shell_id = 7;
 
-  // Working directory for the shell. Optional; meaningful only when kind is
-  // SHELL_ATTACH. Applied when the shell is created and ignored when it
-  // already exists. Must be absolute.
+  // Working directory for the shell. Optional; applied when the shell is
+  // created and ignored when it already exists. Must be absolute.
   string shell_cwd = 8;
 }
 

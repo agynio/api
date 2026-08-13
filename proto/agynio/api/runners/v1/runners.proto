@@ -395,6 +395,9 @@ message Workload {
   int64 allocated_ram_bytes = 14;
   // Flavor the workload started on. Empty when it started without an environment.
   string flavor = 26;
+  // Whether shells in this workload outlive the connections that reach them.
+  // Resolved from the environment at start and fixed for the workload's life.
+  bool persistent_shells = 27;
   // Machine-readable reason for failures when status is WORKLOAD_STATUS_FAILED.
   // When status is not FAILED, this value may be unset or stale.
   optional WorkloadFailureReason failure_reason = 15;
@@ -436,6 +439,8 @@ message CreateWorkloadRequest {
   // Present when owner_kind is RUNTIME_OWNER_KIND_AGENT_INSTANCE; absent otherwise.
   optional string agent_instance_id = 14;
   string flavor = 15;
+  // Whether shells in this workload outlive the connections that reach them.
+  bool persistent_shells = 16;
 }
 
 message CreateWorkloadResponse {
