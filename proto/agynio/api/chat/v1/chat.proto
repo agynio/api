@@ -27,6 +27,8 @@ service ChatService {
   // Delegates to Threads.UpdateThread using the authenticated identity_id.
   rpc UpdateChat(UpdateChatRequest) returns (UpdateChatResponse);
 
+  rpc DeleteChat(DeleteChatRequest) returns (DeleteChatResponse);
+
   // List messages in a chat with pagination.
   // Returns an unread_count derived from Threads.GetUnackedMessageCounts.
   // Read-only — does not change acknowledgment state.
@@ -148,6 +150,16 @@ message UpdateChatRequest {
 message UpdateChatResponse {
   Chat chat = 1;
 }
+
+// ===========================================================================
+// DeleteChat
+// ===========================================================================
+
+message DeleteChatRequest {
+  string chat_id = 1; // UUID
+}
+
+message DeleteChatResponse {}
 
 // ===========================================================================
 // GetMessages
