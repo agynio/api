@@ -594,10 +594,15 @@ message UpdateServiceRequest {
   // Deprecated: use tags_update to distinguish omitted from empty.
   map<string, string> tags = 4 [deprecated = true];
   optional TagsUpdate tags_update = 5;
+  optional RoleAttributesUpdate role_attributes_update = 6;
 }
 
 message TagsUpdate {
   map<string, string> tags = 1;
+}
+
+message RoleAttributesUpdate {
+  repeated string role_attributes = 1;
 }
 
 message UpdateServiceResponse {

@@ -32,3 +32,7 @@ service NetworksGateway {
   rpc DeletePrivateResourceAccess(agynio.api.networks.v1.DeletePrivateResourceAccessRequest) returns (agynio.api.networks.v1.DeletePrivateResourceAccessResponse);
   rpc ListPrivateResourceAccess(agynio.api.networks.v1.ListPrivateResourceAccessRequest) returns (agynio.api.networks.v1.ListPrivateResourceAccessResponse);
 }
+
+// SetPrivateResourceMediation and ListPrivateResourcesReachableBy are
+// deliberately absent: they are internal calls from the EgressRules service,
+// and the Gateway is the external surface.
