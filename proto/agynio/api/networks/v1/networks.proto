@@ -32,6 +32,10 @@ service NetworksService {
   rpc CreatePrivateResourceAccess(CreatePrivateResourceAccessRequest) returns (CreatePrivateResourceAccessResponse);
   rpc DeletePrivateResourceAccess(DeletePrivateResourceAccessRequest) returns (DeletePrivateResourceAccessResponse);
   rpc ListPrivateResourceAccess(ListPrivateResourceAccessRequest) returns (ListPrivateResourceAccessResponse);
+
+  // --- Internal ---
+  rpc SetPrivateResourceMediation(SetPrivateResourceMediationRequest) returns (SetPrivateResourceMediationResponse);
+  rpc ListPrivateResourcesReachableBy(ListPrivateResourcesReachableByRequest) returns (ListPrivateResourcesReachableByResponse);
 }
 
 // Metadata shared by network resources.
@@ -69,6 +73,12 @@ enum PrivateResourceProtocol {
   PRIVATE_RESOURCE_PROTOCOL_TCP = 1;
   PRIVATE_RESOURCE_PROTOCOL_HTTP = 2;
   PRIVATE_RESOURCE_PROTOCOL_HTTPS = 3;
+}
+
+enum PrivateResourceMediation {
+  PRIVATE_RESOURCE_MEDIATION_UNSPECIFIED = 0;
+  PRIVATE_RESOURCE_MEDIATION_TUNNEL = 1;
+  PRIVATE_RESOURCE_MEDIATION_EGRESS_GATEWAY = 2;
 }
 
 // Principal types eligible for private resource access.
@@ -118,6 +128,7 @@ message PrivateResource {
   // Numeric intercept ports. Each value must be in the range 1..65535.
   repeated int32 intercept_ports = 9;
   ProvisioningState provisioning_state = 10;
+  PrivateResourceMediation mediation = 11;
 }
 
 // Immutable grant authorizing a principal to dial a private resource.
@@ -303,4 +314,36 @@ message ListPrivateResourceAccessRequest {
 message ListPrivateResourceAccessResponse {
   repeated PrivateResourceAccess private_resource_access = 1;
   string next_page_token = 2;
+}
+
+message SetPrivateResourceMediationRequest {
+  string id = 1;
+  PrivateResourceMediation mediation = 2;
+}
+
+message SetPrivateResourceMediationResponse {
+  PrivateResource private_resource = 1;
+}
+
+message ReachablePrivateResourceGrant {
+  PrivateResourceAccessPrincipalType principal_type = 1;
+  string principal_id = 2;
+}
+
+message ReachablePrivateResource {
+  string id = 1;
+  string intercept_host = 2;
+  repeated int32 intercept_ports = 3;
+  repeated ReachablePrivateResourceGrant grants = 4;
+}
+
+message ListPrivateResourcesReachableByRequest {
+  oneof principal {
+    string agent_id = 1;
+    string environment_id = 2;
+  }
+}
+
+message ListPrivateResourcesReachableByResponse {
+  repeated ReachablePrivateResource private_resources = 1;
 }
