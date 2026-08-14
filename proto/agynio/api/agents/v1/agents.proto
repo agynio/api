@@ -627,6 +627,9 @@ message Environment {
   // Vendor model names a native-mode workload may request, enforced by the LLM
   // Proxy. Empty means no restriction. Ignored in platform mode.
   repeated string llm_allowed_models = 15;
+  // Whether shells in workloads here outlive the connections that reach them.
+  // Defaults to true.
+  bool persistent_shells = 16;
 }
 
 message CreateEnvironmentRequest {
@@ -644,6 +647,8 @@ message CreateEnvironmentRequest {
   // Unspecified defaults to PLATFORM.
   LLMMode llm_mode = 12;
   repeated string llm_allowed_models = 13;
+  // Unset defaults to true.
+  optional bool persistent_shells = 14;
 }
 
 message CreateEnvironmentResponse {
@@ -676,6 +681,7 @@ message UpdateEnvironmentRequest {
   optional LLMMode llm_mode = 12;
   // Replaces the existing list; an empty list clears the allowlist.
   repeated string llm_allowed_models = 13;
+  optional bool persistent_shells = 14;
 }
 
 message UpdateEnvironmentResponse {
