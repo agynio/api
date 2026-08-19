@@ -36,6 +36,8 @@ service NetworksService {
   // --- Internal ---
   rpc SetPrivateResourceMediation(SetPrivateResourceMediationRequest) returns (SetPrivateResourceMediationResponse);
   rpc ListPrivateResourcesReachableBy(ListPrivateResourcesReachableByRequest) returns (ListPrivateResourcesReachableByResponse);
+
+  rpc DeleteOrganizationResources(DeleteOrganizationResourcesRequest) returns (DeleteOrganizationResourcesResponse);
 }
 
 // Metadata shared by network resources.
@@ -347,3 +349,9 @@ message ListPrivateResourcesReachableByRequest {
 message ListPrivateResourcesReachableByResponse {
   repeated ReachablePrivateResource private_resources = 1;
 }
+
+message DeleteOrganizationResourcesRequest {
+  string organization_id = 1;
+}
+
+message DeleteOrganizationResourcesResponse {}

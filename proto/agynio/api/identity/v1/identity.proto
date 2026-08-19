@@ -25,6 +25,8 @@ service IdentityService {
   // BatchGetNicknames resolves identity IDs to nicknames within an org.
   // Unknown or unset nicknames are omitted from the response.
   rpc BatchGetNicknames(BatchGetNicknamesRequest) returns (BatchGetNicknamesResponse);
+
+  rpc DeleteOrganizationResources(DeleteOrganizationResourcesRequest) returns (DeleteOrganizationResourcesResponse);
 }
 
 enum IdentityType {
@@ -125,3 +127,9 @@ message NicknameEntry {
 message BatchGetNicknamesResponse {
   repeated NicknameEntry entries = 1;
 }
+
+message DeleteOrganizationResourcesRequest {
+  string organization_id = 1;
+}
+
+message DeleteOrganizationResourcesResponse {}

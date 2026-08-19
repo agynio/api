@@ -67,6 +67,8 @@ service RunnersService {
   rpc ListVolumesByThread(ListVolumesByThreadRequest) returns (ListVolumesByThreadResponse);
   rpc ListVolumesByAgentInstance(ListVolumesByAgentInstanceRequest) returns (ListVolumesByAgentInstanceResponse);
   rpc BatchUpdateVolumeSampledAt(BatchUpdateVolumeSampledAtRequest) returns (BatchUpdateVolumeSampledAtResponse);
+
+  rpc DeleteOrganizationResources(DeleteOrganizationResourcesRequest) returns (DeleteOrganizationResourcesResponse);
 }
 
 // ===========================================================================
@@ -776,3 +778,9 @@ message BatchUpdateVolumeSampledAtRequest {
 }
 
 message BatchUpdateVolumeSampledAtResponse {}
+
+message DeleteOrganizationResourcesRequest {
+  string organization_id = 1;
+}
+
+message DeleteOrganizationResourcesResponse {}
