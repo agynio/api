@@ -45,6 +45,8 @@ service LLMService {
   // --- Internal ---
   // Secrets -> refuse deleting a secret a subscription references.
   rpc CountSubscriptionsReferencingSecret(CountSubscriptionsReferencingSecretRequest) returns (CountSubscriptionsReferencingSecretResponse);
+
+  rpc DeleteOrganizationResources(DeleteOrganizationResourcesRequest) returns (DeleteOrganizationResourcesResponse);
 }
 
 // ===========================================================================
@@ -397,3 +399,9 @@ message ResolveSubscriptionResponse {
   repeated string allowed_models = 6;
   string organization_id = 7; // UUID
 }
+
+message DeleteOrganizationResourcesRequest {
+  string organization_id = 1;
+}
+
+message DeleteOrganizationResourcesResponse {}
