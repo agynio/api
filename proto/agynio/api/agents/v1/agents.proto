@@ -1464,6 +1464,7 @@ message InitScript {
     string hook_id = 6 [deprecated = true];
     string environment_id = 7;
   }
+  string name = 7;
 }
 
 message CreateInitScriptRequest {
@@ -1475,6 +1476,7 @@ message CreateInitScriptRequest {
     string hook_id = 5 [deprecated = true];
     string environment_id = 6;
   }
+  string name = 6;
 }
 
 message CreateInitScriptResponse {
@@ -1493,6 +1495,7 @@ message UpdateInitScriptRequest {
   string id = 1; // UUID
   optional string script = 2;
   optional string description = 3;
+  optional string name = 4;
 }
 
 message UpdateInitScriptResponse {
