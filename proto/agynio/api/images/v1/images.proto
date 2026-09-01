@@ -36,6 +36,8 @@ service ImagesService {
   // Count the images holding a secret by reference. Called by the Secrets
   // service before a delete.
   rpc CountImagesReferencingSecret(CountImagesReferencingSecretRequest) returns (CountImagesReferencingSecretResponse);
+
+  rpc DeleteOrganizationResources(DeleteOrganizationResourcesRequest) returns (DeleteOrganizationResourcesResponse);
 }
 
 // ===========================================================================
@@ -308,3 +310,9 @@ message CountImagesReferencingSecretResponse {
   int32 count = 1;
   repeated string image_ids = 2;
 }
+
+message DeleteOrganizationResourcesRequest {
+  string organization_id = 1;
+}
+
+message DeleteOrganizationResourcesResponse {}

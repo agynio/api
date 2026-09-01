@@ -42,6 +42,8 @@ service ChatService {
   // Mark messages as read for the authenticated user.
   // Delegates to Threads.AckMessages using the authenticated identity_id.
   rpc MarkAsRead(MarkAsReadRequest) returns (MarkAsReadResponse);
+
+  rpc DeleteOrganizationResources(DeleteOrganizationResourcesRequest) returns (DeleteOrganizationResourcesResponse);
 }
 
 // ===========================================================================
@@ -212,3 +214,9 @@ message MarkAsReadResponse {
   // IDs are silently ignored for idempotency.
   int32 read_count = 1;
 }
+
+message DeleteOrganizationResourcesRequest {
+  string organization_id = 1;
+}
+
+message DeleteOrganizationResourcesResponse {}

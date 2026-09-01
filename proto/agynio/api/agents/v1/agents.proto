@@ -146,6 +146,8 @@ service AgentsService {
   rpc ListImagePullSecretAttachments(ListImagePullSecretAttachmentsRequest) returns (ListImagePullSecretAttachmentsResponse) {
     option deprecated = true;
   }
+
+  rpc DeleteOrganizationResources(DeleteOrganizationResourcesRequest) returns (DeleteOrganizationResourcesResponse);
 }
 
 // ===========================================================================
@@ -1518,3 +1520,9 @@ message ListInitScriptsResponse {
   repeated InitScript init_scripts = 1;
   string next_page_token = 2;
 }
+
+message DeleteOrganizationResourcesRequest {
+  string organization_id = 1;
+}
+
+message DeleteOrganizationResourcesResponse {}

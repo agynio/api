@@ -46,6 +46,8 @@ service AppsService {
   rpc AppendInstallationAuditLogEntry(AppendInstallationAuditLogEntryRequest) returns (AppendInstallationAuditLogEntryResponse);
   // List audit log entries for an installation.
   rpc ListInstallationAuditLogEntries(ListInstallationAuditLogEntriesRequest) returns (ListInstallationAuditLogEntriesResponse);
+
+  rpc DeleteOrganizationResources(DeleteOrganizationResourcesRequest) returns (DeleteOrganizationResourcesResponse);
 }
 
 message EntityMeta {
@@ -300,3 +302,9 @@ message ListInstallationAuditLogEntriesResponse {
   repeated InstallationAuditLogEntry entries = 1;
   string next_page_token = 2;
 }
+
+message DeleteOrganizationResourcesRequest {
+  string organization_id = 1;
+}
+
+message DeleteOrganizationResourcesResponse {}

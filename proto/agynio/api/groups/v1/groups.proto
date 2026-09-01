@@ -23,6 +23,8 @@ service GroupsService {
 
   // --- Internal ---
   rpc ListMemberGroupsBatch(ListMemberGroupsBatchRequest) returns (ListMemberGroupsBatchResponse);
+
+  rpc DeleteOrganizationResources(DeleteOrganizationResourcesRequest) returns (DeleteOrganizationResourcesResponse);
 }
 
 // Metadata shared by groups resources.
@@ -170,3 +172,9 @@ message ListMemberGroupsBatchEntry {
 message ListMemberGroupsBatchResponse {
   repeated ListMemberGroupsBatchEntry entries = 1;
 }
+
+message DeleteOrganizationResourcesRequest {
+  string organization_id = 1;
+}
+
+message DeleteOrganizationResourcesResponse {}

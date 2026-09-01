@@ -58,6 +58,12 @@ enum MembershipStatus {
   MEMBERSHIP_STATUS_ACTIVE = 2;
 }
 
+enum OrganizationState {
+  ORGANIZATION_STATE_UNSPECIFIED = 0;
+  ORGANIZATION_STATE_ACTIVE = 1;
+  ORGANIZATION_STATE_DELETING = 2;
+}
+
 // ===========================================================================
 // Organization
 // ===========================================================================
@@ -74,6 +80,8 @@ message Organization {
   // proxy reference. Max 64 chars, pattern ^[a-z0-9-]+$.
   string slug = 7;
   string sandbox_max_idle_timeout = 8;
+  OrganizationState state = 9;
+  string deletion_step = 10;
 }
 
 message CreateOrganizationRequest {

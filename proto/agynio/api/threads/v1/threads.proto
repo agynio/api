@@ -52,6 +52,8 @@ service ThreadsService {
 
   // Acknowledge messages as processed by a participant.
   rpc AckMessages(AckMessagesRequest) returns (AckMessagesResponse);
+
+  rpc DeleteOrganizationResources(DeleteOrganizationResourcesRequest) returns (DeleteOrganizationResourcesResponse);
 }
 
 // ===========================================================================
@@ -372,3 +374,9 @@ message AckMessagesResponse {
   // retried ack requests do not fail.
   int32 acked_count = 1;
 }
+
+message DeleteOrganizationResourcesRequest {
+  string organization_id = 1;
+}
+
+message DeleteOrganizationResourcesResponse {}
