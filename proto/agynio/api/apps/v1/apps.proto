@@ -286,6 +286,17 @@ message GetInstallationConfigurationResponse {
   google.protobuf.Struct configuration = 1;
 }
 
+// ConfigurationValidationFailure is attached as an error detail when a
+// configuration is rejected, naming each property that failed.
+message ConfigurationValidationFailure {
+  repeated ConfigurationPropertyError errors = 1;
+}
+
+message ConfigurationPropertyError {
+  string property = 1;
+  string message = 2;
+}
+
 message ReportConfigurationSchemaRequest {
   string app_id = 1;
   google.protobuf.Struct configuration_schema = 2;
