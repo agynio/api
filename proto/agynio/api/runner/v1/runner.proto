@@ -85,6 +85,14 @@ message VolumeSpec {
   // Labels applied to the persistent volume claim.
   map<string, string> labels = 4;
 
+  // Requested capacity for a named volume (e.g. "1Gi"). Empty uses the
+  // runner's default.
+  string size = 5;
+
+  // Storage class catalog name for a named volume. Empty uses the runner's
+  // default.
+  string storage_class = 6;
+
   map<string, string> additional_properties = 100;
 }
 
