@@ -85,6 +85,10 @@ message VolumeSpec {
   // Labels applied to the persistent volume claim.
   map<string, string> labels = 4;
 
+  string size = 5;
+
+  string storage_class = 6;
+
   map<string, string> additional_properties = 100;
 }
 
