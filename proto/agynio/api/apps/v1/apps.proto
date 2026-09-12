@@ -98,13 +98,8 @@ message Installation {
   string app_id = 2;
   string organization_id = 3;
   string slug = 4;
-  // Properties marked x-agyn-secret in the app's configuration_schema are
-  // omitted here on every read path except GetInstallationConfiguration.
   google.protobuf.Struct configuration = 5;
   optional string status = 6;
-  // Names of the x-agyn-secret properties that hold a value. Set on the read
-  // paths where those values are omitted.
-  repeated string secret_keys_set = 7;
 }
 
 enum InstallationAuditLogLevel {
