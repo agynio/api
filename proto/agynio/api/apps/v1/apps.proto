@@ -48,6 +48,8 @@ service AppsService {
   rpc ListInstallationAuditLogEntries(ListInstallationAuditLogEntriesRequest) returns (ListInstallationAuditLogEntriesResponse);
 
   rpc DeleteOrganizationResources(DeleteOrganizationResourcesRequest) returns (DeleteOrganizationResourcesResponse);
+
+  rpc ReportConfigurationSchema(ReportConfigurationSchemaRequest) returns (ReportConfigurationSchemaResponse);
 }
 
 message EntityMeta {
@@ -74,6 +76,11 @@ message App {
   string organization_id = 9;
   AppVisibility visibility = 10;
   repeated string permissions = 11;
+  // JSON Schema for installation configuration. Root is an object with a flat
+  // properties map; property types are string, integer, number, boolean, and
+  // array of string.
+  optional google.protobuf.Struct configuration_schema = 12;
+  optional google.protobuf.Timestamp schema_reported_at = 13;
 }
 
 message AppProfile {
@@ -270,6 +277,24 @@ message GetInstallationConfigurationRequest {
 
 message GetInstallationConfigurationResponse {
   google.protobuf.Struct configuration = 1;
+}
+
+message ConfigurationValidationFailure {
+  repeated ConfigurationPropertyError errors = 1;
+}
+
+message ConfigurationPropertyError {
+  string property = 1;
+  string message = 2;
+}
+
+message ReportConfigurationSchemaRequest {
+  string app_id = 1;
+  google.protobuf.Struct configuration_schema = 2;
+}
+
+message ReportConfigurationSchemaResponse {
+  App app = 1;
 }
 
 message ReportInstallationStatusRequest {

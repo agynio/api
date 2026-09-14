@@ -47,6 +47,17 @@ service LLMService {
   rpc CountSubscriptionsReferencingSecret(CountSubscriptionsReferencingSecretRequest) returns (CountSubscriptionsReferencingSecretResponse);
 
   rpc DeleteOrganizationResources(DeleteOrganizationResourcesRequest) returns (DeleteOrganizationResourcesResponse);
+
+  rpc ResolveModelExists(ResolveModelExistsRequest) returns (ResolveModelExistsResponse);
+}
+
+message ResolveModelExistsRequest {
+  string model_id = 1;
+  string organization_id = 2;
+}
+
+message ResolveModelExistsResponse {
+  bool exists = 1;
 }
 
 // ===========================================================================

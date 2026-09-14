@@ -148,6 +148,27 @@ service AgentsService {
   }
 
   rpc DeleteOrganizationResources(DeleteOrganizationResourcesRequest) returns (DeleteOrganizationResourcesResponse);
+
+  rpc ResolveAgentExists(ResolveAgentExistsRequest) returns (ResolveAgentExistsResponse);
+  rpc ResolveEnvironmentExists(ResolveEnvironmentExistsRequest) returns (ResolveEnvironmentExistsResponse);
+}
+
+message ResolveAgentExistsRequest {
+  string agent_id = 1;
+  string organization_id = 2;
+}
+
+message ResolveAgentExistsResponse {
+  bool exists = 1;
+}
+
+message ResolveEnvironmentExistsRequest {
+  string environment_id = 1;
+  string organization_id = 2;
+}
+
+message ResolveEnvironmentExistsResponse {
+  bool exists = 1;
 }
 
 // ===========================================================================
