@@ -48,8 +48,6 @@ service LLMService {
 
   rpc DeleteOrganizationResources(DeleteOrganizationResourcesRequest) returns (DeleteOrganizationResourcesResponse);
 
-  // Verify a model exists in an organization, for another service validating a
-  // reference before it is persisted.
   rpc ResolveModelExists(ResolveModelExistsRequest) returns (ResolveModelExistsResponse);
 }
 

@@ -149,9 +149,6 @@ service AgentsService {
 
   rpc DeleteOrganizationResources(DeleteOrganizationResourcesRequest) returns (DeleteOrganizationResourcesResponse);
 
-  // --- Internal reference checks ---
-  // Verify a resource exists in an organization, for another service
-  // validating a reference before it is persisted.
   rpc ResolveAgentExists(ResolveAgentExistsRequest) returns (ResolveAgentExistsResponse);
   rpc ResolveEnvironmentExists(ResolveEnvironmentExistsRequest) returns (ResolveEnvironmentExistsResponse);
 }

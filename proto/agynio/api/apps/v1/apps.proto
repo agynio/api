@@ -49,7 +49,6 @@ service AppsService {
 
   rpc DeleteOrganizationResources(DeleteOrganizationResourcesRequest) returns (DeleteOrganizationResourcesResponse);
 
-  // Replace the app's configuration schema with the reported document.
   rpc ReportConfigurationSchema(ReportConfigurationSchemaRequest) returns (ReportConfigurationSchemaResponse);
 }
 
@@ -79,9 +78,8 @@ message App {
   repeated string permissions = 11;
   // JSON Schema for installation configuration. Root is an object with a flat
   // properties map; property types are string, integer, number, boolean, and
-  // array of string. Absent until the app first reports one.
+  // array of string.
   optional google.protobuf.Struct configuration_schema = 12;
-  // When configuration_schema was last reported. Absent while it is.
   optional google.protobuf.Timestamp schema_reported_at = 13;
 }
 
@@ -281,8 +279,6 @@ message GetInstallationConfigurationResponse {
   google.protobuf.Struct configuration = 1;
 }
 
-// ConfigurationValidationFailure is attached as an error detail when a
-// configuration is rejected, naming each property that failed.
 message ConfigurationValidationFailure {
   repeated ConfigurationPropertyError errors = 1;
 }
