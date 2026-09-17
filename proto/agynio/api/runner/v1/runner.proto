@@ -182,6 +182,8 @@ message StartWorkloadRequest {
   // containers that list the path in inline_file_mounts.
   map<string, bytes> inline_files = 10;
 
+  string flavor = 11;
+
   map<string, string> additional_properties = 100;
 }
 
