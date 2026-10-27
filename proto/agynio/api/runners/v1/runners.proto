@@ -49,6 +49,7 @@ service RunnersService {
   rpc UpdateWorkloadStatus(UpdateWorkloadStatusRequest) returns (UpdateWorkloadStatusResponse);
   rpc ReportWorkloadState(ReportWorkloadStateRequest) returns (ReportWorkloadStateResponse);
   rpc TouchWorkload(TouchWorkloadRequest) returns (TouchWorkloadResponse);
+  rpc ReportWorkloadIdle(ReportWorkloadIdleRequest) returns (ReportWorkloadIdleResponse);
   rpc DeleteWorkload(DeleteWorkloadRequest) returns (DeleteWorkloadResponse);
   rpc GetWorkload(GetWorkloadRequest) returns (GetWorkloadResponse);
   rpc ListWorkloadsByThread(ListWorkloadsByThreadRequest) returns (ListWorkloadsByThreadResponse);
@@ -331,6 +332,12 @@ enum WorkloadStatus {
   WORKLOAD_STATUS_STOPPING = 3;
   WORKLOAD_STATUS_STOPPED = 4;
   WORKLOAD_STATUS_FAILED = 5;
+  // Being paused and persisted by the runner.
+  WORKLOAD_STATUS_HIBERNATING = 6;
+  // State persisted on the runner, occupying no compute.
+  WORKLOAD_STATUS_HIBERNATED = 7;
+  // Being resumed from its persisted state.
+  WORKLOAD_STATUS_WAKING = 8;
 }
 
 enum WorkloadAgentState {
@@ -346,6 +353,10 @@ enum WorkloadFailureReason {
   WORKLOAD_FAILURE_REASON_CONFIG_INVALID = 3;
   WORKLOAD_FAILURE_REASON_CRASHLOOP = 4;
   WORKLOAD_FAILURE_REASON_RUNTIME_LOST = 5;
+  // A hibernated workload could not be woken.
+  WORKLOAD_FAILURE_REASON_WAKE_FAILED = 6;
+  // A hibernated workload's persisted state is gone from its runner.
+  WORKLOAD_FAILURE_REASON_SNAPSHOT_LOST = 7;
 }
 
 enum ContainerRole {
@@ -400,6 +411,15 @@ message Workload {
   // Whether shells in this workload outlive the connections that reach them.
   // Resolved from the environment at start and fixed for the workload's life.
   bool persistent_shells = 27;
+  // When the workload most recently entered WORKLOAD_STATUS_HIBERNATED. Unset
+  // while it has never been hibernated or is awake.
+  optional google.protobuf.Timestamp hibernated_at = 28;
+  // When the workload most recently left WORKLOAD_STATUS_HIBERNATED for
+  // WORKLOAD_STATUS_RUNNING. Unset until its first wake.
+  optional google.protobuf.Timestamp woken_at = 29;
+  // Size of the persisted state in bytes. Set while status is
+  // WORKLOAD_STATUS_HIBERNATED; unset while the workload is awake.
+  optional int64 snapshot_size_bytes = 30;
   // Machine-readable reason for failures when status is WORKLOAD_STATUS_FAILED.
   // When status is not FAILED, this value may be unset or stale.
   optional WorkloadFailureReason failure_reason = 15;
@@ -460,6 +480,9 @@ message UpdateWorkloadRequest {
   optional WorkloadFailureReason failure_reason = 7;
   // Human-readable failure detail; not intended for programmatic parsing.
   optional string failure_message = 8;
+  optional google.protobuf.Timestamp hibernated_at = 9;
+  optional google.protobuf.Timestamp woken_at = 10;
+  optional int64 snapshot_size_bytes = 11;
 }
 
 message UpdateWorkloadResponse {
@@ -473,6 +496,8 @@ message ReportWorkloadStateRequest {
   WorkloadStatus status = 4;
   repeated Container containers = 5;
   google.protobuf.Timestamp observed_at = 6;
+  // Size of the persisted state in bytes. Set with WORKLOAD_STATUS_HIBERNATED.
+  optional int64 snapshot_size_bytes = 7;
 }
 
 message ReportWorkloadStateResponse {
@@ -496,6 +521,12 @@ message TouchWorkloadRequest {
 }
 
 message TouchWorkloadResponse {}
+
+message ReportWorkloadIdleRequest {
+  string id = 1;
+}
+
+message ReportWorkloadIdleResponse {}
 
 message DeleteWorkloadRequest {
   string id = 1;

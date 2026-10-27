@@ -15,6 +15,10 @@ service RunnerService {
   rpc StopWorkload(StopWorkloadRequest) returns (StopWorkloadResponse);
   rpc RemoveWorkload(RemoveWorkloadRequest) returns (RemoveWorkloadResponse);
 
+  // Unimplemented on a runner that does not advertise the hibernate capability.
+  rpc HibernateWorkload(HibernateWorkloadRequest) returns (HibernateWorkloadResponse);
+  rpc WakeWorkload(WakeWorkloadRequest) returns (WakeWorkloadResponse);
+
   // Minimal inspect surface with EXACT fields required by platform today.
   rpc InspectWorkload(InspectWorkloadRequest) returns (InspectWorkloadResponse);
 
@@ -221,6 +225,12 @@ enum WorkloadStatus {
   WORKLOAD_STATUS_STARTING = 2;
   WORKLOAD_STATUS_STOPPED = 3;
   WORKLOAD_STATUS_FAILED = 4;
+  // Being paused and persisted by the runner.
+  WORKLOAD_STATUS_HIBERNATING = 5;
+  // State persisted on the runner, occupying no compute.
+  WORKLOAD_STATUS_HIBERNATED = 6;
+  // Being resumed from its persisted state.
+  WORKLOAD_STATUS_WAKING = 7;
 }
 
 message WorkloadFailure {
@@ -243,6 +253,20 @@ message RemoveWorkloadRequest {
 }
 
 message RemoveWorkloadResponse {}
+
+message HibernateWorkloadRequest {
+  string workload_id = 1;
+}
+
+message HibernateWorkloadResponse {}
+
+message WakeWorkloadRequest {
+  string workload_id = 1;
+
+  repeated ImagePullCredential image_pull_credentials = 2;
+}
+
+message WakeWorkloadResponse {}
 
 enum ContainerRole {
   CONTAINER_ROLE_UNSPECIFIED = 0;
@@ -294,6 +318,11 @@ message InspectWorkloadResponse {
   string state_status = 7;
   bool state_running = 8;
   repeated WorkloadContainer containers = 9;
+
+  WorkloadStatus status = 10;
+
+  // Size of the persisted state in bytes. Present when status is HIBERNATED.
+  optional int64 snapshot_size_bytes = 11;
 }
 
 message TargetMount {
@@ -316,6 +345,9 @@ message ListWorkloadsRequest {}
 message WorkloadListItem {
   string instance_id = 1;
   string workload_key = 2;
+  WorkloadStatus status = 3;
+  // Size of the persisted state in bytes. Present when status is HIBERNATED.
+  optional int64 snapshot_size_bytes = 4;
 }
 
 message ListWorkloadsResponse {
