@@ -301,8 +301,10 @@ message Agent {
   // Vendor model name for native mode, opaque to the platform. Mutually
   // exclusive with model, which mode the environment is in decides.
   string model_name = 19;
-  optional string hibernate_after = 20; // Go duration string (e.g., "0s", "30s", "5m").
-  optional string hibernation_ttl = 21; // Go duration string (e.g., "24h", "168h"). Minimum "1h".
+  // Whether this agent's idle workloads are hibernated. Defaults to true.
+  bool hibernate = 20;
+  optional string hibernate_after = 21; // Go duration string (e.g., "0s", "30s", "5m").
+  optional string hibernation_ttl = 22; // Go duration string (e.g., "24h", "168h"). Minimum "1h".
 }
 
 message CreateAgentRequest {
@@ -327,8 +329,10 @@ message CreateAgentRequest {
   optional string instance_idle_ttl = 17; // Go duration string (e.g., "30m", "6h").
   // Required-and-exclusive against model, decided by the environment's llm_mode.
   string model_name = 18;
-  optional string hibernate_after = 19; // Go duration string (e.g., "0s", "30s", "5m").
-  optional string hibernation_ttl = 20; // Go duration string (e.g., "24h", "168h"). Minimum "1h".
+  // Unset defaults to true.
+  optional bool hibernate = 19;
+  optional string hibernate_after = 20; // Go duration string (e.g., "0s", "30s", "5m").
+  optional string hibernation_ttl = 21; // Go duration string (e.g., "24h", "168h"). Minimum "1h".
 }
 
 message CreateAgentResponse {
@@ -375,8 +379,9 @@ message UpdateAgentRequest {
   optional AgentFinalMessage final_message = 16;
   optional string instance_idle_ttl = 17; // Go duration string (e.g., "30m", "6h").
   optional string model_name = 18;
-  optional string hibernate_after = 19; // Go duration string (e.g., "0s", "30s", "5m").
-  optional string hibernation_ttl = 20; // Go duration string (e.g., "24h", "168h"). Minimum "1h".
+  optional bool hibernate = 19;
+  optional string hibernate_after = 20; // Go duration string (e.g., "0s", "30s", "5m").
+  optional string hibernation_ttl = 21; // Go duration string (e.g., "24h", "168h"). Minimum "1h".
 }
 
 message UpdateAgentResponse {
