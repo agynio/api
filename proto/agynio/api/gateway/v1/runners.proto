@@ -34,6 +34,7 @@ service RunnersGateway {
   rpc ListWorkloadsByAgentInstance(agynio.api.runners.v1.ListWorkloadsByAgentInstanceRequest) returns (agynio.api.runners.v1.ListWorkloadsByAgentInstanceResponse);
   rpc GetWorkload(agynio.api.runners.v1.GetWorkloadRequest) returns (agynio.api.runners.v1.GetWorkloadResponse);
   rpc TouchWorkload(agynio.api.runners.v1.TouchWorkloadRequest) returns (agynio.api.runners.v1.TouchWorkloadResponse);
+  rpc ReportWorkloadIdle(agynio.api.runners.v1.ReportWorkloadIdleRequest) returns (agynio.api.runners.v1.ReportWorkloadIdleResponse);
   rpc StreamWorkloadLogs(agynio.api.runner.v1.StreamWorkloadLogsRequest) returns (stream agynio.api.runner.v1.StreamWorkloadLogsResponse);
 
   // --- Volumes ---
